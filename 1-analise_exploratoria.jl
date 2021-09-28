@@ -25,6 +25,13 @@ html"""
 <p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp<b>Análise Exploratória</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
 """
 
+# ╔═╡ cfc649b3-e423-4aa9-925b-763e2986e2f5
+md"""
+
+![ufmg-logo](https://logodownload.org/wp-content/uploads/2015/02/ufmg-logo-2.png)
+
+"""
+
 # ╔═╡ b53bfda4-60de-43c8-9852-faa1051050e2
 md""" # 📊 Análise Exploratória
 
@@ -183,7 +190,7 @@ Crie uma função `raiz` que retorne a raíz quadrada de cada um dos elementos d
 """
 
 # ╔═╡ bb887c83-8982-4f66-a91a-6b147979bd1b
-raiz(vetor) = missing
+raiz(vetor) = .√vetor
 
 # ╔═╡ f9da8fe7-7a17-42b1-a436-d40a38a3efad
 md" As **matrizes** podem ser escritas como... "
@@ -193,7 +200,7 @@ A = [1 2
 	 3 4]
 
 # ╔═╡ 2b181f17-724d-4607-9cb1-328985fbc8d4
-B = [1 2 3; 4 5 6; 7 8 9]
+tabuada = [i * j for i in 1:10, j in 1:10]
 
 # ╔═╡ c8d9a673-ad1f-4fff-b448-b01d830ba174
 md" Os **tensores** podem ser escritos como... "
@@ -1967,8 +1974,9 @@ version = "0.9.1+5"
 
 # ╔═╡ Cell order:
 # ╟─9aed0800-1e13-11ec-2780-69699771cc17
-# ╟─5e44a696-0a3e-40f1-b125-2dec95b5cf79
 # ╟─67ed7bd0-32cc-49bf-8c30-6c34ad29c88a
+# ╟─5e44a696-0a3e-40f1-b125-2dec95b5cf79
+# ╟─cfc649b3-e423-4aa9-925b-763e2986e2f5
 # ╟─b53bfda4-60de-43c8-9852-faa1051050e2
 # ╟─1283f745-89d2-4bb9-8af0-fc0c55b510db
 # ╟─8b4a428f-5975-47ea-b46c-2e6a9fb43d3a

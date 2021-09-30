@@ -16,14 +16,14 @@ begin
 	gr(format=:png)
 end;
 
-# ╔═╡ 5e44a696-0a3e-40f1-b125-2dec95b5cf79
-PlutoUI.TableOfContents(aside=true, title="Sumário",
-						indent=true, depth=3)
-
 # ╔═╡ 67ed7bd0-32cc-49bf-8c30-6c34ad29c88a
 html"""
 <p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp<b>Análise Exploratória</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
 """
+
+# ╔═╡ 5e44a696-0a3e-40f1-b125-2dec95b5cf79
+PlutoUI.TableOfContents(aside=true, title="Sumário",
+						indent=true, depth=2)
 
 # ╔═╡ cfc649b3-e423-4aa9-925b-763e2986e2f5
 md"""
@@ -190,7 +190,7 @@ Crie uma função `raiz` que retorne a raíz quadrada de cada um dos elementos d
 """
 
 # ╔═╡ bb887c83-8982-4f66-a91a-6b147979bd1b
-raiz(vetor) = .√vetor
+raiz(vetor) = missing
 
 # ╔═╡ f9da8fe7-7a17-42b1-a436-d40a38a3efad
 md" As **matrizes** podem ser escritas como... "
@@ -327,6 +327,90 @@ md"""
 
 """
 
+# ╔═╡ 9d2655a0-de38-4fde-9fd0-98c703d8a14e
+md"""
+
+### Filtragem dos dados
+
+Em problemas de (geo)ciência de dados, uma das tarefas mais comuns é a **filtragem** de certas linhas do banco de dados de acordo com algumas condições. Para isso, utilizaremos a operação `@filter` também da biblioteca **Query.jl**.
+
+A operação utiliza o símbolo especial `_` para se referir a linha atual da tabela sendo filtrada. Podemos escrever `_.Co` para nos referirmos ao valor da coluna (ou variável) `Co` na linha atual.
+
+Podemos filtrar, por exemplo, apenas as linhas em que `Rock = Kimmeridgiano` e `Co ≥ 15`...
+
+"""
+
+# ╔═╡ f0d24d48-2acb-4924-a3fc-21e2231e8959
+dados |> @filter(_.Rock == "Kimmeridgiano" && _.Co ≥ 15)
+
+# ╔═╡ b1352c54-4336-42d4-afe1-beb20502fc11
+md"""
+
+##### 🖊️ Exercício
+
+Filtre apenas as linhas da tabela `dados` em que a soma dos teores `Cd` e `Co` seja superior a **18 ppm**.
+
+"""
+
+# ╔═╡ 1fccec2e-c9aa-4ce8-a1ef-5a3477c44111
+dados2 = missing
+
+# ╔═╡ 88b48cd9-6a27-47ce-867f-a7b0072802ff
+md"""
+
+### Agrupamento dos dados
+
+Outra tarefa bastante comum e crucial para responder perguntas complexas é o **agrupamento dos dados** por uma variável categórica (e.g. litologia, zona mineralizada). Para isso, utilizaremos as operações `@groupby` e `@map`.
+
+A operação `@map` possui uma sintaxe um pouco mais complexa:
+
+```julia
+@map({col1 = exp1, col2 = exp2, ..., coln = expn})
+```
+
+Neste formato, estamos criando novas colunas `col1`, `col2`, ..., `coln` a partir de diferentes expressões `exp1`, `exp2`, ..., `expn` em função de outras colunas.
+
+Para exemplificar o formato, vamos calcular o número de amostras por litologia, bem como a média da variável `Cr` por litologia. Para fazer isso, utilizaremos as funções `length` (contagem/tamanho) e `mean` (média).
+
+Três colunas serão geradas no relatório: `rocha` que representa os valores de litologia, `contagem` o número de amostras por litologia e `μCr` a média de Cr (ppm) por litologia.
+
+Tudo isso pode ser feito em apenas uma linha...
+
+"""
+
+# ╔═╡ 50089575-c317-496f-a2e6-2853ed300f87
+dados |> @groupby(_.Rock) |> @map({rock = key(_),
+								   contagem = length(_),
+								   μCr = mean(_.Cr)})
+
+# ╔═╡ 17702ab7-6bde-46eb-940c-4824d4411ca2
+md"""
+
+A função `key(_)` retorna os valores da variável utilizada no agrupamento que, neste caso, foi a variável `Rock`. Essa variável assume os valores `Sequaniano`, `Kimmeridgiano`, `Quaternario`, `Argoviano` e `Portlandiano`
+"""
+
+# ╔═╡ 279b4f1e-5592-4fb4-a38e-599a0b4299b3
+md"""
+
+##### 🖊️ Exercício
+
+Construa uma consulta que verifique quais tipos de ocupação ocorrem por litologia. Utilize os atributos `Rock` e `Landuse` nessa ordem para obter o relatório.
+
+"""
+
+# ╔═╡ 2e4356e0-b963-43d9-89a0-9a24616a6303
+dados3 = missing
+
+# ╔═╡ e9b24f45-62e5-4d1e-b092-e9c306f2e36f
+md"""
+
+## 4. Visualização dos dados
+
+"""
+
+# ╔═╡ d409376e-a795-46ac-9d0d-b90aac30fc17
+
+
 # ╔═╡ e15fb49d-ba55-46d2-ae3c-bf4f1c70c3b8
 begin
 	hint(text) = Markdown.MD(Markdown.Admonition("hint", "Dica", [text]))
@@ -416,6 +500,39 @@ end
 
 # ╔═╡ 4737ed5b-73db-4daa-b464-8870bae8e242
 hint(md"Utilize a operação `@replacena`")
+
+# ╔═╡ ee8b4b8b-425d-4672-8a9b-accb779dd0ca
+begin
+	scored5 = false
+	if ismissing(dados2)
+		still_missing()
+	elseif dados2 |> DataFrame == (dados |> @filter(_.Cd + _.Co > 18) |> DataFrame)
+		scored5 = true
+		correct()
+	else
+		keep_working()
+	end
+end
+
+# ╔═╡ 05072307-77fc-4915-8326-c1450e1766ec
+hint(md"Faça uma analogia com o exemplo anterior...")
+
+# ╔═╡ af6c6d38-4bb8-4925-9828-9780e68fa608
+begin
+	scored6 = false
+	if ismissing(dados3)
+		still_missing()
+	elseif dados3 |> DataFrame == (dados |> @groupby(_.Rock) |> @map({rocha = key(_),
+											uso = unique(_.Landuse)}) |> DataFrame)
+		scored6 = true
+		correct()
+	else
+		keep_working()
+	end
+end
+
+# ╔═╡ 39d947bb-e575-4b66-bf51-7e2bdeabe503
+hint(md"Utilize um raciocínio análogo ao exemplo anterior e a função `unique`.")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -2032,6 +2149,21 @@ version = "0.9.1+5"
 # ╟─4cd26967-a0c1-4d14-9ee3-645129d782dd
 # ╟─4737ed5b-73db-4daa-b464-8870bae8e242
 # ╟─f6142765-32bf-46a8-ac66-ea5fd8dc8797
+# ╟─9d2655a0-de38-4fde-9fd0-98c703d8a14e
+# ╠═f0d24d48-2acb-4924-a3fc-21e2231e8959
+# ╟─b1352c54-4336-42d4-afe1-beb20502fc11
+# ╠═1fccec2e-c9aa-4ce8-a1ef-5a3477c44111
+# ╟─ee8b4b8b-425d-4672-8a9b-accb779dd0ca
+# ╟─05072307-77fc-4915-8326-c1450e1766ec
+# ╟─88b48cd9-6a27-47ce-867f-a7b0072802ff
+# ╠═50089575-c317-496f-a2e6-2853ed300f87
+# ╟─17702ab7-6bde-46eb-940c-4824d4411ca2
+# ╟─279b4f1e-5592-4fb4-a38e-599a0b4299b3
+# ╠═2e4356e0-b963-43d9-89a0-9a24616a6303
+# ╟─af6c6d38-4bb8-4925-9828-9780e68fa608
+# ╟─39d947bb-e575-4b66-bf51-7e2bdeabe503
+# ╟─e9b24f45-62e5-4d1e-b092-e9c306f2e36f
+# ╠═d409376e-a795-46ac-9d0d-b90aac30fc17
 # ╟─e15fb49d-ba55-46d2-ae3c-bf4f1c70c3b8
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

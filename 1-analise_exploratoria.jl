@@ -199,6 +199,9 @@ md" As **matrizes** podem ser escritas como... "
 A = [1 2
 	 3 4]
 
+# ╔═╡ 2b936f77-1af0-49d2-b6d2-2a3a912d5602
+B = [1 2 3; 4 5 6; 7 8 9]
+
 # ╔═╡ 2b181f17-724d-4607-9cb1-328985fbc8d4
 tabuada = [i * j for i in 1:10, j in 1:10]
 
@@ -241,6 +244,9 @@ Crie uma função `tiporocha` que recebe o nome de uma rocha e retorna o seu tip
 function tiporocha(rocha)
 	missing
 end
+
+# ╔═╡ 21daf2f4-fb73-439b-9fb8-0ffda6265083
+md"---"
 
 # ╔═╡ 966a59b1-f8b8-4612-ab4d-ff7ec2a569d9
 md"""
@@ -306,7 +312,7 @@ Nesse caso, iremos eliminar as linhas da tabela que contenham valores faltantes 
 # ╔═╡ 1014b88e-9aad-4e89-ba9d-f7701fc1a812
 dados = jura |> @dropna() |> @rename(:Xloc => :X, :Yloc => :Y,
 								     :cadmio => :Cd, :cobalto => :Co,
-									 :niquel => :Ni, :chumbo => :Pb)
+									 :niquel => :Ni, :chumbo => :Pb) |> DataFrame
 
 # ╔═╡ e5e744d6-41e6-45f3-b4a3-fc8d08911eb1
 md"""
@@ -319,6 +325,9 @@ Utilizando a [documentação](http://www.queryverse.org/Query.jl/stable/standalo
 
 # ╔═╡ 96d6f64f-fe3d-40e9-93f1-77b2a57cbb39
 dados1 = missing
+
+# ╔═╡ c07352bf-7f1f-40bb-a32c-d9f5b62a9b89
+md"---"
 
 # ╔═╡ f6142765-32bf-46a8-ac66-ea5fd8dc8797
 md"""
@@ -401,15 +410,73 @@ Construa uma consulta que verifique quais tipos de ocupação ocorrem por litolo
 # ╔═╡ 2e4356e0-b963-43d9-89a0-9a24616a6303
 dados3 = missing
 
+# ╔═╡ aade9e29-135e-4790-8fac-08e9e5de9b8d
+md"---"
+
 # ╔═╡ e9b24f45-62e5-4d1e-b092-e9c306f2e36f
 md"""
 
 ## 4. Visualização dos dados
 
+Além de consultas e estatísticas, outra estratégia crucial para responder perguntas é a **visualização dos dados**. Na Ciência de Dados tradicional, o espaço de visualização está associado aos valores assumidos pelas variáveis e é denominado **espaço de atributos**.
+
+Por outro lado, na **Geo**ciência de Dados, além do espaço de atributos, existe ainda o **espaço geográfico**. Portanto, em problemas geocientíficos, iremos nos atentar a dois tipos de espaços de visualização:
+
+1. Espaço de Atributos
+2. Espaço Geográfico
+
+Para investigar esses espaços, iremos utilizar a biblioteca [StatsPlots.jl](https://github.com/JuliaPlots/StatsPlots.jl) que tem uma boa interação com o pacote **Query.jl**. Uma das visualizações mais importantes para o geocientista de dados é o mapa de localização que, por sua vez, ilustra a posição das amostras no espaço geográfico. As amostras desse mapa podem ser coloridas de acordo com alguma variável, como `Rock`...
+
 """
 
 # ╔═╡ d409376e-a795-46ac-9d0d-b90aac30fc17
+dados |> @df scatter(:X, :Y, group = :Rock, marker = (:circle,4),
+					 markerstrokewidth=0.5, markerstrokecolor = :black,
+					 legend=:topleft, xlabel = "X", ylabel="Y",
+					 title="Mapa de Localização")
 
+# ╔═╡ cc8c8381-bfc5-4f7a-b324-1afb782d133a
+md"""
+
+##### 🖊️ Exercício
+
+Construa um mapa de localização colorido pela variável `Cr`.
+
+"""
+
+# ╔═╡ 639fc300-f464-41a2-8e66-05c5efa45ccf
+
+
+# ╔═╡ 1ada5973-e579-404f-9748-6dc02168c4f8
+md"""
+
+### Filtragem e visualização dos dados
+
+Um tipo de investigação extremamente importante na Geoestatística é a visualização dos **high grades**. Quando não se tem muito conhecimento acerca de um depósito mineral, uma prática comum, para fins de exploração dos dados, é considerar que os high grades são amostras cujo teor é superior ao **percentil 90 (P90%)**.
+
+Para exemplificar essa situação, consideremos a variável `Co`. Podemos facilmente gerar essa visualização, utilizando as funções `@filter` (filtragem dos dados), `quantile` (cálculo do percentil/quantil) e `scatter` (diagrama de dispersão/scatter plot)...
+
+"""
+
+# ╔═╡ 5608b405-6f5d-451e-8107-b7b7831b4caa
+begin
+	# cálculo do P90
+	P90 = quantile(dados.Co, 0.9)
+	
+	# filtragem + visualização
+	dados |> @filter(_.Co > P90) |>
+			 @df scatter(:X, :Y, group = :Rock, marker = (:circle,4),
+					 	 markerstrokewidth=0.5, markerstrokecolor = :black,
+					 	 legend=:topleft, xlabel = "X", ylabel="Y")
+end
+
+# ╔═╡ 33b2c85c-e186-4f20-996e-65ef370b561b
+md"""
+
+### Interatividade
+
+
+"""
 
 # ╔═╡ e15fb49d-ba55-46d2-ae3c-bf4f1c70c3b8
 begin
@@ -533,6 +600,9 @@ end
 
 # ╔═╡ 39d947bb-e575-4b66-bf51-7e2bdeabe503
 hint(md"Utilize um raciocínio análogo ao exemplo anterior e a função `unique`.")
+
+# ╔═╡ 1bd337bb-f36a-4bcc-ae15-2e5147db4d4f
+hint(md"O exercício é análogo ao exemplo anterior. No lugar do argumento `group`, utilize `marker_z`. O argumento `color` define a paleta da barra de cores.")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -2128,6 +2198,7 @@ version = "0.9.1+5"
 # ╟─6241b02d-d5cc-4ed0-a40d-bcd6a96a39bc
 # ╟─f9da8fe7-7a17-42b1-a436-d40a38a3efad
 # ╠═7fb8137b-d19a-4b8b-947e-65c0eba7c3b5
+# ╠═2b936f77-1af0-49d2-b6d2-2a3a912d5602
 # ╠═2b181f17-724d-4607-9cb1-328985fbc8d4
 # ╟─c8d9a673-ad1f-4fff-b448-b01d830ba174
 # ╠═8ba85fcf-0a04-4a1e-a7f3-6bf506c20188
@@ -2136,6 +2207,7 @@ version = "0.9.1+5"
 # ╠═fe2bc798-068c-4bbe-b33f-ab3ab36b5235
 # ╟─04ab436e-021f-46b2-8dc2-7aa374cc6e94
 # ╟─14b46bb2-17d2-4bdd-938c-05a8cef1f73f
+# ╟─21daf2f4-fb73-439b-9fb8-0ffda6265083
 # ╟─966a59b1-f8b8-4612-ab4d-ff7ec2a569d9
 # ╟─9b819a7c-53c7-407b-b56b-12c07897ba36
 # ╠═6ded7ce7-4239-4a17-a048-c02982dae5f9
@@ -2148,6 +2220,7 @@ version = "0.9.1+5"
 # ╠═96d6f64f-fe3d-40e9-93f1-77b2a57cbb39
 # ╟─4cd26967-a0c1-4d14-9ee3-645129d782dd
 # ╟─4737ed5b-73db-4daa-b464-8870bae8e242
+# ╟─c07352bf-7f1f-40bb-a32c-d9f5b62a9b89
 # ╟─f6142765-32bf-46a8-ac66-ea5fd8dc8797
 # ╟─9d2655a0-de38-4fde-9fd0-98c703d8a14e
 # ╠═f0d24d48-2acb-4924-a3fc-21e2231e8959
@@ -2162,8 +2235,15 @@ version = "0.9.1+5"
 # ╠═2e4356e0-b963-43d9-89a0-9a24616a6303
 # ╟─af6c6d38-4bb8-4925-9828-9780e68fa608
 # ╟─39d947bb-e575-4b66-bf51-7e2bdeabe503
+# ╟─aade9e29-135e-4790-8fac-08e9e5de9b8d
 # ╟─e9b24f45-62e5-4d1e-b092-e9c306f2e36f
 # ╠═d409376e-a795-46ac-9d0d-b90aac30fc17
+# ╟─cc8c8381-bfc5-4f7a-b324-1afb782d133a
+# ╠═639fc300-f464-41a2-8e66-05c5efa45ccf
+# ╟─1bd337bb-f36a-4bcc-ae15-2e5147db4d4f
+# ╟─1ada5973-e579-404f-9748-6dc02168c4f8
+# ╠═5608b405-6f5d-451e-8107-b7b7831b4caa
+# ╟─33b2c85c-e186-4f20-996e-65ef370b561b
 # ╟─e15fb49d-ba55-46d2-ae3c-bf4f1c70c3b8
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

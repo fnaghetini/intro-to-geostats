@@ -49,209 +49,13 @@ Neste primeiro módulo, os seguintes tópicos serão abordados:
 
 """
 
-# ╔═╡ 1283f745-89d2-4bb9-8af0-fc0c55b510db
-md"""
-
-## 1. Introdução à linguagem Julia
-
-[Julia](https://julialang.org/) é uma linguagem de programação moderna e de propósito geral que possui diversos recursos favoráveis ao desenvolvimento de rotinas geoestatísticas.
-
-A linguagem é *simples* como Python e *rápida* como C 🚀
-
-A seguir, serão apresentados alguns conceitos básicos de programação, como *variáveis*, *funções* e *condicionais*, além de *recursos exclusivos* da linguagem.
-
-"""
-
-# ╔═╡ 8b4a428f-5975-47ea-b46c-2e6a9fb43d3a
-md"""
-
-### Variáveis
-
-As **variáveis** podem ser entendidas como partes da memória (ou "caixas") em que se armazena **valores** de diferentes **tipos** para serem posteriormente processados. Cada variável é identificada ou rotulada por um **nome**.
-
-As variáveis podem ser **numéricas**...
-
-"""
-
-# ╔═╡ dc2a9d07-6c8a-40d9-bc2e-80a1c4c36d01
-numero_inteiro = 10
-
-# ╔═╡ b8e72b8f-5323-48f5-b14f-22bb96472698
-numero_decimal = 15.5
-
-# ╔═╡ 272c9ec7-9e46-4b19-94d8-ee13a6a85249
-md" As variáveis podem armazenar **cadeias de caracteres**... "
-
-# ╔═╡ 1a5ca5db-00a0-4a08-a187-023aa3a020b7
-nome = "Camila"
-
-# ╔═╡ 3de9f1ef-610c-4eb0-b172-39b504381b17
-frase = "Olá, mundo! 🌎"
-
-# ╔═╡ 49245329-3ab5-4760-a909-2fccb98bfaef
-md"""
-
-> **Nota:** as cadeias de caracteres (**strings**) devem ser encapsuladas por áspas duplas.
-
-"""
-
-# ╔═╡ 1638e470-f521-4f4b-81ae-c1e0ce18048f
-md"""
-
-Podemos utilizar *símbolos matemáticos* como nomes das variáveis. Para inserir o símbolo $\alpha$, por exemplo, digita-se `\alpha` + `TAB`. No caso do símbolo $\gamma$, digita-se `\gamma` + `TAB`.
-
-Cique [aqui](https://docs.julialang.org/en/v1/manual/unicode-input/) para acessar a lista completa de símbolos disponíveis.
-
-
-"""
-
-# ╔═╡ 6fd15a42-0f30-4285-bc96-9046ead85762
-β = 2.0
-
-# ╔═╡ c40759aa-11d5-42d0-b3be-88cdbc892405
-ϵ = 0.5
-
-# ╔═╡ 4033821f-41c2-4da4-8adb-8a3aa36abf5b
-β + ϵ
-
-# ╔═╡ 40420118-fea3-40ca-bdcf-8614e73e2f8d
-π
-
-# ╔═╡ e1e8b749-6652-45be-9994-c87eea94196f
-md"""
-
-### Funções
-
-As **funções**, no mundo da computação, são similares às funções matemáticas. De forma geral, uma função recebe valores de **entrada**, processa-os e retorna valores de **saída**.
-
-Em Julia, existem, essencialmente, três maneiras distintas de se construir funções:
-
-"""
-
-# ╔═╡ 35d0c0d2-8708-40e7-bd1c-c6d18c0465b7
-f(χ) = 5χ + 25
-
-# ╔═╡ 6bef6324-737b-436e-9e9d-040de367b15c
-function areatriangulo(b,h)
-	A = (b * h) / 2
-	return A
-end
-
-# ╔═╡ 3884952e-0fec-4778-b928-fbc00d0d2843
-diagonal = l -> l * √2
-
-# ╔═╡ 64ba3047-4cde-4ab4-be59-a226eee13c4d
-f(2) + areatriangulo(10,4) / diagonal(1)
-
-# ╔═╡ ba30218a-d1b3-4153-8cc3-3b6470251d97
-md"""
-
-##### 🖊️ Exercício
-
-Crie uma função `recurso` que retorne a tonelagem em metal contido de um depósito de volume `V`, densidade média `ρ` e teor médio `T` (em %).
-
-
-
-"""
-
-# ╔═╡ 406e228b-eb49-4fe3-aef9-7ae2e8f86515
-recurso(V, ρ, T) = missing
-
-# ╔═╡ e1c28578-0ffa-42ad-a4ea-5a3e760e27ff
-md"""
-
-### Coleções
-
-As **coleções** são conjuntos de elementos, normalmente do mesmo tipo, mas não necessariamente. São exemplos *vetores*, *matrizes* e *tensores*.
-
-Os **vetores** podem ser escritos como...
-
-"""
-
-# ╔═╡ 4fa19fe5-b328-4fcd-b07e-c9a4d4044e23
-vetor1 = [1,2,3,4,5,6,7,8,9,10]
-
-# ╔═╡ 19f97ddb-deda-43d4-9c9b-05a2ee470b8f
-md"...ou podem ser escritos com a sintaxe *list comprehension*... "
-
-# ╔═╡ e4250536-ae9e-4e24-964b-17126f64fb2b
-vetor2 = [i for i in 1:10]
-
-# ╔═╡ f80252bc-4fc8-493c-8f4d-232357864296
-numerospares = [i for i in 1:10 if iseven(i)]
-
-# ╔═╡ dd0ab574-a34b-49bb-b498-736da4f6d0c9
-md"""
-
-##### 🖊️ Exercício
-
-Crie uma função `raiz` que retorne a raíz quadrada de cada um dos elementos de um vetor.
-
-"""
-
-# ╔═╡ bb887c83-8982-4f66-a91a-6b147979bd1b
-raiz(vetor) = missing
-
-# ╔═╡ f9da8fe7-7a17-42b1-a436-d40a38a3efad
-md" As **matrizes** podem ser escritas como... "
-
-# ╔═╡ 7fb8137b-d19a-4b8b-947e-65c0eba7c3b5
-A = [1 2
-	 3 4]
-
-# ╔═╡ 2b936f77-1af0-49d2-b6d2-2a3a912d5602
-B = [1 2 3; 4 5 6; 7 8 9]
-
-# ╔═╡ 2b181f17-724d-4607-9cb1-328985fbc8d4
-tabuada = [i * j for i in 1:10, j in 1:10]
-
-# ╔═╡ c8d9a673-ad1f-4fff-b448-b01d830ba174
-md" Os **tensores** podem ser escritos como... "
-
-# ╔═╡ 8ba85fcf-0a04-4a1e-a7f3-6bf506c20188
-tensor_de_zeros = zeros(5,5,2)
-
-# ╔═╡ 0bfbb34e-3999-492b-b7c1-2a3b787fffa4
-md"""
-
-### Condicionais
-
-As **estruturas condicionais** são utilizadas em situações em que se deseja executar algum trecho de código apenas quando uma **condição** é satisfeita:
-
-```julia
-if quartzo < 20
-   rochaignea != "granitoide"
-else
-   rochaignea = "granitoide"
-end
-```
-"""
-
-# ╔═╡ a1f6558a-83aa-45e0-84d2-6004982e6172
-md"""
-
-##### 🖊️ Exercício
-
-Crie uma função `tiporocha` que recebe o nome de uma rocha e retorna o seu tipo:
-
-* "gabro" → "ígnea"
-* "gnaisse" → "metamórfica"
-* "ritmito" → "sedimentar"
-
-"""
-
-# ╔═╡ fe2bc798-068c-4bbe-b33f-ab3ab36b5235
-function tiporocha(rocha)
-	missing
-end
-
 # ╔═╡ 21daf2f4-fb73-439b-9fb8-0ffda6265083
 md"---"
 
 # ╔═╡ 966a59b1-f8b8-4612-ab4d-ff7ec2a569d9
 md"""
 
-## 2. Importação e limpeza dos dados
+## 1. Importação e limpeza dos dados
 
 A partir desta seção, iremos trabalhar com o banco de dados [Jura](https://rdrr.io/cran/gstat/man/jura.html) do excelente livro [Geostatistics for Natural Resources Evaluation](https://books.google.com.br/books/about/Geostatistics_for_Natural_Resources_Eval.html?id=CW-7tHAaVR0C&redir_esc=y) de **Pierre Goovaerts**.
 
@@ -494,63 +298,6 @@ begin
 
 	not_defined(variable_name) = Markdown.MD(Markdown.Admonition("danger", "Opa!", [md"Tenha certeza que definiu uma variável chamada **$(Markdown.Code(string(variable_name)))**"]))
 end;
-
-# ╔═╡ 5f6d5a73-f1fa-4958-95fb-430cd2d3a3d2
-begin
-	scored1 = false
-	_rec = recurso(12500000,2.7,5)
-	if ismissing(_rec)
-		still_missing()
-	elseif _rec ≈ (12500000 * 2.7 * 5) / 100
-		scored1 = true
-		correct()
-	elseif _rec isa Number
-		almost(md"A fórmula não está certa...")
-	else
-		keep_working()
-	end
-end
-
-# ╔═╡ 0b120a60-84c3-4369-8296-3c012abf11ed
-hint(md"Um passarinho me contou que a fórmula é $\frac{VρT}{100}$...")
-
-# ╔═╡ 395d7e9e-f875-4725-a372-aacbc6d6bb9e
-begin
-	scored2 = false
-	_sqrt = raiz([1 4; 9 16])
-	if ismissing(_sqrt)
-		still_missing()
-	elseif _sqrt == [1 2; 3 4]
-		scored2 = true
-		correct()
-	elseif _sqrt == [1,3,2,5]
-		almost(md"Leia a dica!")
-	else
-		keep_working()
-	end
-end
-
-# ╔═╡ 6241b02d-d5cc-4ed0-a40d-bcd6a96a39bc
-hint(md"A função de raíz quadrada é escrita como `sqrt()`.")
-
-# ╔═╡ 04ab436e-021f-46b2-8dc2-7aa374cc6e94
-begin
-	scored3 = false
-	_rcktype = tiporocha.(["gabro","gnaisse","ritmito"])
-	if all(ismissing.(_rcktype))
-		still_missing()
-	elseif all(_rcktype .== ["ígnea","metamórfica","sedimentar"])
-		scored3 = true
-		correct()
-	elseif _rcktype ⊆ ["ígnea","metamórfica","sedimentar"]
-		almost(md"A resposta não está 100% correta...")
-	else
-		keep_working()
-	end
-end
-
-# ╔═╡ 14b46bb2-17d2-4bdd-938c-05a8cef1f73f
-hint(md"Basta escrever uma sequência de `if rocha == \"gabro\" return \"ígnea\" end`")
 
 # ╔═╡ 4cd26967-a0c1-4d14-9ee3-645129d782dd
 begin
@@ -2165,48 +1912,6 @@ version = "0.9.1+5"
 # ╟─5e44a696-0a3e-40f1-b125-2dec95b5cf79
 # ╟─cfc649b3-e423-4aa9-925b-763e2986e2f5
 # ╟─b53bfda4-60de-43c8-9852-faa1051050e2
-# ╟─1283f745-89d2-4bb9-8af0-fc0c55b510db
-# ╟─8b4a428f-5975-47ea-b46c-2e6a9fb43d3a
-# ╠═dc2a9d07-6c8a-40d9-bc2e-80a1c4c36d01
-# ╠═b8e72b8f-5323-48f5-b14f-22bb96472698
-# ╟─272c9ec7-9e46-4b19-94d8-ee13a6a85249
-# ╠═1a5ca5db-00a0-4a08-a187-023aa3a020b7
-# ╠═3de9f1ef-610c-4eb0-b172-39b504381b17
-# ╟─49245329-3ab5-4760-a909-2fccb98bfaef
-# ╟─1638e470-f521-4f4b-81ae-c1e0ce18048f
-# ╠═6fd15a42-0f30-4285-bc96-9046ead85762
-# ╠═c40759aa-11d5-42d0-b3be-88cdbc892405
-# ╠═4033821f-41c2-4da4-8adb-8a3aa36abf5b
-# ╠═40420118-fea3-40ca-bdcf-8614e73e2f8d
-# ╟─e1e8b749-6652-45be-9994-c87eea94196f
-# ╠═35d0c0d2-8708-40e7-bd1c-c6d18c0465b7
-# ╠═6bef6324-737b-436e-9e9d-040de367b15c
-# ╠═3884952e-0fec-4778-b928-fbc00d0d2843
-# ╠═64ba3047-4cde-4ab4-be59-a226eee13c4d
-# ╟─ba30218a-d1b3-4153-8cc3-3b6470251d97
-# ╠═406e228b-eb49-4fe3-aef9-7ae2e8f86515
-# ╟─5f6d5a73-f1fa-4958-95fb-430cd2d3a3d2
-# ╟─0b120a60-84c3-4369-8296-3c012abf11ed
-# ╟─e1c28578-0ffa-42ad-a4ea-5a3e760e27ff
-# ╠═4fa19fe5-b328-4fcd-b07e-c9a4d4044e23
-# ╟─19f97ddb-deda-43d4-9c9b-05a2ee470b8f
-# ╠═e4250536-ae9e-4e24-964b-17126f64fb2b
-# ╠═f80252bc-4fc8-493c-8f4d-232357864296
-# ╟─dd0ab574-a34b-49bb-b498-736da4f6d0c9
-# ╠═bb887c83-8982-4f66-a91a-6b147979bd1b
-# ╟─395d7e9e-f875-4725-a372-aacbc6d6bb9e
-# ╟─6241b02d-d5cc-4ed0-a40d-bcd6a96a39bc
-# ╟─f9da8fe7-7a17-42b1-a436-d40a38a3efad
-# ╠═7fb8137b-d19a-4b8b-947e-65c0eba7c3b5
-# ╠═2b936f77-1af0-49d2-b6d2-2a3a912d5602
-# ╠═2b181f17-724d-4607-9cb1-328985fbc8d4
-# ╟─c8d9a673-ad1f-4fff-b448-b01d830ba174
-# ╠═8ba85fcf-0a04-4a1e-a7f3-6bf506c20188
-# ╟─0bfbb34e-3999-492b-b7c1-2a3b787fffa4
-# ╟─a1f6558a-83aa-45e0-84d2-6004982e6172
-# ╠═fe2bc798-068c-4bbe-b33f-ab3ab36b5235
-# ╟─04ab436e-021f-46b2-8dc2-7aa374cc6e94
-# ╟─14b46bb2-17d2-4bdd-938c-05a8cef1f73f
 # ╟─21daf2f4-fb73-439b-9fb8-0ffda6265083
 # ╟─966a59b1-f8b8-4612-ab4d-ff7ec2a569d9
 # ╟─9b819a7c-53c7-407b-b56b-12c07897ba36
@@ -2218,7 +1923,7 @@ version = "0.9.1+5"
 # ╠═1014b88e-9aad-4e89-ba9d-f7701fc1a812
 # ╟─e5e744d6-41e6-45f3-b4a3-fc8d08911eb1
 # ╠═96d6f64f-fe3d-40e9-93f1-77b2a57cbb39
-# ╟─4cd26967-a0c1-4d14-9ee3-645129d782dd
+# ╠═4cd26967-a0c1-4d14-9ee3-645129d782dd
 # ╟─4737ed5b-73db-4daa-b464-8870bae8e242
 # ╟─c07352bf-7f1f-40bb-a32c-d9f5b62a9b89
 # ╟─f6142765-32bf-46a8-ac66-ea5fd8dc8797

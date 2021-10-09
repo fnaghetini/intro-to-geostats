@@ -4,6 +4,15 @@
 using Markdown
 using InteractiveUtils
 
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    quote
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
+        el
+    end
+end
+
 # ╔═╡ 75fe8fd0-2563-11ec-30ef-d15cdc3d4e63
 using PlutoUI
 
@@ -196,7 +205,7 @@ v₁[1]
 # ╔═╡ e127bdf8-2a53-4534-a628-1463a5735f41
 md"""
 
-> **Nota:** Assim como *R* e diferentemente de *Python* ou *Java Script*, a numeração do índice se inicia em **1** na linguagem *Julia*.
+> **Nota:** Assim como *R* e diferentemente de *Python* ou *JavaScript*, a numeração do índice se inicia em **1** na linguagem *Julia*.
 
 Os três primeiros elementos de `v₁` podem ser obtidos como...
 
@@ -239,21 +248,40 @@ md"""
 As **estruturas condicionais** são utilizadas em situações em que se deseja executar algum trecho de código apenas quando uma **condição** é satisfeita:
 
 ```julia
-if quartzo < 20
-   rochaignea != "granitoide"
+if condição
+	comando_1
 else
-   rochaignea = "granitoide"
+	comando_2
 end
 ```
 
+O exemplo abaixo mostra uma função `égranitoide` que utiliza estruturas condicionais. **Se** o conteúdo em quartzo for menor que 20%, a função retorna a frase "Não é granitoide 😐". **Caso contrário**, a frase "É granitoide!" é retornada.
+
 """
+
+# ╔═╡ 4a778055-7ade-4275-aa87-95c121b31232
+function égranitoide(quartzo)
+	if quartzo < 20
+   		rochaignea = "Não é granitoide 😐"
+	else
+   		rochaignea = "É granitoide!"
+	end
+	
+	return rochaignea
+end
+
+# ╔═╡ ca5453f5-1768-4f59-b09d-e40bb4981622
+égranitoide(30)
+
+# ╔═╡ 217945a3-919b-4c5f-afb0-6eaadf4e9022
+égranitoide(5)
 
 # ╔═╡ 1f0abfbe-49cd-4529-8f4d-65f8286b6f0e
 md"""
 
 #### 🖊️ Exercício
 
-Crie uma função `tiporocha` que recebe o nome de uma rocha e retorna o seu tipo:
+Agora, crie uma função `tiporocha` que recebe o nome de uma rocha e retorna o seu tipo:
 
 * "gabro" → "ígnea"
 * "gnaisse" → "metamórfica"
@@ -269,34 +297,147 @@ end
 # ╔═╡ 3cfbddfb-be59-4019-965f-13bdbac2295a
 md"""
 
-## 5. Laços
+## 5. Laços de Repetição
+
+Os **laços de repetição** são utilizados quando se deseja repetir determinado trecho do algoritmo múltiplas vezes. O número de repetições pode ser indeterminado, mas necessariamente finito.
+
+Uma das repetições mais utilizadas é o `for`, que apresenta a seguinte sintaxe:
+
+```julia
+for elemento in vetor
+	comando
+end
+```
+
+O comando `for` também pode ser utilizado para criar vetores/listas, a partir das chamadas **list comprehensions**. A sintaxe é definida da seguinte maneira:
+
+```julia
+[comando for elemento in vetor]
+```
+
+O exemplo abaixo mostra a utilização do recurso *list comprehension* para a criação de um vetor constituído por potências de 2:
 
 """
 
-# ╔═╡ aac164f5-6209-4d4e-a135-a848593f0c25
+# ╔═╡ abc428c6-b762-47bc-b5ac-7abedd1a7021
+[2 ^ num for num in 1:10]
 
+# ╔═╡ bc8fa2b9-0803-40e7-af91-2196a11aae44
+md"""
 
-# ╔═╡ 525cd275-7b36-4d77-bbbf-d7b75fdcd2b6
+#### 🖊️ Exercício
 
+Escreva a função `raiz` que retorna a raíz quadrada de todos os elementos do vetor `v₄`.
 
-# ╔═╡ 0029b8a6-e44b-4005-8eb1-d81253f93332
+"""
 
+# ╔═╡ 729eaff4-7aa1-4db1-a04f-57216175b029
+raiz(v₄) = missing
+
+# ╔═╡ 5eb8ff96-2adf-465d-bf8c-bd4e64fa6342
+md"""
+Podemos utilizar ainda a sintaxe *list comprehension* para criarmos uma tabuada em apenas uma linha!
+"""
+
+# ╔═╡ 0d420048-c4f9-4149-b25b-149ef77f3264
+[linha * coluna for linha in 1:10, coluna in 1:10]
 
 # ╔═╡ f8f272e0-17ca-47e5-8dd0-577eb6322c90
 md"""
 
 ## 6. Interatividade
 
+O ambiente [Pluto](https://github.com/fonsp/Pluto.jl) e o pacote [PlutoUI](https://github.com/fonsp/PlutoUI.jl) proporciona uma série de recursos interativos a partir da macro `@bind`. Esses recursos permitem que o valor de uma variável seja alterado de acordo com a interação entre o usuário e o notebook.
+
+O recurso **Slider** funciona como uma barra de deslizamento para variáveis que assumem valores contínuos. A sua sintaxe é dada por:
+
+```julia
+@bind nome_var Slider(inicio:passo:fim)
+```
+
+O *slider* abaixo mostra o teor de Cu (%) em uma amostra...
+
 """
 
 # ╔═╡ e137bf5e-d795-49ac-b641-b5f7364cfac9
-
+@bind CU Slider(0.05:0.01:3.00, default=1.0, show_value=true)
 
 # ╔═╡ fae5e284-66e7-4599-9905-f0d5e64387ea
+md" A amostra apresenta $CU % de Cu"
 
+# ╔═╡ 9ee680a7-2866-4f1b-84af-0fdb737246ad
+md"""
+Um outro elemento interativo é o **TextField**, que se refere a uma caixa de texto. Sua sintaxe é definida como:
 
-# ╔═╡ a9c9cbbe-1e74-46d9-b1cc-fd60e6c2cc41
+```julia
+@bind nome_var TextField()
+```
 
+"""
+
+# ╔═╡ 6c7e7d3e-d544-4b59-9504-e28fe2cc3619
+md"""
+
+#### 🖊️ Exercício
+
+Com seus conhecimentos geológicos, tente identificar qual rocha é exibida na figura a seguir. Escreva o nome da rocha (apenas com letras minúsculas) na caixa de texto abaixo.
+
+"""
+
+# ╔═╡ 2fd0708e-b225-4f8c-8f4f-b46305e06366
+md"""
+![rocha](http://lh3.googleusercontent.com/-4dxg2gAuqgk/VeqttO0BqSI/AAAAAAAAKq0/j_G5leYIfIg/s720/01465%252520IMG_20150809_104742%252520mylonite.jpg)
+
+Fonte: [sandatlas.org](https://www.sandatlas.org/mylonite/)
+"""
+
+# ╔═╡ 98a32d2d-7173-406d-92cf-dfa847d47c49
+md" Rocha: $(@bind rocha TextField())"
+
+# ╔═╡ df1f77ac-bbf5-4d42-91bf-e634ebee4bb9
+md""" Podemos também utilizar o recurso interativo **Select** que, por sua vez, atua como uma lista suspensa. Esse comando possui a seguinte sintaxe:
+
+```julia
+@bind nome_var Select(["elem_1", "elem_2", ..., "elem_n"])
+```
+
+"""
+
+# ╔═╡ ba7ce05c-cae6-4eec-9760-e4e253986061
+md"""
+
+#### 🖊️ Exercício
+
+Na lista suspensa seguir, selecione a opção que corresponda à correta subclasse do silicato exibido na figura abaixo.
+
+"""
+
+# ╔═╡ b844b981-2922-4056-811d-8c61b904d996
+md"""
+![silicato](https://geology.com/minerals/photos/titanite-crystal.jpg)
+
+Fonte: [geology.com](https://geology.com/minerals/titanite.shtml)
+"""
+
+# ╔═╡ 87832d6c-525d-4060-a1e8-d06a611b5dfe
+md""" Subclasse: $(@bind silicato Select(["Tectossilicato","Filossilicato",
+										  "Inossilicato","Ciclossilicato",
+										  "Sorossilicato","Nesossilicato"]))
+"""
+
+# ╔═╡ 8f866ee4-ce44-4d42-be56-7764168c1c71
+md"""
+## 7. Leituras Recomendadas
+
+Abaixo, são listados alguns recursos complementares a este notebook:
+
+- [Algoritmos e Lógica de Programação](https://d1wqtxts1xzle7.cloudfront.net/50512348/LIVRO_ALGORITIMOS__LOGICA_E_PROGRAMACAO-with-cover-page-v2.pdf?Expires=1633802730&Signature=QIowB4JkDT4EX~bRTaUT2W6z7q8d8rZPM95h3QIY-TijjVWtTg5HL7IqOA7o5-zEUJxMeqKJIxvzRxMFfcLsjr6YO85lP6VF5Vud8giQ3uP-n0hvPPkLeR2AqKBgxU71gUm-xwOPws96zjVusfFFi-ETBmMGidq9USwvCgRIN1B~A8GAFdLJohaqdQ7hjHpNt7CUCAlkPraTEK-Ng10f0K90TZ~FqGf8tvFRAm8dOTXWfQf9KHOz-247WotTA9QZnaicbvAePlazORbBjkSssngqcNuEWEeGg9v2OMz95dmYoNQvF8nljSv99sT88Blw2aSH2s9Gi6hwZoCT4DqtlQ__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA)
+
+- [Documentação da Linguagem Julia](https://docs.julialang.org/en/v1/)
+
+- [Minicurso de Geoestatística CBMina 2021](https://github.com/juliohm/CBMina2021)
+
+"""
 
 # ╔═╡ bb899ab7-b3d8-493f-aaa6-85a4710a6690
 begin
@@ -306,7 +447,7 @@ begin
 
 	still_missing(text=md"Troque `missing` pela sua resposta.") = Markdown.MD(Markdown.Admonition("warning", "Aqui vamos nós!", [text]))
 
-	keep_working(text=md"A resposta não está totalmente certa.") = Markdown.MD(Markdown.Admonition("danger", "Continue trabalhando!", [text]))
+	keep_working(text=md"A resposta não está correta 😔") = Markdown.MD(Markdown.Admonition("danger", "Continue trabalhando!", [text]))
 
 	yays = [md"Fantástico!", md"Ótimo!", md"Yay ❤", md"Legal! 🎉", md"Muito bem!", md"Bom trabalho!", md"Você conseguiu a resposta certa!", md"Vamos seguir para próxima seção."]
 
@@ -368,6 +509,57 @@ end
 
 # ╔═╡ e462ca14-b38a-46b0-8faa-2261a2cfc150
 hint(md"Basta escrever uma sequência de `if rocha == \"gabro\" return \"ígnea\" end`")
+
+# ╔═╡ 7d12857d-d767-49e5-b7de-11e696f1d84a
+begin
+	s4 = false
+	_sqrt = raiz([1 4; 9 16])
+	if ismissing(_sqrt)
+		still_missing()
+	elseif _sqrt == [1 2; 3 4]
+		s4 = true
+		correct()
+	elseif _sqrt == [1, 2, 3, 4]
+		almost(md"Tente usar a dica!")
+	else
+		keep_working()
+	end
+end
+
+# ╔═╡ a9f386e1-8c6e-40e7-ba67-b3792c50f87e
+hint(md"A notação list comprehension `[f(x) for v in v₄]` pode ser bem útil!")
+
+# ╔═╡ f1080b76-7564-4419-884f-70a49bfe9d57
+begin
+	s5 = false
+	if rocha == ""
+		almost(md"Identifique a rocha!")
+	elseif rocha == "milonito"
+		s5 = true
+		correct()
+	elseif rocha == "protomilonito" || rocha == "ultramilonito"
+		almost(md"""A porcentagem de matriz "triturada" é de 50% a 90%.""")
+	else
+		keep_working()
+	end
+end
+
+# ╔═╡ 844171ee-dfc3-4985-a6a1-7aa7986d1ac4
+hint(md"Essa rocha é um típico produto de recristalização dinâmica!")
+
+# ╔═╡ 8b0df84d-a112-49ec-9f7b-c6e5efd45c48
+begin
+	s6 = false
+	if silicato == "Nesossilicato"
+		s6 = true
+		correct()
+	else
+		keep_working()
+	end
+end
+
+# ╔═╡ 55298aee-618b-4704-98ff-e81fdbddd9a7
+hint(md"A fórmula química deste silicato é `CaTiO(SiO₄)`.")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -497,7 +689,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╠═92b0cb5f-41a1-420f-8b81-3b967db8138f
 # ╟─7471120d-6e00-46be-be11-649c8cdbb32c
 # ╠═b31b883d-5a69-4e04-b8b5-cedca81dcf9a
-# ╠═c7f94dcd-64a2-4e97-b38d-363dc6f9f757
+# ╟─c7f94dcd-64a2-4e97-b38d-363dc6f9f757
 # ╠═2a25a884-44cf-4460-ab23-02e728201f90
 # ╟─e127bdf8-2a53-4534-a628-1463a5735f41
 # ╠═0806feb3-33eb-402c-92d2-af0b153834ba
@@ -510,18 +702,37 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─a84b90c1-fa85-499a-9fa4-ac1f33ed8469
 # ╟─e2c42c9e-abbb-4a33-844d-ef0f0c9b4939
 # ╟─8253149c-e1b0-4e3f-9f5b-909621dba86e
+# ╠═4a778055-7ade-4275-aa87-95c121b31232
+# ╠═ca5453f5-1768-4f59-b09d-e40bb4981622
+# ╠═217945a3-919b-4c5f-afb0-6eaadf4e9022
 # ╟─1f0abfbe-49cd-4529-8f4d-65f8286b6f0e
 # ╠═6fcc1433-c348-4825-8503-782304ed508b
 # ╟─33b81b24-ca33-4dd3-a85e-0371ca8623e8
 # ╟─e462ca14-b38a-46b0-8faa-2261a2cfc150
 # ╟─3cfbddfb-be59-4019-965f-13bdbac2295a
-# ╠═aac164f5-6209-4d4e-a135-a848593f0c25
-# ╠═525cd275-7b36-4d77-bbbf-d7b75fdcd2b6
-# ╠═0029b8a6-e44b-4005-8eb1-d81253f93332
+# ╠═abc428c6-b762-47bc-b5ac-7abedd1a7021
+# ╟─bc8fa2b9-0803-40e7-af91-2196a11aae44
+# ╠═729eaff4-7aa1-4db1-a04f-57216175b029
+# ╟─7d12857d-d767-49e5-b7de-11e696f1d84a
+# ╟─a9f386e1-8c6e-40e7-ba67-b3792c50f87e
+# ╟─5eb8ff96-2adf-465d-bf8c-bd4e64fa6342
+# ╠═0d420048-c4f9-4149-b25b-149ef77f3264
 # ╟─f8f272e0-17ca-47e5-8dd0-577eb6322c90
-# ╠═e137bf5e-d795-49ac-b641-b5f7364cfac9
-# ╠═fae5e284-66e7-4599-9905-f0d5e64387ea
-# ╠═a9c9cbbe-1e74-46d9-b1cc-fd60e6c2cc41
+# ╟─e137bf5e-d795-49ac-b641-b5f7364cfac9
+# ╟─fae5e284-66e7-4599-9905-f0d5e64387ea
+# ╟─9ee680a7-2866-4f1b-84af-0fdb737246ad
+# ╟─6c7e7d3e-d544-4b59-9504-e28fe2cc3619
+# ╟─2fd0708e-b225-4f8c-8f4f-b46305e06366
+# ╟─98a32d2d-7173-406d-92cf-dfa847d47c49
+# ╟─f1080b76-7564-4419-884f-70a49bfe9d57
+# ╟─844171ee-dfc3-4985-a6a1-7aa7986d1ac4
+# ╟─df1f77ac-bbf5-4d42-91bf-e634ebee4bb9
+# ╟─ba7ce05c-cae6-4eec-9760-e4e253986061
+# ╟─b844b981-2922-4056-811d-8c61b904d996
+# ╟─87832d6c-525d-4060-a1e8-d06a611b5dfe
+# ╟─8b0df84d-a112-49ec-9f7b-c6e5efd45c48
+# ╟─55298aee-618b-4704-98ff-e81fdbddd9a7
+# ╟─8f866ee4-ce44-4d42-be56-7764168c1c71
 # ╟─bb899ab7-b3d8-493f-aaa6-85a4710a6690
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

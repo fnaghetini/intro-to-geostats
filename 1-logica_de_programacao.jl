@@ -68,10 +68,10 @@ As variáveis podem ser **numéricas**...
 """
 
 # ╔═╡ 7ceb9c27-0310-4f97-8349-91286c1f9235
-numero_inteiro = 10
+idade = 24
 
 # ╔═╡ 218bb8c3-729b-43c7-9a53-d3b579cf2d21
-numero_decimal = 15.5
+altura = 1.58
 
 # ╔═╡ 3b3e6955-1573-4620-8109-d80b71cf0708
 md" As variáveis podem armazenar **cadeias de caracteres**... "
@@ -88,6 +88,16 @@ md"""
 > **Nota:** as cadeias de caracteres (**strings**) devem ser encapsuladas por áspas duplas.
 
 """
+
+# ╔═╡ 449c91c3-7f03-4ffd-95e7-02cdb58323fd
+md"""
+Um recurso muito utilizado e presente em diversas linguagens de programação é a **interpolação de strings**. Esse procedimento utiliza o valor de uma variável dentro de uma string, de modo que a string interpolada atua como um "template". Em Julia, usamos o símbolo `$` para interpolar strings.
+
+A célula abaixo mostra um exemplo de interpolação de string, utilizando as variáveis já criadas `nome`, `idade` e `altura`...
+"""
+
+# ╔═╡ 8d463f50-d694-41eb-bbad-c40f93471852
+"Olá! Meu nome é $nome, tenho $idade anos e tenho $altura m de altura."
 
 # ╔═╡ 4d31b989-7a7d-43ca-a1f8-831db58f1c8e
 md"""
@@ -109,6 +119,11 @@ Cique [aqui](https://docs.julialang.org/en/v1/manual/unicode-input/) para acessa
 
 # ╔═╡ 96ced3bd-69e7-490c-b8be-b06a30049a31
 π
+
+# ╔═╡ 3de2d16f-8849-4462-9ef3-0cc1830285c6
+md"""
+> **Nota:** perceba que o símbolo $π$ já possui um valor associado na linguagem Julia.
+"""
 
 # ╔═╡ d28119c3-6800-430d-9ffe-d6f25e8e5c2a
 md"""
@@ -664,11 +679,14 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╠═f2e6adcd-9095-496f-a8e3-88069537015c
 # ╠═870cbb76-b0c3-4d14-be22-86e0d34ebe58
 # ╟─55a2c622-0f9f-45db-b534-55873c0759d4
+# ╟─449c91c3-7f03-4ffd-95e7-02cdb58323fd
+# ╠═8d463f50-d694-41eb-bbad-c40f93471852
 # ╟─4d31b989-7a7d-43ca-a1f8-831db58f1c8e
 # ╠═b0d01238-1213-45c3-9bef-a443afc6b87c
 # ╠═2cce4c5e-7890-4c6c-bd7c-eecc8437bef3
 # ╠═1b454935-c858-4817-928d-da116011d7b0
 # ╠═96ced3bd-69e7-490c-b8be-b06a30049a31
+# ╟─3de2d16f-8849-4462-9ef3-0cc1830285c6
 # ╟─d28119c3-6800-430d-9ffe-d6f25e8e5c2a
 # ╠═bb495116-8ff9-4a66-9b66-6f6fe990c5d9
 # ╠═a63d4a04-0ceb-4e4f-90ba-30dc798e1b48

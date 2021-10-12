@@ -45,15 +45,22 @@ Neste módulo, estudaremos alguns conceitos básicos de lógica de programação
 
 > A linguagem é *simples* como Python e *rápida* como C 🚀
 
-A seguir, serão apresentados alguns conceitos básicos de lógica de programação, além de uma introdução sobre os recursos interativos da linguagem Julia: 
+A seguir, serão apresentados alguns conceitos básicos de lógica de programação, além de uma introdução sobre os recursos interativos da linguagem Julia.
 
-1. Variáveis
-2. Funções
-3. Coleções
-4. Condicionais
-5. Laços
-6. Interatividade
+"""
 
+# ╔═╡ 14db5525-7c0a-433b-a23c-088db728f46b
+md"""
+#### Informações sobre o notebook
+
+- Este notebook é constituído por várias células individuais:
+    - Para executá-las, pasta clicar no ícone ▶️, localizado no canto inferior direito da célula.
+    - Algumas células encontram-se ocultadas. Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
+    - Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
+
+- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."`. Elas são chamadas de **markdown** e representam as células de texto do notebook. Caso deseje aprender um pouco mais sobre a linguagem markdown, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
+
+- Você pode utilizar este notebook da forma que quiser! 🙂 Caso deseje utilizá-lo em algum trabalho, apenas referencie [este link](https://github.com/fnaghetini/intro-to-geostats).
 """
 
 # ╔═╡ c111da75-d294-4def-93fb-56953c3585ad
@@ -442,15 +449,17 @@ md""" Subclasse: $(@bind silicato Select(["Tectossilicato","Filossilicato",
 
 # ╔═╡ 8f866ee4-ce44-4d42-be56-7764168c1c71
 md"""
-## 7. Leituras Recomendadas
+## 7. Leituras Adicionais
 
 Abaixo, são listados alguns recursos complementares a este notebook:
 
-- [Algoritmos e Lógica de Programação](https://d1wqtxts1xzle7.cloudfront.net/50512348/LIVRO_ALGORITIMOS__LOGICA_E_PROGRAMACAO-with-cover-page-v2.pdf?Expires=1633802730&Signature=QIowB4JkDT4EX~bRTaUT2W6z7q8d8rZPM95h3QIY-TijjVWtTg5HL7IqOA7o5-zEUJxMeqKJIxvzRxMFfcLsjr6YO85lP6VF5Vud8giQ3uP-n0hvPPkLeR2AqKBgxU71gUm-xwOPws96zjVusfFFi-ETBmMGidq9USwvCgRIN1B~A8GAFdLJohaqdQ7hjHpNt7CUCAlkPraTEK-Ng10f0K90TZ~FqGf8tvFRAm8dOTXWfQf9KHOz-247WotTA9QZnaicbvAePlazORbBjkSssngqcNuEWEeGg9v2OMz95dmYoNQvF8nljSv99sT88Blw2aSH2s9Gi6hwZoCT4DqtlQ__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA)
+> [Algoritmos e Lógica de Programação](https://d1wqtxts1xzle7.cloudfront.net/50512348/LIVRO_ALGORITIMOS__LOGICA_E_PROGRAMACAO-with-cover-page-v2.pdf?Expires=1633802730&Signature=QIowB4JkDT4EX~bRTaUT2W6z7q8d8rZPM95h3QIY-TijjVWtTg5HL7IqOA7o5-zEUJxMeqKJIxvzRxMFfcLsjr6YO85lP6VF5Vud8giQ3uP-n0hvPPkLeR2AqKBgxU71gUm-xwOPws96zjVusfFFi-ETBmMGidq9USwvCgRIN1B~A8GAFdLJohaqdQ7hjHpNt7CUCAlkPraTEK-Ng10f0K90TZ~FqGf8tvFRAm8dOTXWfQf9KHOz-247WotTA9QZnaicbvAePlazORbBjkSssngqcNuEWEeGg9v2OMz95dmYoNQvF8nljSv99sT88Blw2aSH2s9Gi6hwZoCT4DqtlQ__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA)
 
-- [Documentação da Linguagem Julia](https://docs.julialang.org/en/v1/)
+> [Documentação da Linguagem Julia](https://docs.julialang.org/en/v1/)
 
-- [Minicurso de Geoestatística CBMina 2021](https://github.com/juliohm/CBMina2021)
+> [Canal Oficial da Linguagem Julia](https://www.youtube.com/c/TheJuliaLanguage)
+
+> [Minicurso de Geoestatística CBMina 2021](https://github.com/juliohm/CBMina2021)
 
 """
 
@@ -462,7 +471,7 @@ begin
 
 	still_missing(text=md"Troque `missing` pela sua resposta.") = Markdown.MD(Markdown.Admonition("warning", "Aqui vamos nós!", [text]))
 
-	keep_working(text=md"A resposta não está correta 😔") = Markdown.MD(Markdown.Admonition("danger", "Continue trabalhando!", [text]))
+	keep_working(text=md"A resposta não está correta 😔") = Markdown.MD(Markdown.Admonition("danger", "Não desanime, você está quase lá!", [text]))
 
 	yays = [md"Fantástico!", md"Ótimo!", md"Yay ❤", md"Legal! 🎉", md"Muito bem!", md"Bom trabalho!", md"Você conseguiu a resposta certa!", md"Vamos seguir para próxima seção."]
 
@@ -672,6 +681,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─deee1735-37ee-4c97-a4df-8fcb61e95d6a
 # ╟─488dcacd-109d-41f2-b904-3d17193e6190
 # ╟─6ca3e113-02db-4cef-ad9e-3941ac7d7a6d
+# ╟─14db5525-7c0a-433b-a23c-088db728f46b
 # ╟─c111da75-d294-4def-93fb-56953c3585ad
 # ╠═7ceb9c27-0310-4f97-8349-91286c1f9235
 # ╠═218bb8c3-729b-43c7-9a53-d3b579cf2d21

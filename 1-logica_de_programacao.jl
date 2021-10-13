@@ -449,7 +449,7 @@ md""" Subclasse: $(@bind silicato Select(["Tectossilicato","Filossilicato",
 
 # ╔═╡ 8f866ee4-ce44-4d42-be56-7764168c1c71
 md"""
-## 7. Leituras adicionais
+## 7. Recursos adicionais
 
 Abaixo, são listados alguns recursos complementares a este notebook:
 

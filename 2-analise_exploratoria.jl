@@ -44,7 +44,7 @@ md"""
 # ╔═╡ b53bfda4-60de-43c8-9852-faa1051050e2
 md""" # 📊 Análise Exploratória
 
-A **Análise Exploratória dos Dados (AED)** consiste em uma abordagem para organizar e sumarizar um determinado conjunto de dados, a partir de estatísticas descritivas e técnicas de visualização de dados. Segundo **Tukey (1977)**, pesquisador que propôs o termo, a AED pode ser comparada ao trabalho de investigação realizado por um detetive.
+A **Análise Exploratória dos Dados (AED)** consiste em uma abordagem para organizar e sumarizar um determinado conjunto de dados, a partir de estatísticas descritivas e técnicas de visualização de dados. Segundo *Tukey (1977)*, pesquisador que propôs o termo, a AED pode ser comparada ao trabalho de investigação realizado por um detetive.
 
 De forma mais descontraída, pode-se dizer que:
 
@@ -79,13 +79,13 @@ Nesta primeira seção, iremos aprender/revisar alguns conceitos básicos sobre 
 md"""
 ### População x Amostra
 
-A **população** é o conjunto exaustivo e finito de todos os elementos ou resultados sob investigação. Em outras palavras, é a realidade física (**Bussab & Morettin, 2017**).
+A **população** é o conjunto exaustivo e finito de todos os elementos ou resultados sob investigação. Em outras palavras, é a realidade física (*Bussab & Morettin, 2017*).
 
-Por outro lado, a **amostra** é qualquer subconjunto da população formado por elementos que foram medidos (**Bussab & Morettin, 2017**).
+Por outro lado, a **amostra** é qualquer subconjunto da população formado por elementos que foram medidos (*Bussab & Morettin, 2017*).
 
 No contexto de estimativa de recursos, a **amostra** seria formada pelo conjunto de furos de sondagem disponíveis, enquanto a **população** seria o depósito/jazida/mina sob investigação.
 
-Assim como em várias áreas, não temos informações sobre toda a população (i.e. depósito), mas apenas sobre um subconjunto dela (i.e. furos de sondagem) (Figura 01). Segundo **Rossi & Deutsch (2014)**, em média, apenas $\frac{1}{10^9}$ de um depósito é amostrado. Isso se deve ao fato de a sondagem ser uma atividade de elevado custo ao empreendimento.
+Assim como em várias áreas, não temos informações sobre toda a população (i.e. depósito), mas apenas sobre um subconjunto dela (i.e. furos de sondagem) (Figura 01). Segundo *Rossi & Deutsch (2013)*, em média, apenas $\frac{1}{10^9}$ de um depósito é amostrado. Isso se deve ao fato de a sondagem ser uma atividade de elevado custo ao empreendimento.
 
 """
 
@@ -100,9 +100,9 @@ md"""
 md"""
 ### Parâmetros x Estimadores
 
-Os **parâmetros** são as quantidades da população sobre as quais temos interesse. Normalmente são representadas por letras gregas, como $\mu$ (média populacional), $\sigma^2$ (variância populacional) e $\sigma$ (desvio padrão populacional) (**Magalhães & De Lima, 2015**).
+Os **parâmetros** são as quantidades da população sobre as quais temos interesse. Normalmente são representadas por letras gregas, como $\mu$ (média populacional), $\sigma^2$ (variância populacional) e $\sigma$ (desvio padrão populacional) (*Magalhães & De Lima, 2015*).
 
-Por outro lado, os **estimadores**, às vezes chamados de **estatísticas**, correspondem à combinação dos elementos da amostra construída com a finalidade de representar ou estimar um parâmetro de interesse na população. São representados por letras do alfabeto latino, como X̅ (média amostral), $S^2$ (variância amostral) e $S$ (desvio padrão amostral) (**Magalhães & De Lima, 2015**).
+Por outro lado, os **estimadores**, às vezes chamados de **estatísticas**, correspondem à combinação dos elementos da amostra construída com a finalidade de representar ou estimar um parâmetro de interesse na população. São representados por letras do alfabeto latino, como X̅ (média amostral), $S^2$ (variância amostral) e $S$ (desvio padrão amostral) (*Magalhães & De Lima, 2015*).
 
 Como só temos acesso à amostra (e.g. furos de sondagem), iremos trabalhar com estimadores (i.e. estatísticas).
 
@@ -112,9 +112,9 @@ Como só temos acesso à amostra (e.g. furos de sondagem), iremos trabalhar com 
 md"""
 ### Tipos de variáveis
 
-As **variáveis qualitativas** apresentam como possíveis realizações uma qualidade ou atributo de um indivíduo pesquisado. Essas variáveis podem ainda ser divididas em **nominais**, quando não existe uma ordenação nas possíveis realizações, e **ordinais**, quando existe uma ordem nos seus resultados (**Bussab & Morettin, 2017**). Litologia e grau de alteração são exemplos de variáveis qualitativas nominais e ordinais, respectivamente.
+As **variáveis qualitativas** apresentam como possíveis realizações uma qualidade ou atributo de um indivíduo pesquisado. Essas variáveis podem ainda ser divididas em **nominais**, quando não existe uma ordenação nas possíveis realizações, e **ordinais**, quando existe uma ordem nos seus resultados (*Bussab & Morettin, 2017*). Litologia e grau de alteração são exemplos de variáveis qualitativas nominais e ordinais, respectivamente.
 
-As **variáveis quantitativas** também estão sujeitas a uma classificação dicotômica. As variáveis **discretas** são aquelas cujos possíveis valores formam um conjunto finito ou enumerável de números (1, 2, ...). Já as variáveis **contínuas** apresentam possíveis valores pertencentes a um intervalo de números reais resultantes de uma mensuração (**Bussab & Morettin, 2017**). Zona mineralizada e teor são exemplos de variáveis quantitativas discretas e contínuas, respectivamente.
+As **variáveis quantitativas** também estão sujeitas a uma classificação dicotômica. As variáveis **discretas** são aquelas cujos possíveis valores formam um conjunto finito ou enumerável de números (1, 2, ...). Já as variáveis **contínuas** apresentam possíveis valores pertencentes a um intervalo de números reais resultantes de uma mensuração (*Bussab & Morettin, 2017*). Zona mineralizada e teor são exemplos de variáveis quantitativas discretas e contínuas, respectivamente.
 
 A Figura 02 mostra um esquema com os tipos de variáveis existentes.
 """
@@ -123,7 +123,7 @@ A Figura 02 mostra um esquema com os tipos de variáveis existentes.
 md"""
 ![Figura_02](https://i.postimg.cc/MGvTF2fZ/Figura-02.jpg)
 
-**Figura 02:** Tipos de variáveis. Modificado de **Bussab & Morettin (2017)**.
+**Figura 02:** Tipos de variáveis. Modificado de *Bussab & Morettin (2017)*.
 """
 
 # ╔═╡ 966a59b1-f8b8-4612-ab4d-ff7ec2a569d9
@@ -131,7 +131,7 @@ md"""
 
 ## 2. Importação dos dados
 
-Neste módulo, iremos trabalhar com o banco de dados [Jura](https://rdrr.io/cran/gstat/man/jura.html) do excelente livro de **Goovaerts (1997)**. Esse banco de dados é constituído por amostras de solo que possuem os seguintes atributos:
+Neste módulo, iremos trabalhar com o banco de dados [Jura](https://rdrr.io/cran/gstat/man/jura.html) do excelente livro de *Goovaerts (1997)*. Esse banco de dados é constituído por amostras de solo que possuem os seguintes atributos:
 
 - `Xloc` e `Yloc`: coordenadas locais X e Y.
 - `Landuse` e `Rock`: tipo de uso do solo e tipo de rocha, respectivamente.
@@ -226,7 +226,7 @@ Nesta seção, as principais técnicas de sumarização e visualização univari
 md"""
 ### Medidas-resumo
 
-Segundo **Isaaks & Srivastava (1989)**, as **medidas-resumo** podem ser classificadas em:
+Segundo *Isaaks & Srivastava (1989)*, as **medidas-resumo** podem ser classificadas em:
 
 > **Medidas de posição:** trazem informações sobre várias porções de uma distribuição (e.g. centro, caudas).
 
@@ -246,7 +246,7 @@ Três medidas de posição serão apresentadas:
 - Mediana
 - Quantis
 
-A **média aritmética**, ou simplesmente média, consiste na soma das observações dividida pelo número delas (**Bussab & Morettin, 2017**) e, portanto, traz informação sobre o centro de uma distribuição:
+A **média aritmética**, ou simplesmente média, consiste na soma das observações dividida pelo número delas (*Bussab & Morettin, 2017*) e, portanto, traz informação sobre o centro de uma distribuição:
 
 ```math
 \overline{X} = \frac{1}{n} \sum_{i=1}^{n} x_i
@@ -261,7 +261,7 @@ mean(dados.Cr)
 
 # ╔═╡ 476e5bc7-5d9c-43fe-ac84-ead5bbbfe4b9
 md"""
-A **mediana** consiste no ponto médio dos valores observados, desde que as observações estejam organizadas em ordem crescente (**Isaaks & Srivastava, 1989**). Portanto, assim como a média, a mediana também traz informação sobre o centro da distribuição:
+A **mediana** consiste no ponto médio dos valores observados, desde que as observações estejam organizadas em ordem crescente (*Isaaks & Srivastava, 1989*). Portanto, assim como a média, a mediana também traz informação sobre o centro da distribuição:
 
 ```math
 \begin{equation}
@@ -281,7 +281,7 @@ median(dados.Cr)
 
 # ╔═╡ 581459c4-312a-4022-a87c-35887f625d6d
 md"""
-Os **quantis**, assim como a mediana, também se baseiam na ideia de separar os dados (em ordem crescente) em subconjuntos com o mesmo número de observações (**Isaaks & Srivastava, 1989**). Enquanto a mediana separa os dados em duas metades, os percentis subdividem os dados em 100 subconjuntos com o mesmo número de amostras. Nesse sentido, os percentis trazem informações sobre todas as partes de uma distribuição (i.e. centro e caudas).
+Os **quantis**, assim como a mediana, também se baseiam na ideia de separar os dados (em ordem crescente) em subconjuntos com o mesmo número de observações (*Isaaks & Srivastava, 1989*). Enquanto a mediana separa os dados em duas metades, os percentis subdividem os dados em 100 subconjuntos com o mesmo número de amostras. Nesse sentido, os percentis trazem informações sobre todas as partes de uma distribuição (i.e. centro e caudas).
 
 Podemos utilizar a função `quantile` para computar os quantis `q(0.10)`, `q(0.50)` e `q(0.90)` da variável `Cr`...
 """
@@ -304,7 +304,7 @@ Quatro medidas de dispersão serão apresentadas:
 - Distância interquartil
 - Coeficiente de variação
 
-A **variância** consiste na diferença quadrática média entre os valores observados para uma variável e sua média (**Isaaks & Srivastava, 1989**). Como há termos ao quadrado, pode-se dizer que a variância é uma estatística pouco robusta (i.e. muito sensível a valores extremos) e que não se encontra na unidade da variável de interesse.
+A **variância** consiste na diferença quadrática média entre os valores observados para uma variável e sua média (*Isaaks & Srivastava, 1989*). Como há termos ao quadrado, pode-se dizer que a variância é uma estatística pouco robusta (i.e. muito sensível a valores extremos) e que não se encontra na unidade da variável de interesse.
 
 ```math
 S^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \overline{X})^2
@@ -321,7 +321,7 @@ var(dados.Cr)
 
 # ╔═╡ e23f2abb-37a2-483f-80f1-c24312de1adb
 md"""
-O **desvio padrão** é simplesmente a raíz quadrada da variância. Normalmente, essa estatística é utilizada para substituir a variância, uma vez que se encontra na mesma unidade de medida da variável de interesse (**Isaaks & Srivastava, 1989**). O desvio padrão também é uma estatística pouco robusta.
+O **desvio padrão** é simplesmente a raíz quadrada da variância. Normalmente, essa estatística é utilizada para substituir a variância, uma vez que se encontra na mesma unidade de medida da variável de interesse (*Isaaks & Srivastava, 1989*). O desvio padrão também é uma estatística pouco robusta.
 
 ```math
 S^2 = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i - \overline{X})^2} = \sqrt{S^2}
@@ -337,7 +337,7 @@ std(dados.Cr)
 
 # ╔═╡ b3fb81b8-8f00-4fe5-877c-3c6a1f7ded77
 md"""
-A **distância interquartil**, comumente chamada de IQR (*interquartile range*), é uma medida de dispersão assim como a variância e o desvio padrão, mas, por ser baseada em quantis, é uma estatística robusta. O IQR consiste na diferença entre o quantil superior $Q_3$ e o quantil inferior $Q_1$ (**Isaaks & Srivastava, 1989**):
+A **distância interquartil**, comumente chamada de IQR (*interquartile range*), é uma medida de dispersão assim como a variância e o desvio padrão, mas, por ser baseada em quantis, é uma estatística robusta. O IQR consiste na diferença entre o quantil superior $Q_3$ e o quantil inferior $Q_1$ (*Isaaks & Srivastava, 1989*):
 
 ```math
 IQR = Q_3 - Q_1 = q(0.75) - q(0.25)
@@ -360,7 +360,7 @@ O coeficiente de variação consiste na razão entre o desvio padrão e a média
 C_v = \frac{\overline{X}}{S}
 ```
 
-> **Nota:** O coeficiente de variação é de suma importância, uma vez que fornece avisos sobre eventuais dificuldades na estimativa. Caso essa estatística seja superior a 1, possivelmente as estimativas finais terão uma grande incerteza associada em função da alta variabilidade natural da variável (**Isaaks & Srivastava, 1989**).
+> **Nota:** O coeficiente de variação é de suma importância, uma vez que fornece avisos sobre eventuais dificuldades na estimativa. Caso essa estatística seja superior a 1, possivelmente as estimativas finais terão uma grande incerteza associada em função da alta variabilidade natural da variável (*Isaaks & Srivastava, 1989*).
 
 Podemos utilizar a função `variation` para computar o coeficiente de variação da variável `Cr`...
 
@@ -374,7 +374,7 @@ md""" #### Medidas de forma
 
 Apenas uma medida de forma será apresentada, o coeficiente de assimetria.
 
-O **coeficiente de assimetria**, também chamado de *skewness**, traz informações sobre a simetria de uma distribuição. Como apresenta termos elevados ao cubo, essa estatística é extremamente sensível à presença de valores extremos (**Isaaks & Srivastava, 1989**). Essa medida pode ser representada como:
+O **coeficiente de assimetria**, também chamado de *skewness*, traz informações sobre a simetria de uma distribuição. Como apresenta termos elevados ao cubo, essa estatística é extremamente sensível à presença de valores extremos (*Isaaks & Srivastava, 1989*). Essa medida pode ser representada como:
 
 ```math
 skew(X) = \frac{\frac{1}{n-1} \sum_{i=1}^{n} (x_i - \overline{X})^3}{S^3}
@@ -449,7 +449,7 @@ md"""
 md"""
 ### Histograma
 
-O **histograma** é um gráfico de barras contíguas com as bases proporcionais aos intervalos das classes e a área de cada retângulo proporcional à respectiva frequência (**Bussab & Morettin, 2017**). Esse gráfico univariado é, provavelmente, o mais utilizado na AED que precede a estimativa de recursos.
+O **histograma** é um gráfico de barras contíguas com as bases proporcionais aos intervalos das classes e a área de cada retângulo proporcional à respectiva frequência (*Bussab & Morettin, 2017*). Esse gráfico univariado é, provavelmente, o mais utilizado na AED que precede a estimativa de recursos.
 
 > **Nota:** o histograma é um gráfico utilizado para representar a distribuição de variáveis contínuas.
 
@@ -471,6 +471,59 @@ begin
 	vline!([X̅], color=:red, label="Média")
 	vline!([md], color=:green, label="Mediana")
 end
+
+# ╔═╡ 155f6b0f-5156-4f42-93c2-6f867415ef37
+md"""
+##### Observações
+- As variáveis que apresentam distribuições assimétricas positivas possuem caudas alongadas à direita. Essa forma de distribuição é típica de elementos menores;
+- A variável `Co`, que possui distribuição ligeiramente assimétrica negativa, exibe uma distribuição com cauda alongada à esquerda. Esse tipo de assimetria é mais comum em elementos maiores (e.g. Fe₂O₃+FeO, Al₂O₃);
+- A variável `Cr` mostra uma distribuição aproximadamente simétrica, o que não é algo típico de metais.
+"""
+
+# ╔═╡ 0acf95ad-4bd9-4022-b9f9-ce9a886ed1ed
+md"""
+### Boxplot
+
+O **boxplot**, assim como o histograma, é um gráfico univariado que visa representar a distribuição de uma variável contínua. Essa visualização dá uma ideia da posição, dispersão, simetria e valores extremos de uma variável de interesse (*Bussab & Morettin, 2017*). A Figura 03 ilustra os elementos que constituem o boxplot.
+
+![Figura 03](https://i.postimg.cc/HnRG8289/Figura-03.png)
+
+**Figura 03:** Exemplo de boxplot e seus elementos. Figura elaborada pelo autor.
+
+Selecione, na lista suspensa abaixo, uma variável de teor para que seu boxplot correspondente seja exibido.
+
+Teor: $(@bind teor2 Select(["Cd","Co","Cr","Cu","Ni","Pb","Zn"]))
+
+"""
+
+# ╔═╡ 6c227179-d25f-4b13-86b1-f69e3f74bb8f
+begin
+	media = mean(dados[!,teor2])
+	q1 = quantile(dados[!,teor2], 0.25)
+	q2 = median(dados[!,teor2])
+	q3 = quantile(dados[!,teor2], 0.75)
+	iqr = q3 - q1
+	min = minimum(dados[!,teor2])
+	LS = q3 + (1.5 * iqr)
+	
+	boxplot(dados[!,teor2], label=false, alpha=0.75,
+			color=:lightcyan, ylabel="$teor2 (ppm)",
+			xticks=false, xaxis=false, outliers=false)
+	
+	plot!([media], seriestype = :scatter, color=:red,
+		  marker=(:star5,5), label="Média")
+end
+
+# ╔═╡ c42132cd-b4e6-4561-a71b-13b276793f13
+md"""
+##### Observações
+
+- Uma outra forma de descrever a assimetria de uma distribuição é por meio da comparação entre média e mediana:
+    - Se $\overline{X} > md(X)$ $\rightarrow$ assimetria positiva;
+    - Se $\overline{X} < md(X)$ $\rightarrow$ assimetria é negativa;
+    - Se $\overline{X} = md(X)$ $\rightarrow$ simetria.
+- O boxplot, pode ser entendido como uma "vista em planta" do histograma.
+"""
 
 # ╔═╡ a2b3a946-5ff3-4127-a797-be2fa4a2b9bf
 md"""
@@ -510,26 +563,14 @@ begin
 	end
 end
 
-# ╔═╡ 0acf95ad-4bd9-4022-b9f9-ce9a886ed1ed
+# ╔═╡ 98c18d0a-95fe-4949-9507-240bb90a02b9
 md"""
-### Boxplot
+##### Observações
 
-O **boxplot**, assim como o histograma, é um gráfico univariado que visa representar a distribuição de uma variável contínua. Essa visualização dá uma ideia da posição, dispersão, simetria e valores extremos de uma variável de interesse (**Bussab & Morettin, 2017**). A Figura 03 ilustra os elementos que constituem o boxplot.
+- A maior parte da área é composta por regiões de `Campo`;
 
-![Figura 03](https://i.postimg.cc/HnRG8289/Figura-03.png)
-
-**Figura 03:** Exemplo de boxplot e seus elementos. Figura elaborada pelo autor.
-
-Selecione, na lista suspensa abaixo, uma variável de teor para que seu boxplot correspondente seja exibido.
-
-Teor: $(@bind teor2 Select(["Cd","Co","Cr","Cu","Ni","Pb","Zn"]))
-
+- Há um grande desbalanceamento na distribuição das litologias. As rochas pertencentes ao `Kimmeridgiano` e ao `Sequentiano` são predominantes na área, enquanto litotipos associados ao Portlandiano são escassos.
 """
-
-# ╔═╡ 6c227179-d25f-4b13-86b1-f69e3f74bb8f
-boxplot(dados[!,teor2], label=false, alpha=0.5,
-		color=:honeydew3, ylabel="$teor2 (ppm)",
-		xticks=false, xaxis=false)
 
 # ╔═╡ c42c2eb0-2047-4490-9ebb-9b0203466836
 md"""
@@ -561,28 +602,11 @@ md"""
 # ╔═╡ fb7fc033-cfb8-45f2-8602-b8e8d69ac9bd
 
 
-# ╔═╡ 47cf20cd-62f6-43c2-b531-31eab994aa15
-md"""
-## 7. Referências
-
-Bussab, W. O.; Morettin, P. A. [Estatística básica](https://www.google.com.br/books/edition/ESTAT%C3%8DSTICA_B%C3%81SICA/vDhnDwAAQBAJ?hl=pt-BR&gbpv=0). 9ª ed. São Paulo: Saraiva, 2017.
-
-Goovaerts, P. [Geostatistics for natural resources evaluation](https://www.google.com.br/books/edition/Geostatistics_for_Natural_Resources_Eval/CW-7tHAaVR0C?hl=pt-BR&gbpv=0). New York: Oxford University Press, 1997.
-
-Isaaks, E. H.; Srivastava, M. R. [Applied geostatistics](https://www.google.com.br/books/edition/Applied_Geostatistics/gUXQzQEACAAJ?hl=pt-BR). New York: Oxford University Press, 1989.
-
-Magalhães, M. N.; De Lima, A. C. P. [Noções de probabilidade e estatística](https://www.google.com.br/books/edition/No%C3%A7%C3%B5es_de_Probabilidade_e_Estat%C3%ADstica/-BAuPwAACAAJ?hl=pt-BR). 7ª ed. São Paulo: Editora da Universidade de São Paulo, 2015.
-
-Rossi, M. E.; Deutsch, C. V. [Mineral resource estimation](https://www.google.com.br/books/edition/Mineral_Resource_Estimation/gzK_BAAAQBAJ?hl=pt-BR&gbpv=0). New York: Springer Science & Business Media, 2014.
-
-Tukey, J. W. [Exploratory data analysis](https://www.google.com.br/books/edition/Exploratory_Data_Analysis/UT9dAAAAIAAJ?hl=pt-BR&gbpv=0&bsq=exploratory%20data%20analysis). Princeton: Addison-Wesley Publishing Company, 
-1977 
-
-"""
-
 # ╔═╡ 5f177c03-cb3d-4268-8c33-3aa7610e337b
 md"""
-## 8. Leituras adicionais
+## 7. Recursos adicionais
+
+Abaixo, são listados alguns recursos complementares a este notebook:
 
 > [Videoaula Descrição Univariada - LPM/UFRGS](https://www.youtube.com/watch?v=ZRh9d_GHfqM)
 
@@ -591,6 +615,24 @@ md"""
 > [Videoaula Estatística Univariada - University of Texas](https://www.youtube.com/watch?v=wAcbA2cIqec&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ)
 
 > [Minicurso de Geoestatística CBMina 2021](https://github.com/juliohm/CBMina2021)
+"""
+
+# ╔═╡ 47cf20cd-62f6-43c2-b531-31eab994aa15
+md"""
+## 8. Referências
+
+*Bussab, W. O.; Morettin, P. A. [Estatística básica](https://www.google.com.br/books/edition/ESTAT%C3%8DSTICA_B%C3%81SICA/vDhnDwAAQBAJ?hl=pt-BR&gbpv=0). 9ª ed. São Paulo: Saraiva, 2017.*
+
+*Goovaerts, P. [Geostatistics for natural resources evaluation](https://www.google.com.br/books/edition/Geostatistics_for_Natural_Resources_Eval/CW-7tHAaVR0C?hl=pt-BR&gbpv=0). New York: Oxford University Press, 1997.*
+
+*Isaaks, E. H.; Srivastava, M. R. [Applied geostatistics](https://www.google.com.br/books/edition/Applied_Geostatistics/gUXQzQEACAAJ?hl=pt-BR). New York: Oxford University Press, 1989.*
+
+*Magalhães, M. N.; De Lima, A. C. P. [Noções de probabilidade e estatística](https://www.google.com.br/books/edition/No%C3%A7%C3%B5es_de_Probabilidade_e_Estat%C3%ADstica/-BAuPwAACAAJ?hl=pt-BR). 7ª ed. São Paulo: Editora da Universidade de São Paulo, 2015.*
+
+*Rossi, M. E.; Deutsch, C. V. [Mineral resource estimation](https://www.google.com.br/books/edition/Mineral_Resource_Estimation/gzK_BAAAQBAJ?hl=pt-BR&gbpv=0). New York: Springer Science & Business Media, 2013.*
+
+*Tukey, J. W. [Exploratory data analysis](https://www.google.com.br/books/edition/Exploratory_Data_Analysis/UT9dAAAAIAAJ?hl=pt-BR&gbpv=0&bsq=exploratory%20data%20analysis). Princeton: Addison-Wesley Publishing Company, 1977.*
+
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -2197,12 +2239,15 @@ version = "0.9.1+5"
 # ╟─64b87701-bf9e-46c9-8700-89d2ef546621
 # ╟─bf03e7f7-82a1-413c-bc6b-3bd19242f65d
 # ╟─ad7306da-0936-4208-9963-b3af1815b43b
+# ╟─155f6b0f-5156-4f42-93c2-6f867415ef37
+# ╟─0acf95ad-4bd9-4022-b9f9-ce9a886ed1ed
+# ╟─6c227179-d25f-4b13-86b1-f69e3f74bb8f
+# ╟─c42132cd-b4e6-4561-a71b-13b276793f13
 # ╟─a2b3a946-5ff3-4127-a797-be2fa4a2b9bf
 # ╟─85ac468b-452a-48b9-ae61-73a6e970c8c8
 # ╟─9093aff6-4dac-4847-96e1-d6ef2c50cce7
 # ╟─4dbd3eca-9a4c-4aa5-8c15-2f294e33e814
-# ╟─0acf95ad-4bd9-4022-b9f9-ce9a886ed1ed
-# ╟─6c227179-d25f-4b13-86b1-f69e3f74bb8f
+# ╟─98c18d0a-95fe-4949-9507-240bb90a02b9
 # ╟─c42c2eb0-2047-4490-9ebb-9b0203466836
 # ╠═cbec4c3f-198e-4334-ba18-55d2fbcc8a0d
 # ╠═e7a33281-7f6d-45cc-bb27-d7d9d2774bee
@@ -2211,7 +2256,7 @@ version = "0.9.1+5"
 # ╠═00ec56d1-1800-472e-8d4c-f542cc8edd4a
 # ╠═9d8d6dc8-eb6b-479b-8194-322134dce5d4
 # ╠═fb7fc033-cfb8-45f2-8602-b8e8d69ac9bd
-# ╟─47cf20cd-62f6-43c2-b531-31eab994aa15
 # ╟─5f177c03-cb3d-4268-8c33-3aa7610e337b
+# ╟─47cf20cd-62f6-43c2-b531-31eab994aa15
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

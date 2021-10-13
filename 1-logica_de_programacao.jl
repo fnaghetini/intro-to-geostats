@@ -51,7 +51,7 @@ A seguir, serão apresentados alguns conceitos básicos de lógica de programaç
 
 # ╔═╡ 14db5525-7c0a-433b-a23c-088db728f46b
 md"""
-#### Informações sobre o notebook
+#### ⚠️ Informações sobre o notebook
 
 - Este notebook é constituído por várias células individuais:
     - Para executá-las, pasta clicar no ícone ▶️, localizado no canto inferior direito da célula.
@@ -402,7 +402,7 @@ md"""
 
 #### 🖊️ Exercício
 
-Com seus conhecimentos geológicos, tente identificar qual rocha é exibida na figura a seguir. Escreva o nome da rocha (apenas com letras minúsculas) na caixa de texto abaixo.
+Com seus conhecimentos geológicos, tente identificar qual rocha é exibida na Figura 01. Escreva o nome da rocha (apenas com letras minúsculas) na caixa de texto abaixo.
 
 """
 
@@ -410,7 +410,7 @@ Com seus conhecimentos geológicos, tente identificar qual rocha é exibida na f
 md"""
 ![rocha](http://lh3.googleusercontent.com/-4dxg2gAuqgk/VeqttO0BqSI/AAAAAAAAKq0/j_G5leYIfIg/s720/01465%252520IMG_20150809_104742%252520mylonite.jpg)
 
-Fonte: [sandatlas.org](https://www.sandatlas.org/mylonite/)
+**Figura 01:** Identifique a rocha acima. Extraído de [sandatlas.org](https://www.sandatlas.org/mylonite/).
 """
 
 # ╔═╡ 98a32d2d-7173-406d-92cf-dfa847d47c49
@@ -430,7 +430,7 @@ md"""
 
 #### 🖊️ Exercício
 
-Na lista suspensa seguir, selecione a opção que corresponda à correta subclasse do silicato exibido na figura abaixo.
+Na lista suspensa seguir, selecione a opção que corresponda à correta subclasse do silicato exibido na Figura 02.
 
 """
 
@@ -438,7 +438,7 @@ Na lista suspensa seguir, selecione a opção que corresponda à correta subclas
 md"""
 ![silicato](https://geology.com/minerals/photos/titanite-crystal.jpg)
 
-Fonte: [geology.com](https://geology.com/minerals/titanite.shtml)
+**Figura 02:** Identifique a subclasse do silicato acima. Extraído de: [geology.com](https://geology.com/minerals/titanite.shtml).
 """
 
 # ╔═╡ 87832d6c-525d-4060-a1e8-d06a611b5dfe

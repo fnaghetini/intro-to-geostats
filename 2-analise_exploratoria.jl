@@ -56,7 +56,7 @@ A AED é uma etapa crucial do fluxo de trabalho de estimativa de recursos, pois 
 
 # ╔═╡ f7756000-3e37-436e-b070-6d57afe142d7
 md"""
-#### Informações sobre o notebook
+#### ⚠️ Informações sobre o notebook
 
 - Este notebook é constituído por várias células individuais:
     - Para executá-las, pasta clicar no ícone ▶️, localizado no canto inferior direito da célula.
@@ -619,7 +619,7 @@ Abaixo, são listados alguns recursos complementares a este notebook:
 
 # ╔═╡ 47cf20cd-62f6-43c2-b531-31eab994aa15
 md"""
-## 8. Referências
+## Referências
 
 *Bussab, W. O.; Morettin, P. A. [Estatística básica](https://www.google.com.br/books/edition/ESTAT%C3%8DSTICA_B%C3%81SICA/vDhnDwAAQBAJ?hl=pt-BR&gbpv=0). 9ª ed. São Paulo: Saraiva, 2017.*
 

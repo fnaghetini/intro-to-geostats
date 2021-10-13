@@ -537,6 +537,62 @@ md"""
 
 """
 
+# ╔═╡ cbec4c3f-198e-4334-ba18-55d2fbcc8a0d
+
+
+# ╔═╡ e7a33281-7f6d-45cc-bb27-d7d9d2774bee
+
+
+# ╔═╡ 6f9c9c1e-dcf6-49e4-b6b4-de71a8f4c1ef
+
+
+# ╔═╡ a5fd7cc5-9460-48d1-ae90-c1a0f0dff265
+md"""
+## 6. Descrição espacial
+
+"""
+
+# ╔═╡ 00ec56d1-1800-472e-8d4c-f542cc8edd4a
+
+
+# ╔═╡ 9d8d6dc8-eb6b-479b-8194-322134dce5d4
+
+
+# ╔═╡ fb7fc033-cfb8-45f2-8602-b8e8d69ac9bd
+
+
+# ╔═╡ 47cf20cd-62f6-43c2-b531-31eab994aa15
+md"""
+## 7. Referências
+
+Bussab, W. O.; Morettin, P. A. [Estatística básica](https://www.google.com.br/books/edition/ESTAT%C3%8DSTICA_B%C3%81SICA/vDhnDwAAQBAJ?hl=pt-BR&gbpv=0). 9ª ed. São Paulo: Saraiva, 2017.
+
+Goovaerts, P. [Geostatistics for natural resources evaluation](https://www.google.com.br/books/edition/Geostatistics_for_Natural_Resources_Eval/CW-7tHAaVR0C?hl=pt-BR&gbpv=0). New York: Oxford University Press, 1997.
+
+Isaaks, E. H.; Srivastava, M. R. [Applied geostatistics](https://www.google.com.br/books/edition/Applied_Geostatistics/gUXQzQEACAAJ?hl=pt-BR). New York: Oxford University Press, 1989.
+
+Magalhães, M. N.; De Lima, A. C. P. [Noções de probabilidade e estatística](https://www.google.com.br/books/edition/No%C3%A7%C3%B5es_de_Probabilidade_e_Estat%C3%ADstica/-BAuPwAACAAJ?hl=pt-BR). 7ª ed. São Paulo: Editora da Universidade de São Paulo, 2015.
+
+Rossi, M. E.; Deutsch, C. V. [Mineral resource estimation](https://www.google.com.br/books/edition/Mineral_Resource_Estimation/gzK_BAAAQBAJ?hl=pt-BR&gbpv=0). New York: Springer Science & Business Media, 2014.
+
+Tukey, J. W. [Exploratory data analysis](https://www.google.com.br/books/edition/Exploratory_Data_Analysis/UT9dAAAAIAAJ?hl=pt-BR&gbpv=0&bsq=exploratory%20data%20analysis). Princeton: Addison-Wesley Publishing Company, 
+1977 
+
+"""
+
+# ╔═╡ 5f177c03-cb3d-4268-8c33-3aa7610e337b
+md"""
+## 8. Leituras adicionais
+
+> [Videoaula Descrição Univariada - LPM/UFRGS](https://www.youtube.com/watch?v=ZRh9d_GHfqM)
+
+> [Videoaula Descrição Bivariada - LPM/UFRGS](https://www.youtube.com/watch?v=U0sqVJY_mzA)
+
+> [Videoaula Estatística Univariada - University of Texas](https://www.youtube.com/watch?v=wAcbA2cIqec&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ)
+
+> [Minicurso de Geoestatística CBMina 2021](https://github.com/juliohm/CBMina2021)
+"""
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -2148,5 +2204,14 @@ version = "0.9.1+5"
 # ╟─0acf95ad-4bd9-4022-b9f9-ce9a886ed1ed
 # ╟─6c227179-d25f-4b13-86b1-f69e3f74bb8f
 # ╟─c42c2eb0-2047-4490-9ebb-9b0203466836
+# ╠═cbec4c3f-198e-4334-ba18-55d2fbcc8a0d
+# ╠═e7a33281-7f6d-45cc-bb27-d7d9d2774bee
+# ╠═6f9c9c1e-dcf6-49e4-b6b4-de71a8f4c1ef
+# ╟─a5fd7cc5-9460-48d1-ae90-c1a0f0dff265
+# ╠═00ec56d1-1800-472e-8d4c-f542cc8edd4a
+# ╠═9d8d6dc8-eb6b-479b-8194-322134dce5d4
+# ╠═fb7fc033-cfb8-45f2-8602-b8e8d69ac9bd
+# ╟─47cf20cd-62f6-43c2-b531-31eab994aa15
+# ╟─5f177c03-cb3d-4268-8c33-3aa7610e337b
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

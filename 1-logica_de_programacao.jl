@@ -319,7 +319,7 @@ end
 # ╔═╡ 3cfbddfb-be59-4019-965f-13bdbac2295a
 md"""
 
-## 5. Laços de Repetição
+## 5. Laços de repetição
 
 Os **laços de repetição** são utilizados quando se deseja repetir determinado trecho do algoritmo múltiplas vezes. O número de repetições pode ser indeterminado, mas necessariamente finito.
 
@@ -449,7 +449,7 @@ md""" Subclasse: $(@bind silicato Select(["Tectossilicato","Filossilicato",
 
 # ╔═╡ 8f866ee4-ce44-4d42-be56-7764168c1c71
 md"""
-## 7. Leituras Adicionais
+## 7. Leituras adicionais
 
 Abaixo, são listados alguns recursos complementares a este notebook:
 

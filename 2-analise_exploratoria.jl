@@ -324,7 +324,7 @@ md"""
 O **desvio padrão** é simplesmente a raíz quadrada da variância. Normalmente, essa estatística é utilizada para substituir a variância, uma vez que se encontra na mesma unidade de medida da variável de interesse (*Isaaks & Srivastava, 1989*). O desvio padrão também é uma estatística pouco robusta.
 
 ```math
-S^2 = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i - \overline{X})^2} = \sqrt{S^2}
+S = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i - \overline{X})^2} = \sqrt{S^2}
 ```
 > **Nota:** a equação acima representa ao **desvio padrão amostral**.
 
@@ -508,7 +508,7 @@ begin
 	
 	boxplot(dados[!,teor2], label=false, alpha=0.75,
 			color=:lightcyan, ylabel="$teor2 (ppm)",
-			xticks=false, xaxis=false, outliers=false)
+			xticks=false, xaxis=false)
 	
 	plot!([media], seriestype = :scatter, color=:red,
 		  marker=(:star5,5), label="Média")
@@ -576,16 +576,97 @@ md"""
 md"""
 ## 5. Descrição bivariada
 
+A **descrição bivariada** consiste em um conjunto de estatísticas e técnicas de visualização que visam descrever a relação entre duas variáveis por vez. Segundo *Isaaks & Srivastava (1989)*, grande parte das informações presentes em conjuntos de dados geoespaciais estão associadas às relações entre variáveis.
 """
 
 # ╔═╡ cbec4c3f-198e-4334-ba18-55d2fbcc8a0d
+md"""
+### Coeficiente de Pearson
 
+O **coeficiente de Pearson** é a estatística mais comum para descrever a relação entre duas variáveis (*Isaaks & Srivastava, 1989*). Essa medida pode ser calculada como:
+
+```math
+r = \frac{\frac{1}{n} \sum_{i=1}^{n} (x_i - \overline{X})(y_i - \overline{Y})}{S_x S_y}
+```
+
+> **Nota:** o numerador da equação acima é uma estatística denominada **covariância**. Portanto, podemos dizer que o coeficiente de Pearson é a covariância normalizada.
+
+O coeficiente de Pearson mede um tipo especial de relação, a **correlação linear**. Basicamente, existem três tipos de padrões:
+
+- **$r > 0$** → correlação linear positiva;
+
+- **$r < 0$** → correlação linear negativa;
+
+- **$r \approx 0$** → ausência de correlação.
+
+> **Nota:** esse coeficiente assume valores no intervalo **[-1, 1]**. Desse modo, quanto maior é o módulo do coeficiente, maior é a força da correlação linear, seja ela positiva ou negativa.
+
+Podemos utilizar a função `cor` para computar o coeficiente de correlação de Pearson entre os teores de `Cr` e `Co`...
+
+"""
 
 # ╔═╡ e7a33281-7f6d-45cc-bb27-d7d9d2774bee
+cor(dados.Cr, dados.Co)
 
+# ╔═╡ 1f684b7d-3cfb-4ede-aadd-e82b131e017d
+md"""
+Como nossos dados contém sete elementos químicos, podemos calcular uma **matriz de correlação** para facilitar a visualização das relações entre todas as variáveis de uma só vez.
 
-# ╔═╡ 6f9c9c1e-dcf6-49e4-b6b4-de71a8f4c1ef
+Selecione as variáveis de interesse nas listas suspensas abaixo para que o coeficiente de Pearson entre elas seja computado:
+"""
 
+# ╔═╡ 98912d9a-d1bb-4b4d-a7eb-f98963bf790d
+begin
+	TEORES = ["Cd","Co","Cr","Cu","Ni","Pb","Zn"]
+	
+	md"""Variáveis: $(@bind V₁ Select(TEORES)) e $(@bind V₂ Select(TEORES))"""
+end
+
+# ╔═╡ fce35de6-7f4c-4817-8554-397d2bb19778
+begin
+	mtz = Matrix(dados[!,TEORES])
+	cor_mtz = cor(mtz)
+	cc = round(cor(dados[!,V₁], dados[!,V₂]), digits=2)
+	
+	heatmap(TEORES, TEORES, cor_mtz, color=:coolwarm, clims=(0,1),
+			title="r($V₁, $V₂) = $cc")
+end
+
+# ╔═╡ d2956461-9a8f-4123-9243-523f623e1f21
+md"""
+##### Observações
+
+- Todos os elementos químicos do banco de dados apresentam correlações lineares positivas entre si;
+- Os elementos `Pb` e `Cu` apresentam a correlação linear mais forte ($r = 0.78$);
+- Os elementos `Cu` e `Cd` apresentam a correlação linear mais fraca ($r = 0.13$).
+"""
+
+# ╔═╡ ab709b9f-a06a-4bed-a36b-f3c5d6e46265
+md"""
+### Diagrama de dispersão
+
+O **diagrama de dispersão**, também chamado de *scatterplot*, é um o dispositivo útil para se verificar a associação entre duas variáveis (*Bussab & Morettin, 2017*). No eixo horizontal é representado pelos valores de uma variável, enquanto o eixo vertical é rotulado com os valores da outra variável.
+
+> **Nota:** é sempre interessante visualizar o diagrama de dispersão (gráfico) em conjunto com o coeficiente de Pearson (estatística) para analisar a relação de um par de variáveis.
+
+Nas listas suspensas abaixo, selecione as variáveis de interesse para visualizar o diagrama de dispersão.
+
+Variáveis: $(@bind var₁ Select(TEORES)) e $(@bind var₂ Select(TEORES))
+"""
+
+# ╔═╡ 3a75e14e-9ddb-423b-99a5-d7280218b41e
+begin
+	x = dados[!,var₁]
+	y = dados[!,var₂]
+	r = round(cor(x,y), digits=2)
+	
+	scatter(x, y, xlabel="$var₁ (ppm)", ylabel="$var₂ (ppm)",
+			label="r = $r", color=:black, markersize=2)
+	
+	vline!([mean(x)], color=:red, ls=:dash, label="Média")
+	hline!([mean(y)], color=:red, ls=:dash, label=false)
+	plot!([mean(x)],[mean(y)], marker=(:square, 4, :red), label=false)
+end
 
 # ╔═╡ a5fd7cc5-9460-48d1-ae90-c1a0f0dff265
 md"""
@@ -593,13 +674,13 @@ md"""
 
 """
 
-# ╔═╡ 00ec56d1-1800-472e-8d4c-f542cc8edd4a
+# ╔═╡ e6a85185-8188-42e7-b639-34e8c9a8c515
 
 
-# ╔═╡ 9d8d6dc8-eb6b-479b-8194-322134dce5d4
+# ╔═╡ 447ead1b-53a3-42a3-ad9d-6bc7c099c40f
 
 
-# ╔═╡ fb7fc033-cfb8-45f2-8602-b8e8d69ac9bd
+# ╔═╡ fbeade43-7a37-4d16-bc24-eb857799a732
 
 
 # ╔═╡ 5f177c03-cb3d-4268-8c33-3aa7610e337b
@@ -2216,7 +2297,7 @@ version = "0.9.1+5"
 # ╟─f5bf9985-62be-48d1-8399-ecde710e1dd5
 # ╟─b7820679-6ec3-4580-a502-4e4315ed44f9
 # ╟─e1ff515f-c0d2-4e4b-b768-8d5611347e2d
-# ╟─17cdccaf-a34e-4b49-8156-01f6221ae00b
+# ╠═17cdccaf-a34e-4b49-8156-01f6221ae00b
 # ╟─476e5bc7-5d9c-43fe-ac84-ead5bbbfe4b9
 # ╠═98b6bce7-8cc4-4d7f-b947-21feb4b43bf0
 # ╟─581459c4-312a-4022-a87c-35887f625d6d
@@ -2249,13 +2330,18 @@ version = "0.9.1+5"
 # ╟─4dbd3eca-9a4c-4aa5-8c15-2f294e33e814
 # ╟─98c18d0a-95fe-4949-9507-240bb90a02b9
 # ╟─c42c2eb0-2047-4490-9ebb-9b0203466836
-# ╠═cbec4c3f-198e-4334-ba18-55d2fbcc8a0d
+# ╟─cbec4c3f-198e-4334-ba18-55d2fbcc8a0d
 # ╠═e7a33281-7f6d-45cc-bb27-d7d9d2774bee
-# ╠═6f9c9c1e-dcf6-49e4-b6b4-de71a8f4c1ef
+# ╟─1f684b7d-3cfb-4ede-aadd-e82b131e017d
+# ╟─98912d9a-d1bb-4b4d-a7eb-f98963bf790d
+# ╟─fce35de6-7f4c-4817-8554-397d2bb19778
+# ╟─d2956461-9a8f-4123-9243-523f623e1f21
+# ╟─ab709b9f-a06a-4bed-a36b-f3c5d6e46265
+# ╟─3a75e14e-9ddb-423b-99a5-d7280218b41e
 # ╟─a5fd7cc5-9460-48d1-ae90-c1a0f0dff265
-# ╠═00ec56d1-1800-472e-8d4c-f542cc8edd4a
-# ╠═9d8d6dc8-eb6b-479b-8194-322134dce5d4
-# ╠═fb7fc033-cfb8-45f2-8602-b8e8d69ac9bd
+# ╠═e6a85185-8188-42e7-b639-34e8c9a8c515
+# ╠═447ead1b-53a3-42a3-ad9d-6bc7c099c40f
+# ╠═fbeade43-7a37-4d16-bc24-eb857799a732
 # ╟─5f177c03-cb3d-4268-8c33-3aa7610e337b
 # ╟─47cf20cd-62f6-43c2-b531-31eab994aa15
 # ╟─00000000-0000-0000-0000-000000000001

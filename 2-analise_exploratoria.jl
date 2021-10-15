@@ -65,6 +65,8 @@ md"""
 
 - Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."`. Elas são chamadas de **markdown** e representam as células de texto do notebook. Caso deseje aprender um pouco mais sobre a linguagem markdown, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
 
+- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
+
 - Você pode utilizar este notebook da forma que quiser! 🙂 Caso deseje utilizá-lo em algum trabalho, apenas referencie [este link](https://github.com/fnaghetini/intro-to-geostats).
 """
 
@@ -377,7 +379,7 @@ Apenas uma medida de forma será apresentada, o coeficiente de assimetria.
 O **coeficiente de assimetria**, também chamado de *skewness*, traz informações sobre a simetria de uma distribuição. Como apresenta termos elevados ao cubo, essa estatística é extremamente sensível à presença de valores extremos (*Isaaks & Srivastava, 1989*). Essa medida pode ser representada como:
 
 ```math
-skew(X) = \frac{\frac{1}{n-1} \sum_{i=1}^{n} (x_i - \overline{X})^3}{S^3}
+skew(X) = \frac{\frac{1}{n} \sum_{i=1}^{n} (x_i - \overline{X})^3}{S^3}
 ```
 
 Com base no coeficiente de assimetria, as distribuições podem ser classificadas como:
@@ -507,7 +509,7 @@ begin
 	LS = q3 + (1.5 * iqr)
 	
 	boxplot(dados[!,teor2], label=false, alpha=0.75,
-			color=:lightcyan, ylabel="$teor2 (ppm)",
+			color=:honeydew2, ylabel="$teor2 (ppm)",
 			xticks=false, xaxis=false)
 	
 	plot!([media], seriestype = :scatter, color=:red,
@@ -554,11 +556,11 @@ md"""Variável nominal: $(@bind var_nom Select(["Landuse","Rock"]))"""
 begin
 	if var_nom == "Landuse"
 		bar(df_landuse.classe, df_landuse.contagem,
-			label=false, color=:navajowhite1,
+			label=false, color=:honeydew2,
 			alpha=0.75, ylabel="Freq. Absoluta")
 	else
 		bar(df_rock.classe, df_rock.contagem,
-			label=false, color=:navajowhite1,
+			label=false, color=:honeydew2,
 			alpha=0.75, ylabel="Freq. Absoluta")
 	end
 end
@@ -628,8 +630,8 @@ begin
 	cor_mtz = cor(mtz)
 	cc = round(cor(dados[!,V₁], dados[!,V₂]), digits=2)
 	
-	heatmap(TEORES, TEORES, cor_mtz, color=:coolwarm, clims=(0,1),
-			title="r($V₁, $V₂) = $cc")
+	heatmap(TEORES, TEORES, cor_mtz, color=:Greens, clims=(0,1),
+			title="r($V₁, $V₂) = $cc", colorbartitle="r")
 end
 
 # ╔═╡ d2956461-9a8f-4123-9243-523f623e1f21
@@ -647,7 +649,7 @@ md"""
 
 O **diagrama de dispersão**, também chamado de *scatterplot*, é um o dispositivo útil para se verificar a associação entre duas variáveis (*Bussab & Morettin, 2017*). No eixo horizontal é representado pelos valores de uma variável, enquanto o eixo vertical é rotulado com os valores da outra variável.
 
-> **Nota:** é sempre interessante visualizar o diagrama de dispersão (gráfico) em conjunto com o coeficiente de Pearson (estatística) para analisar a relação de um par de variáveis.
+> **Nota:** é sempre interessante visualizar o diagrama de dispersão (gráfico) em conjunto com o coeficiente de Pearson (estatística) para analisar a relação entre um par de variáveis.
 
 Nas listas suspensas abaixo, selecione as variáveis de interesse para visualizar o diagrama de dispersão.
 
@@ -661,12 +663,78 @@ begin
 	r = round(cor(x,y), digits=2)
 	
 	scatter(x, y, xlabel="$var₁ (ppm)", ylabel="$var₂ (ppm)",
-			label="r = $r", color=:black, markersize=2)
+			label="r = $r", marker=(:circle,2,:black))
 	
 	vline!([mean(x)], color=:red, ls=:dash, label="Média")
 	hline!([mean(y)], color=:red, ls=:dash, label=false)
 	plot!([mean(x)],[mean(y)], marker=(:square, 4, :red), label=false)
 end
+
+# ╔═╡ e34c26f3-4aee-48bc-b164-2347f957a7d7
+md"""
+##### Observações
+
+- O diagrama de dispersão entre as variáveis `Pb` e `Cu` mostra um padrão linear positivo bem definido;
+- O diagrama de dispersão entre as variáveis `Cd` e `Cu` mostra um padrão disperso, sem qualquer alinhamento entre os dados;
+- As variáveis `Cd` e `Cr` apresentam uma relação, mas que não aparenta ser linear. Por esse motivo, o coeficiente de Pearson computado ($r=0.6$) não é tão alto.  
+"""
+
+# ╔═╡ 39b95c2a-df18-40a0-80c6-3c25b2b353e8
+md"""
+### Q-Q plot
+
+O **Q-Q plot** é um dispositivo visual muito útil para comparação de duas distribuições que, por algum motivo, podem ser similares. Os eixos desse gráfico representam os quantis das duas variáveis (*Isaaks & Srivastava, 1989*). O Q-Q plot pode apresentar, essencialmente, três padrões:
+
+- Distribuições com médias e dispersões similares: os dados encontram-se alinhados à reta X=Y;
+- Distribuições com médias distintas e dispersões similares: os dados encontram-se alinhados paralelamente à reta X=Y, mas há uma translação;
+- Distribuições com médias similares e dispersões distintas: os dados encontram-se rotacionados em relação à reta X=Y, mas sem translação.
+
+> **Nota:** esse gráfico é muito importante durante a **definição dos domínios de estimativa**. Durante essa etapa, geralmente é necessário agrupar os dados em subconjuntos distintos por algum critério de natureza geológica (e.g. litologia, tipologia do minério, zonas de highgrade e lowgrade). Nesse sentido, o Q-Q Plot pode ser utilizado para validar visualmente a definição desses domínios.
+
+Abaixo, utilizamos o Q-Q plot para verificar se há diferenças significativas entre as distribuições de um mesmo elemento agrupado por litologias...
+
+"""
+
+# ╔═╡ 0ae3c6dd-63f1-4837-b3f2-f275e06c7d8c
+begin
+	LITO = unique(dados.Rock)
+	
+	md"""
+	Variável: $(@bind Z Select(TEORES))
+	
+	Litologias: $(@bind lito₁ Select(LITO)) e $(@bind lito₂ Select(LITO))
+	"""
+end
+
+# ╔═╡ cd0d4cd3-850d-4730-88c3-9d93e7a922f7
+begin
+	# filtragem por litologia
+	dados_lito1 = dados |> @filter(_.Rock == lito₁) |> DataFrame
+	dados_lito2 = dados |> @filter(_.Rock == lito₂) |> DataFrame
+	
+	# cálculo das medianas
+	md₁ = median(dados_lito1[!,Z])
+	md₂ = median(dados_lito2[!,Z])
+	
+	# qq-plot
+	qqplot(dados_lito1[!,Z], dados_lito2[!,Z], xlabel="$Z ($lito₁)",
+		   ylabel="$Z ($lito₂)", color=:black, marker=(:circle,2),
+		   legend=:topleft, label=false)
+	
+	# plotagem das medianas
+	vline!([md₁], color=:red, ls=:dash, label=false)
+	hline!([md₂], color=:red, ls=:dash, label="Mediana")
+	plot!([md₁],[md₂], marker=(:square, 4, :red), label=false)
+end
+
+# ╔═╡ b1f8414f-e004-4cae-8d69-a56b57b5ea11
+md"""
+##### Observações
+
+- Não há uma grande diferença entre as distribuições de `Pb` nas litologias `Sequaniano` e `Kimmeridgiano`. Repare que a maioria dos dados encontra-se alinhada ao longo da reta X=Y;
+- Os teores de `Pb` nas rochas do `Kimmeridgiano` tendem a ser mais elevados do que as concentrações dessa variável nas rochas do `Argoviano`. Repare que a maioria dos dados encontra-se alinhada paralelamente à reta X=Y;
+- Os teores de `Co` nas rochas do `Quaternario` são bem mais altos e erráticos do que nas rochas do `Argoviano`. Repare que há translação e rotação dos dados em relação à reta X=Y.
+"""
 
 # ╔═╡ a5fd7cc5-9460-48d1-ae90-c1a0f0dff265
 md"""
@@ -2338,6 +2406,11 @@ version = "0.9.1+5"
 # ╟─d2956461-9a8f-4123-9243-523f623e1f21
 # ╟─ab709b9f-a06a-4bed-a36b-f3c5d6e46265
 # ╟─3a75e14e-9ddb-423b-99a5-d7280218b41e
+# ╟─e34c26f3-4aee-48bc-b164-2347f957a7d7
+# ╟─39b95c2a-df18-40a0-80c6-3c25b2b353e8
+# ╟─0ae3c6dd-63f1-4837-b3f2-f275e06c7d8c
+# ╟─cd0d4cd3-850d-4730-88c3-9d93e7a922f7
+# ╟─b1f8414f-e004-4cae-8d69-a56b57b5ea11
 # ╟─a5fd7cc5-9460-48d1-ae90-c1a0f0dff265
 # ╠═e6a85185-8188-42e7-b639-34e8c9a8c515
 # ╠═447ead1b-53a3-42a3-ad9d-6bc7c099c40f

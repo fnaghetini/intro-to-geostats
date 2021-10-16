@@ -4,11 +4,20 @@
 using Markdown
 using InteractiveUtils
 
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    quote
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
+        el
+    end
+end
+
 # ╔═╡ 9aed0800-1e13-11ec-2780-69699771cc17
 begin
 	# carregando pacotes necessários
 	using CSV, DataFrames, Query
-	using Statistics, Random
+	using StatsBase, Statistics, Random
 	using GeoStats, PlutoUI
 	using Plots, StatsPlots
 	
@@ -35,46 +44,115 @@ md"""
 # ╔═╡ b53bfda4-60de-43c8-9852-faa1051050e2
 md""" # 📊 Análise Exploratória
 
-Neste primeiro módulo, os seguintes tópicos serão abordados:
+A **Análise Exploratória dos Dados (AED)** consiste em uma abordagem para organizar e sumarizar um determinado conjunto de dados, a partir de estatísticas descritivas e técnicas de visualização de dados. Segundo *Tukey (1977)*, pesquisador que propôs o termo, a AED pode ser comparada ao trabalho de investigação realizado por um detetive. Pode-se dizer ainda que, durante a AED, *os dados são transformados em informações*.
 
-1. Introdução à linguagem Julia
+De forma mais descontraída, pode-se dizer que:
 
-2. Importação e Limpeza dos dados
+> *A AED é a arte de torturar os dados até que eles confessem informações escondidas!*
 
-3. Filtragem e agrupamento dos dados
-
-4. Visualização dos dados
-
-5. Shape files e rasters
+Neste módulo, iremos aprender sobre algumas das técnicas de AED mais utilizadas no contexto de estimativa de recursos.
 
 """
 
-# ╔═╡ 21daf2f4-fb73-439b-9fb8-0ffda6265083
-md"---"
+# ╔═╡ b6e565dc-96a2-42e8-9997-a4c513ff748e
+html"<hr><hr>"
+
+# ╔═╡ f7756000-3e37-436e-b070-6d57afe142d7
+md"""
+##### ⚡ Informações Gerais
+
+- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
+
+- Algumas células encontram-se ocultadas. Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
+
+- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
+
+- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."`. Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
+
+- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
+
+- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
+
+- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
+"""
+
+# ╔═╡ bd01593a-53a5-4c36-b5e4-3d738a0c3c08
+html"<hr><hr>"
+
+# ╔═╡ e28a9056-d62d-4ab6-be00-0174180a73c5
+md"""
+## 1. Conceitos Básicos
+
+Nesta primeira seção, iremos aprender/revisar alguns conceitos básicos sobre Estatística Clássica.
+"""
+
+# ╔═╡ a8c53b89-634b-4526-be62-f51f22c3c607
+md"""
+### População x Amostra
+
+A **população** é o conjunto exaustivo e finito de todos os elementos ou resultados sob investigação. Em outras palavras, é a realidade física (*Bussab & Morettin, 2017*).
+
+Por outro lado, a **amostra** é qualquer subconjunto da população formado por elementos que foram medidos (*Bussab & Morettin, 2017*).
+
+No contexto de estimativa de recursos, a **amostra** seria formada pelo conjunto de furos de sondagem disponíveis, enquanto a **população** seria o depósito/jazida/mina sob investigação.
+
+Assim como em várias áreas, não temos informações sobre toda a população (i.e. depósito), mas apenas sobre um subconjunto dela (i.e. furos de sondagem) (Figura 01). Segundo *Rossi & Deutsch (2013)*, em média, apenas $\frac{1}{10^9}$ de um depósito é amostrado. Isso se deve ao fato de a sondagem ser uma atividade de elevado custo ao empreendimento.
+
+"""
+
+# ╔═╡ b8576b51-2a2b-4614-ae62-280394944319
+md"""
+![Figura_01](https://i.postimg.cc/dVwQj93Q/Figura-01.png)
+
+**Figura 01:** A população é representada pelo depósito, enquanto a amostra é representada pelos furos de sondagem disponíveis. Figura elaborada pelo autor.
+"""
+
+# ╔═╡ b517b327-27e9-4e7c-a721-3ff8c991ff08
+md"""
+### Parâmetros x Estimadores
+
+Os **parâmetros** são as quantidades da população sobre as quais temos interesse. Normalmente são representadas por letras gregas, como $\mu$ (média populacional), $\sigma^2$ (variância populacional) e $\sigma$ (desvio padrão populacional) (*Magalhães & De Lima, 2015*).
+
+Por outro lado, os **estimadores**, às vezes chamados de **estatísticas**, correspondem à combinação dos elementos da amostra construída com a finalidade de representar ou estimar um parâmetro de interesse na população. São representados por letras do alfabeto latino, como X̅ (média amostral), $S^2$ (variância amostral) e $S$ (desvio padrão amostral) (*Magalhães & De Lima, 2015*).
+
+Como só temos acesso à amostra (e.g. furos de sondagem), iremos trabalhar com estimadores (i.e. estatísticas).
+
+"""
+
+# ╔═╡ c08e9281-bbc8-4328-b005-b867c77f725c
+md"""
+### Tipos de variáveis
+
+As **variáveis qualitativas** apresentam como possíveis realizações uma qualidade ou atributo de um indivíduo pesquisado. Essas variáveis podem ainda ser divididas em **nominais**, quando não existe uma ordenação nas possíveis realizações, e **ordinais**, quando existe uma ordem nos seus resultados (*Bussab & Morettin, 2017*). Litologia e grau de alteração são exemplos de variáveis qualitativas nominais e ordinais, respectivamente.
+
+As **variáveis quantitativas** também estão sujeitas a uma classificação dicotômica. As variáveis **discretas** são aquelas cujos possíveis valores formam um conjunto finito ou enumerável de números (1, 2, ...). Já as variáveis **contínuas** apresentam possíveis valores pertencentes a um intervalo de números reais resultantes de uma mensuração (*Bussab & Morettin, 2017*). Zona mineralizada e teor são exemplos de variáveis quantitativas discretas e contínuas, respectivamente.
+
+A Figura 02 mostra um esquema com os tipos de variáveis existentes.
+"""
+
+# ╔═╡ 01280f05-2fc2-4860-add3-8b40d9bd546e
+md"""
+![Figura_02](https://i.postimg.cc/MGvTF2fZ/Figura-02.jpg)
+
+**Figura 02:** Tipos de variáveis. Modificado de *Bussab & Morettin (2017)*.
+"""
 
 # ╔═╡ 966a59b1-f8b8-4612-ab4d-ff7ec2a569d9
 md"""
 
-## 1. Importação e limpeza dos dados
+## 2. Importação dos dados
 
-A partir desta seção, iremos trabalhar com o banco de dados [Jura](https://rdrr.io/cran/gstat/man/jura.html) do excelente livro [Geostatistics for Natural Resources Evaluation](https://books.google.com.br/books/about/Geostatistics_for_Natural_Resources_Eval.html?id=CW-7tHAaVR0C&redir_esc=y) de **Pierre Goovaerts**.
-
-Esse banco de dados é composto pelos seguintes atributos:
+Neste módulo, iremos trabalhar com o banco de dados [Jura](https://rdrr.io/cran/gstat/man/jura.html) do excelente livro de *Goovaerts (1997)*. Esse banco de dados é constituído por amostras de solo que possuem os seguintes atributos:
 
 - `Xloc` e `Yloc`: coordenadas locais X e Y.
 - `Landuse` e `Rock`: tipo de uso do solo e tipo de rocha, respectivamente.
-- `cadmio`, `cobalto`, `Cr`, `Cu`, `niquel`, `chumbo` e `Zn`: concentração de elementos no solo em ppm.
+- `cadmium`, `cobalt`, `Cr`, `Cu`, `nickel`, `lead` e `Zn`: concentração de elementos no solo em ppm.
 
-"""
+> ⚠️ Algumas modificações no banco de dados foram realizadas pelo autor para exemplificar algumas rotinas típicas da AED.
 
-# ╔═╡ 9b819a7c-53c7-407b-b56b-12c07897ba36
-md"""
+Os dados estão no formato CSV no arquivo `data/jura.csv`. Para carregá-los no notebook, utilizaremos os pacotes [CSV.jl](https://github.com/JuliaData/CSV.jl) e [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl).
 
-### Importação dos dados
-
-Os dados estão no formato CSV no arquivo `data/jura.csv`. Para carregar o arquivo no notebook, utilizaremos os pacotes [CSV.jl](https://github.com/JuliaData/CSV.jl) e [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl).
-
-Especificamos o caminho do arquivo e redirecionamos o resultado para uma tabela `DataFrame` utilizando o operador `|>`, conhecido como *pipe* em Julia.
+Especificamos o caminho do arquivo e redirecionamos o resultado para uma tabela `DataFrame` utilizando o operador `|>`, conhecido como *pipe*.
 
 """
 
@@ -84,7 +162,7 @@ jura = CSV.File("data/jura.csv") |> DataFrame
 # ╔═╡ e34b3cdf-736d-40b8-8289-bfe968925b17
 md"""
 
-Podemos usar a função `describe()` para obter algumas estatísticas básicas...
+Podemos usar a função `describe()` para obter algumas informações gerais sobre o banco de dados...
 
 """
 
@@ -93,263 +171,732 @@ describe(jura)
 
 # ╔═╡ 778ce45e-1486-433b-8c0a-1b5beddaf352
 md"""
+##### Observações
 
-Notamos que cada atributo (coluna) tem um tipo de elemento `eltype` e que todos os elementos (exceto `Ni` e `Pb`) têm valores faltantes. Elementos faltantes neste caso tem o tipo `Union{Missing,Float64}` que representa a união do tipo `Float64` com o tipo `Missing`. Em outras palavras, esses elementos têm valores que são `Float64` mas algumas linhas `missing`.
+- Cada atributo (coluna) tem um tipo de elemento `eltype`;
+
+- Todos os elementos (exceto `Ni` e `Pb`) têm valores faltantes. Elementos faltantes, neste caso, têm o tipo `Union{Missing,Float64}` que representa a união do tipo `Float64` com o tipo `Missing`;
+
+- Os valores dos elementos amostrados encontram-se em escalas distintas;
+
+- As coordenadas `Xloc` e `Yloc` são variáveis quantitativas contínuas;
+
+- Os elementos químicos amostrados são variáveis quantitativas contínuas;
+
+- As colunas `Landuse` e `Rock` podem ser classificadas como variáveis qualitativas nominais.
 
 """
 
 # ╔═╡ 71004e57-95c2-403d-992e-4cf0875a6d2e
 md"""
 
-### Limpeza dos dados
+## 3. Limpeza dos dados
 
-O primeiro passo é a limpeza e preparação dos dados, uma das etapas que mais demandam tempo do fluxo de trabalho geoestatístico. Usaremos o pacote [Query.jl](https://github.com/queryverse/Query.jl) para manipular tabelas de forma sucinta e performática. O pacote introduz um conjunto de operações que podem ser facilmente concatenadas para produzir novas tabelas, como:
+O próximo passo é a limpeza dos dados, uma das etapas que mais demandam tempo do fluxo de trabalho. Usaremos o pacote [Query.jl](https://github.com/queryverse/Query.jl) para manipular os dados de forma sucinta e performática. Esse pacote introduz um conjunto de operações que podem ser facilmente concatenadas para produzir novas tabelas, como:
 
 ```julia
-tabela |> @rename(...) |> @filter(...)
+dados |> @rename(...) |> @filter(...)
 ```
 
-Nesse caso, iremos eliminar as linhas da tabela que contenham valores faltantes a partir da operação `@dropna`. Em seguida, alguns atributos serão renomeados para padronizar os dados. Nesse caso, a operação `@rename` é utilizada:
+Nesse sentido, iremos eliminar as linhas da tabela que contenham valores faltantes a partir da operação `@dropna`. Em seguida, algumas colunas serão renomeadas para fins de padronização. Nesse caso, a operação `@rename` será utilizada...
 
 """
 
 # ╔═╡ 1014b88e-9aad-4e89-ba9d-f7701fc1a812
 dados = jura |> @dropna() |> @rename(:Xloc => :X, :Yloc => :Y,
-								     :cadmio => :Cd, :cobalto => :Co,
-									 :niquel => :Ni, :chumbo => :Pb) |> DataFrame
+								     :cadmium => :Cd, :cobalt => :Co,
+									 :nickel => :Ni, :lead => :Pb) |> DataFrame
 
-# ╔═╡ e5e744d6-41e6-45f3-b4a3-fc8d08911eb1
+# ╔═╡ f25cb0bc-e063-4ff1-9521-50c9e72fcbbe
 md"""
+##### Observações
 
-##### 🖊️ Exercício
+- Após a limpeza, não há mais dados com valores faltantes;
 
-Utilizando a [documentação](http://www.queryverse.org/Query.jl/stable/standalonequerycommands/#The-@replacena-command-1) do pacote `Query.jl`, escreva uma consulta que substitua todos os valores faltantes da tabela `jura` pelo valor `-99` e salve o resultado na variável `dados1`.
-
+- Os nomes das variáveis que representam os elementos químicos amostrados foram atualizados para as siglas correspondentes.
 """
 
-# ╔═╡ 96d6f64f-fe3d-40e9-93f1-77b2a57cbb39
-dados1 = missing
-
-# ╔═╡ c07352bf-7f1f-40bb-a32c-d9f5b62a9b89
-md"---"
-
-# ╔═╡ f6142765-32bf-46a8-ac66-ea5fd8dc8797
+# ╔═╡ 57891f5d-4db7-4e33-80f0-649c6262e516
 md"""
+Agora podemos definir algumas variáveis globais que serão utilizadas ao longo deste módulo..."""
 
-## 3. Filtragem e agrupamento dos dados
-
-"""
-
-# ╔═╡ 9d2655a0-de38-4fde-9fd0-98c703d8a14e
-md"""
-
-### Filtragem dos dados
-
-Em problemas de (geo)ciência de dados, uma das tarefas mais comuns é a **filtragem** de certas linhas do banco de dados de acordo com algumas condições. Para isso, utilizaremos a operação `@filter` também da biblioteca **Query.jl**.
-
-A operação utiliza o símbolo especial `_` para se referir a linha atual da tabela sendo filtrada. Podemos escrever `_.Co` para nos referirmos ao valor da coluna (ou variável) `Co` na linha atual.
-
-Podemos filtrar, por exemplo, apenas as linhas em que `Rock = Kimmeridgiano` e `Co ≥ 15`...
-
-"""
-
-# ╔═╡ f0d24d48-2acb-4924-a3fc-21e2231e8959
-dados |> @filter(_.Rock == "Kimmeridgiano" && _.Co ≥ 15)
-
-# ╔═╡ b1352c54-4336-42d4-afe1-beb20502fc11
-md"""
-
-##### 🖊️ Exercício
-
-Filtre apenas as linhas da tabela `dados` em que a soma dos teores `Cd` e `Co` seja superior a **18 ppm**.
-
-"""
-
-# ╔═╡ 1fccec2e-c9aa-4ce8-a1ef-5a3477c44111
-dados2 = missing
-
-# ╔═╡ 88b48cd9-6a27-47ce-867f-a7b0072802ff
-md"""
-
-### Agrupamento dos dados
-
-Outra tarefa bastante comum e crucial para responder perguntas complexas é o **agrupamento dos dados** por uma variável categórica (e.g. litologia, zona mineralizada). Para isso, utilizaremos as operações `@groupby` e `@map`.
-
-A operação `@map` possui uma sintaxe um pouco mais complexa:
-
-```julia
-@map({col1 = exp1, col2 = exp2, ..., coln = expn})
-```
-
-Neste formato, estamos criando novas colunas `col1`, `col2`, ..., `coln` a partir de diferentes expressões `exp1`, `exp2`, ..., `expn` em função de outras colunas.
-
-Para exemplificar o formato, vamos calcular o número de amostras por litologia, bem como a média da variável `Cr` por litologia. Para fazer isso, utilizaremos as funções `length` (contagem/tamanho) e `mean` (média).
-
-Três colunas serão geradas no relatório: `rocha` que representa os valores de litologia, `contagem` o número de amostras por litologia e `μCr` a média de Cr (ppm) por litologia.
-
-Tudo isso pode ser feito em apenas uma linha...
-
-"""
-
-# ╔═╡ 50089575-c317-496f-a2e6-2853ed300f87
-dados |> @groupby(_.Rock) |> @map({rock = key(_),
-								   contagem = length(_),
-								   μCr = mean(_.Cr)})
-
-# ╔═╡ 17702ab7-6bde-46eb-940c-4824d4411ca2
-md"""
-
-A função `key(_)` retorna os valores da variável utilizada no agrupamento que, neste caso, foi a variável `Rock`. Essa variável assume os valores `Sequaniano`, `Kimmeridgiano`, `Quaternario`, `Argoviano` e `Portlandiano`
-"""
-
-# ╔═╡ 279b4f1e-5592-4fb4-a38e-599a0b4299b3
-md"""
-
-##### 🖊️ Exercício
-
-Construa uma consulta que verifique quais tipos de ocupação ocorrem por litologia. Utilize os atributos `Rock` e `Landuse` nessa ordem para obter o relatório.
-
-"""
-
-# ╔═╡ 2e4356e0-b963-43d9-89a0-9a24616a6303
-dados3 = missing
-
-# ╔═╡ aade9e29-135e-4790-8fac-08e9e5de9b8d
-md"---"
-
-# ╔═╡ e9b24f45-62e5-4d1e-b092-e9c306f2e36f
-md"""
-
-## 4. Visualização dos dados
-
-Além de consultas e estatísticas, outra estratégia crucial para responder perguntas é a **visualização dos dados**. Na Ciência de Dados tradicional, o espaço de visualização está associado aos valores assumidos pelas variáveis e é denominado **espaço de atributos**.
-
-Por outro lado, na **Geo**ciência de Dados, além do espaço de atributos, existe ainda o **espaço geográfico**. Portanto, em problemas geocientíficos, iremos nos atentar a dois tipos de espaços de visualização:
-
-1. Espaço de Atributos
-2. Espaço Geográfico
-
-Para investigar esses espaços, iremos utilizar a biblioteca [StatsPlots.jl](https://github.com/JuliaPlots/StatsPlots.jl) que tem uma boa interação com o pacote **Query.jl**. Uma das visualizações mais importantes para o geocientista de dados é o mapa de localização que, por sua vez, ilustra a posição das amostras no espaço geográfico. As amostras desse mapa podem ser coloridas de acordo com alguma variável, como `Rock`...
-
-"""
-
-# ╔═╡ d409376e-a795-46ac-9d0d-b90aac30fc17
-dados |> @df scatter(:X, :Y, group = :Rock, marker = (:circle,4),
-					 markerstrokewidth=0.5, markerstrokecolor = :black,
-					 legend=:topleft, xlabel = "X", ylabel="Y",
-					 title="Mapa de Localização")
-
-# ╔═╡ cc8c8381-bfc5-4f7a-b324-1afb782d133a
-md"""
-
-##### 🖊️ Exercício
-
-Construa um mapa de localização colorido pela variável `Cr`.
-
-"""
-
-# ╔═╡ 639fc300-f464-41a2-8e66-05c5efa45ccf
-
-
-# ╔═╡ 1ada5973-e579-404f-9748-6dc02168c4f8
-md"""
-
-### Filtragem e visualização dos dados
-
-Um tipo de investigação extremamente importante na Geoestatística é a visualização dos **high grades**. Quando não se tem muito conhecimento acerca de um depósito mineral, uma prática comum, para fins de exploração dos dados, é considerar que os high grades são amostras cujo teor é superior ao **percentil 90 (P90%)**.
-
-Para exemplificar essa situação, consideremos a variável `Co`. Podemos facilmente gerar essa visualização, utilizando as funções `@filter` (filtragem dos dados), `quantile` (cálculo do percentil/quantil) e `scatter` (diagrama de dispersão/scatter plot)...
-
-"""
-
-# ╔═╡ 5608b405-6f5d-451e-8107-b7b7831b4caa
+# ╔═╡ fedae49c-c4e5-4bc0-a6ee-af246c966c67
 begin
-	# cálculo do P90
-	P90 = quantile(dados.Co, 0.9)
-	
-	# filtragem + visualização
-	dados |> @filter(_.Co > P90) |>
-			 @df scatter(:X, :Y, group = :Rock, marker = (:circle,4),
-					 	 markerstrokewidth=0.5, markerstrokecolor = :black,
-					 	 legend=:topleft, xlabel = "X", ylabel="Y")
-end
-
-# ╔═╡ 33b2c85c-e186-4f20-996e-65ef370b561b
-md"""
-
-### Interatividade
-
-
-"""
-
-# ╔═╡ e15fb49d-ba55-46d2-ae3c-bf4f1c70c3b8
-begin
-	hint(text) = Markdown.MD(Markdown.Admonition("hint", "Dica", [text]))
-
-	almost(text) = Markdown.MD(Markdown.Admonition("warning", "Quase lá!", [text]))
-
-	still_missing(text=md"Troque `missing` pela sua resposta.") = Markdown.MD(Markdown.Admonition("warning", "Aqui vamos nós!", [text]))
-
-	keep_working(text=md"A resposta não está totalmente certa.") = Markdown.MD(Markdown.Admonition("danger", "Continue trabalhando!", [text]))
-
-	yays = [md"Fantástico!", md"Ótimo!", md"Yay ❤", md"Legal! 🎉", md"Muito bem!", md"Bom trabalho!", md"Você conseguiu a resposta certa!", md"Vamos seguir para próxima seção."]
-
-	correct(text=rand(yays)) = Markdown.MD(Markdown.Admonition("correct", "Certa resposta!", [text]))
-
-	not_defined(variable_name) = Markdown.MD(Markdown.Admonition("danger", "Opa!", [md"Tenha certeza que definiu uma variável chamada **$(Markdown.Code(string(variable_name)))**"]))
+	TEORES = ["Cd","Co","Cr","Cu","Ni","Pb","Zn"]
+	NOMINAIS = ["Landuse","Rock"]
+	LITO = unique(dados.Rock)
 end;
 
-# ╔═╡ 4cd26967-a0c1-4d14-9ee3-645129d782dd
+# ╔═╡ f5bf9985-62be-48d1-8399-ecde710e1dd5
+md"""
+
+## 4. Descrição univariada
+
+Diferentemente de outras áreas do conhecimento, como Medicina e Física, em problemas geoespaciais, devemos nos atentar dois **tipos de espaço** distintos:
+
+1. Espaço de atributos
+2. Espaço geográfico
+
+O **espaço geográfico** é constituído pelas coordenadas espaciais da região de estudo. No nosso caso, esse espaço é representado pelas variáveis `X` e `Y`.
+
+Por outro lado, o **espaço de atributos** é formado pelos valores das variáveis de interesse do estudo. No nosso exemplo, esse espaço é constituído pelos elementos químicos amostrados e pelas variáveis `Landuse` e `Rock`.
+
+Nesta seção, as principais técnicas de sumarização e visualização univariadas (i.e. uma variável por vez) e, portanto, estaremos interessados no espaço de atributos.
+"""
+
+# ╔═╡ b7820679-6ec3-4580-a502-4e4315ed44f9
+md"""
+### Medidas-resumo
+
+Segundo *Isaaks & Srivastava (1989)*, as **medidas-resumo** podem ser classificadas em:
+
+> **Medidas de posição:** trazem informações sobre várias porções de uma distribuição (e.g. centro, caudas).
+
+> **Medidas de dispersão:** descrevem a variabilidade/erraticidade dos valores assumidos pelas variáveis.
+
+> **Medidas de forma:** descrevem a forma de uma distribuição.
+
+Essas medidas, em conjunto, fornecem informações valiosas acerca das variáveis de interesse do estudo.
+"""
+
+# ╔═╡ e1ff515f-c0d2-4e4b-b768-8d5611347e2d
+md"""
+#### Medidas de posição
+
+Três medidas de posição serão apresentadas:
+- Média - $\overline{X}$
+- Mediana - $md(X)$
+- Quantis - $q$
+
+A **média aritmética**, ou simplesmente média, consiste na soma das observações dividida pelo número delas (*Bussab & Morettin, 2017*) e, portanto, traz informação sobre o centro de uma distribuição:
+
+```math
+\overline{X} = \frac{1}{n} \sum_{i=1}^{n} x_i
+```
+
+> ⚠️ Além da média aritmética, existem outros tipos de média, como a geométrica e a harmônica.
+
+Podemos utilizar a função `mean` para computar a média da variável `Cr`...
+"""
+
+# ╔═╡ 17cdccaf-a34e-4b49-8156-01f6221ae00b
+mean(dados.Cr)
+
+# ╔═╡ 476e5bc7-5d9c-43fe-ac84-ead5bbbfe4b9
+md"""
+A **mediana** consiste no ponto médio dos valores observados, desde que as observações estejam organizadas em ordem crescente (*Isaaks & Srivastava, 1989*). Portanto, assim como a média, a mediana também traz informação sobre o centro da distribuição:
+
+```math
+\begin{equation}
+  md(X) =
+    \begin{cases}
+      x_{\frac{n+1}{2}} & \text{se $n$ é ímpar}\\
+      \frac{x_{\frac{n}{2}} + x_{\frac{n}{2}+1}}{2} & \text{se $n$ é par}\\
+    \end{cases}       
+\end{equation}
+```
+
+Podemos utilizar a função `median` para computar a mediana da variável `Cr`...
+"""
+
+# ╔═╡ 98b6bce7-8cc4-4d7f-b947-21feb4b43bf0
+median(dados.Cr)
+
+# ╔═╡ 581459c4-312a-4022-a87c-35887f625d6d
+md"""
+Os **quantis**, assim como a mediana, também se baseiam na ideia de separar os dados (em ordem crescente) em subconjuntos com o mesmo número de observações (*Isaaks & Srivastava, 1989*). Enquanto a mediana separa os dados em duas metades, os percentis subdividem os dados em 100 subconjuntos com o mesmo número de amostras. Nesse sentido, os percentis trazem informações sobre todas as partes de uma distribuição (i.e. centro e caudas).
+
+Podemos utilizar a função `quantile` para computar os quantis `q(0.10)`, `q(0.50)` e `q(0.90)` da variável `Cr`...
+"""
+
+# ╔═╡ 79ff3f1a-9bf6-421e-8ab9-7a592fa21bbd
+quantile(dados.Cr, [0.1,0.5,0.9])
+
+# ╔═╡ 9b546155-55ad-4927-8f94-b021bf58934e
+md"""
+> ⚠️ Tanto a média quanto a mediana, por conterem informações sobre o centro de uma distribuição, são também classificadas como **medidas de tendência central**. A principal diferença entre essas duas estatísticas é que a média é muito sensível à presença de valores extremos, enquanto a mediana não. Nesse sentido, diz-se que a **média** é uma estatística **pouco robusta**, enquanto a **mediana** é uma medida **robusta**.
+"""
+
+# ╔═╡ 45735824-f693-47e8-b771-2553fb968605
+md"""
+#### Medidas de dispersão
+
+Quatro medidas de dispersão serão apresentadas:
+- Variância - $S^2$
+- Desvio padrão - $S$
+- Distância interquartil - $IQR$
+- Coeficiente de variação - $C_v$
+
+A **variância** consiste na diferença quadrática média entre os valores observados para uma variável e sua média (*Isaaks & Srivastava, 1989*). Como há termos ao quadrado, pode-se dizer que a variância é uma estatística pouco robusta (i.e. muito sensível a valores extremos) e que não se encontra na unidade da variável de interesse.
+
+```math
+S^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \overline{X})^2
+```
+
+> ⚠️ A equação acima representa a **variância amostral**.
+
+Podemos utilizar a função `var` para computar a variância da variável `Cr`...
+
+"""
+
+# ╔═╡ 16ba02e8-e555-4dd7-a197-fc4b1b6a7fe3
+var(dados.Cr)
+
+# ╔═╡ e23f2abb-37a2-483f-80f1-c24312de1adb
+md"""
+O **desvio padrão** é simplesmente a raíz quadrada da variância. Normalmente, essa estatística é utilizada para substituir a variância, uma vez que se encontra na mesma unidade de medida da variável de interesse (*Isaaks & Srivastava, 1989*). O desvio padrão também é uma estatística pouco robusta.
+
+```math
+S = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i - \overline{X})^2} = \sqrt{S^2}
+```
+> ⚠️ A equação acima representa ao **desvio padrão amostral**.
+
+Podemos utilizar a função `std` para computar a variância da variável `Cr`...
+
+"""
+
+# ╔═╡ 746d33e3-448c-45e4-974c-093e3e001553
+std(dados.Cr)
+
+# ╔═╡ b3fb81b8-8f00-4fe5-877c-3c6a1f7ded77
+md"""
+A **distância interquartil**, comumente chamada de IQR (*interquartile range*), é uma medida de dispersão assim como a variância e o desvio padrão, mas, por ser baseada em quantis, é uma estatística robusta. O IQR consiste na diferença entre o quantil superior $Q_3$ e o quantil inferior $Q_1$ (*Isaaks & Srivastava, 1989*):
+
+```math
+IQR = q(0.75) - q(0.25) = Q_3 - Q_1
+```
+
+Podemos calcular o IQR da variável `Cr` utilizando a função `quantile`...
+
+"""
+
+# ╔═╡ 82a219b0-d1ca-4db0-8738-6b3f8e27189b
+quantile(dados.Cr, 0.75) - quantile(dados.Cr, 0.25)
+
+# ╔═╡ 3e2ea93f-0219-4766-b550-4d3788608ca4
+md"""
+O **coeficiente de variação** é uma medida de dispersão que, diferentemente das outras medidas apresentadas anteriormente, é uma estatística **portável**. Isso significa que podemos utilizar o coeficiente de variação para saber qual das variáveis presentes no banco de dados é a mais errática (i.e. apresenta a maior variabilidade).
+
+O coeficiente de variação consiste na razão entre o desvio padrão e a média da variável de interesse:
+
+```math
+C_v = \frac{\overline{X}}{S}
+```
+
+> ⚠️ O coeficiente de variação é de suma importância, uma vez que fornece avisos sobre eventuais dificuldades na estimativa. Caso essa estatística seja superior a 1, possivelmente as estimativas finais terão uma grande incerteza associada em função da alta variabilidade natural da variável (*Isaaks & Srivastava, 1989*).
+
+Podemos utilizar a função `variation` para computar o coeficiente de variação da variável `Cr`...
+
+"""
+
+# ╔═╡ 1c851dd2-7e85-4c94-a806-2afea3199291
+variation(dados.Cr)
+
+# ╔═╡ 2ed2fe35-8b11-41cc-8106-cddad3891b89
+md""" #### Medidas de forma
+
+Apenas uma medida de forma será apresentada, o coeficiente de assimetria - $skew(X)$.
+
+O **coeficiente de assimetria**, também chamado de *skewness*, traz informações sobre a simetria de uma distribuição. Como apresenta termos elevados ao cubo, essa estatística é extremamente sensível à presença de valores extremos (*Isaaks & Srivastava, 1989*). Essa medida pode ser representada como:
+
+```math
+skew(X) = \frac{\frac{1}{n} \sum_{i=1}^{n} (x_i - \overline{X})^3}{S^3}
+```
+
+Com base no coeficiente de assimetria, as distribuições podem ser classificadas como:
+
+> **Assimétrica positiva**: $skew(X) > 0$
+
+> **Simétrica**: $skew(X) = 0$
+
+> **Assimétrica negativa**: $skew(X) < 0$
+
+Podemos utilizar a função `skewness` para o cálculo do coeficiente de assimetria da variável `Cr`...
+
+"""
+
+# ╔═╡ 57414e29-2eee-49a6-8678-94d2fdabb70a
+skewness(dados.Cr)
+
+# ╔═╡ 7f94f1b4-9ac8-4137-9787-a722670508bb
+md"""
+#### Sumário estatístico
+
+Agora que já aprendemos sobre as principais estatísticas univariadas, podemos criar uma função `sumario` que retornará o sumário estatístico de uma determinada variável `teor`...
+"""
+
+# ╔═╡ cecf023e-5002-48ca-8ea5-0cb294f2e419
+function sumario(teor::String)
+	Q₃ = quantile(dados[!,teor], 0.75)
+	Q₁ = quantile(dados[!,teor], 0.25)
+	
+	df = DataFrame(teor = teor,
+                   X̄    = mean(dados[!,teor]),
+				   md   = median(dados[!,teor]),
+				   min  = minimum(dados[!,teor]),
+			       max  = maximum(dados[!,teor]),
+                   S²   = var(dados[!,teor]),
+				   S    = std(dados[!,teor]),
+                   IQR  = Q₃ - Q₁,
+                   Cᵥ   = variation(dados[!,teor]),
+                   skew = skewness(dados[!,teor]))
+				
+	return df
+end
+
+# ╔═╡ 4fcf13f4-7f79-4c6d-b365-052c1fb9bb5d
+md"""
+Agora podemos aplicar a função `sumario` para calcular as estatísticas de cada uma das variáveis contínuas de interesse (i.e. elementos químicos amostrados)...
+"""
+
+# ╔═╡ 55e2c2b3-2727-48c8-866f-9e18f0dc44f7
 begin
-	scored4 = false
-	if ismissing(dados1)
-		still_missing()
-	elseif dados1 |> DataFrame == (jura |> @replacena(-99) |> DataFrame)
-		scored4 = true
-		correct()
+	estats = [sumario(teor) for teor ∈ TEORES]
+	vcat(estats...)
+end
+
+# ╔═╡ b063ec45-fd98-4dc8-aa2f-24f0b101c5e8
+md"""
+> ⚠️ O símbolo $\in$ é apenas uma forma matemática de representar o comando *in*.
+"""
+
+# ╔═╡ 64b87701-bf9e-46c9-8700-89d2ef546621
+md"""
+##### Observações
+
+- Os elementos químicos amostrados encontram-se em escalas distintas;
+- Todas as variáveis apresentam distribuições assimétricas positivas ($skew > 0$), com exceção do `Co` que, por sua vez, mostra uma distribuição levemente assimétrica negativa ($skew < 0$);
+- Os elementos químicos amostrados apresentam distribuições pouco erráticas, com $C_v < 1$;
+- O `Cu` é a variável mais errática, ou seja, aquela que apresenta o maior $C_v$.
+"""
+
+# ╔═╡ bf03e7f7-82a1-413c-bc6b-3bd19242f65d
+md"""
+### Histograma
+
+O **histograma** é um gráfico de barras contíguas com as bases proporcionais aos intervalos das classes e a área de cada retângulo proporcional à respectiva frequência (*Bussab & Morettin, 2017*). Esse gráfico visa representar a distribuição de uma variável contínua.
+
+> ⚠️ O histograma é, provavelmente, o gráfico mais utilizado na AED que precede a estimativa de recursos.
+
+Selecione, na lista suspensa abaixo, uma variável de teor para que seu histograma correspondente seja exibido (Figura 03).
+
+Teor: $(@bind teor1 Select(TEORES))
+
+"""
+
+# ╔═╡ ad7306da-0936-4208-9963-b3af1815b43b
+begin
+	X̅ = mean(dados[!,teor1])
+	md = median(dados[!,teor1])
+	
+	histogram(dados[!,teor1], bins=:scott, label=false,
+			  color=:honeydew2, alpha=0.75,
+			  xlabel="$teor1 (ppm)", ylabel="Freq. Absoluta")
+	
+	vline!([X̅], color=:red, label="Média")
+	vline!([md], color=:green, label="Mediana")
+end
+
+# ╔═╡ f18ea3c8-fbc0-4c8c-a8f6-e2d083809a38
+md"**Figura 03:** Histograma da variável $teor1."
+
+# ╔═╡ 155f6b0f-5156-4f42-93c2-6f867415ef37
+md"""
+##### Observações
+- As variáveis que apresentam distribuições assimétricas positivas possuem caudas alongadas à direita. Essa forma de distribuição é típica de elementos menores;
+- A variável `Co`, que possui distribuição ligeiramente assimétrica negativa, exibe uma distribuição com cauda alongada à esquerda. Esse tipo de assimetria é mais comum em elementos maiores (e.g. Fe₂O₃+FeO, Al₂O₃);
+- A variável `Cr` mostra uma distribuição aproximadamente simétrica, o que não é algo típico de metais.
+"""
+
+# ╔═╡ 0acf95ad-4bd9-4022-b9f9-ce9a886ed1ed
+md"""
+### Boxplot
+
+O **boxplot**, assim como o histograma, é um gráfico univariado que visa representar a distribuição de uma variável contínua. Essa visualização dá uma ideia da posição, dispersão, simetria e valores extremos de uma variável de interesse (*Bussab & Morettin, 2017*). A Figura 03 ilustra os elementos que constituem o boxplot.
+
+![Figura 04](https://i.postimg.cc/HnRG8289/Figura-03.png)
+
+**Figura 04:** Exemplo de boxplot e seus elementos. Figura elaborada pelo autor.
+
+Selecione, na lista suspensa abaixo, uma variável de teor para que seu boxplot correspondente seja exibido (Figura 05).
+
+Teor: $(@bind teor2 Select(TEORES))
+
+"""
+
+# ╔═╡ 6c227179-d25f-4b13-86b1-f69e3f74bb8f
+begin
+	media = mean(dados[!,teor2])
+	q1 = quantile(dados[!,teor2], 0.25)
+	q2 = median(dados[!,teor2])
+	q3 = quantile(dados[!,teor2], 0.75)
+	iqr = q3 - q1
+	min = minimum(dados[!,teor2])
+	LS = q3 + (1.5 * iqr)
+	
+	boxplot(dados[!,teor2], label=false, alpha=0.75,
+			color=:honeydew2, ylabel="$teor2 (ppm)",
+			xticks=false, xaxis=false)
+	
+	plot!([media], seriestype = :scatter, color=:red,
+		  marker=(:star5,5), label="Média")
+end
+
+# ╔═╡ ef54af89-22e2-4149-9fb4-9fc0b48b76c8
+md"**Figura 05:** Boxplot da variável $teor2."
+
+# ╔═╡ c42132cd-b4e6-4561-a71b-13b276793f13
+md"""
+##### Observações
+
+- Uma outra forma de descrever a assimetria de uma distribuição é por meio da comparação entre média e mediana:
+    - Se $\overline{X} > md(X)$ $\rightarrow$ assimetria positiva;
+    - Se $\overline{X} < md(X)$ $\rightarrow$ assimetria negativa;
+    - Se $\overline{X} = md(X)$ $\rightarrow$ simetria.
+- O boxplot, pode ser entendido como uma "vista em planta" do histograma.
+"""
+
+# ╔═╡ a2b3a946-5ff3-4127-a797-be2fa4a2b9bf
+md"""
+### Gráfico de barras
+
+O **gráfico de barras**, assim como o histograma, visa representar a distribuição de uma variável de interesse. Entretanto, esse tipo de gráfico é apropriado para a representação de variáveis qualitativas e discretas, como é o caso de `Rock` e `Landuse`.
+
+Selecione, na lista suspensa abaixo, uma variável nominal para que seu gráfico de barras correspondente seja exibido (Figura 06).
+"""
+
+# ╔═╡ 85ac468b-452a-48b9-ae61-73a6e970c8c8
+begin
+	df_landuse = dados |>
+			 	 @groupby(_.Landuse) |>
+			 	 @map({classe=key(_), contagem=length(_)}) |>
+			 	 DataFrame
+	
+	df_rock = dados |>
+			  @groupby(_.Rock) |>
+			  @map({classe=key(_), contagem=length(_)}) |>
+			  DataFrame
+end;
+
+# ╔═╡ 9093aff6-4dac-4847-96e1-d6ef2c50cce7
+md"""Variável: $(@bind var_nom Select(NOMINAIS))"""
+
+# ╔═╡ 4dbd3eca-9a4c-4aa5-8c15-2f294e33e814
+begin
+	if var_nom == "Landuse"
+		bar(df_landuse.classe, df_landuse.contagem,
+			label=false, color=:honeydew2,
+			alpha=0.75, ylabel="Freq. Absoluta")
 	else
-		keep_working()
+		bar(df_rock.classe, df_rock.contagem,
+			label=false, color=:honeydew2,
+			alpha=0.75, ylabel="Freq. Absoluta")
 	end
 end
 
-# ╔═╡ 4737ed5b-73db-4daa-b464-8870bae8e242
-hint(md"Utilize a operação `@replacena`")
+# ╔═╡ 49d89445-4ca2-4aab-b0a4-a632ddbb640b
+md"**Figura 06:** Gráfico de barras da variável $var_nom."
 
-# ╔═╡ ee8b4b8b-425d-4672-8a9b-accb779dd0ca
+# ╔═╡ 98c18d0a-95fe-4949-9507-240bb90a02b9
+md"""
+##### Observações
+
+- A maior parte da área é composta por regiões de `Campo`;
+
+- Há um grande desbalanceamento na distribuição das litologias. As rochas pertencentes ao `Kimmeridgiano` e ao `Sequentiano` são predominantes na área, enquanto litotipos associados ao Portlandiano são escassos.
+"""
+
+# ╔═╡ c42c2eb0-2047-4490-9ebb-9b0203466836
+md"""
+## 5. Descrição bivariada
+
+A **descrição bivariada** consiste em um conjunto de estatísticas e técnicas de visualização que visam descrever a relação entre duas variáveis por vez. Segundo *Isaaks & Srivastava (1989)*, grande parte das informações presentes em conjuntos de dados geoespaciais estão associadas às relações entre variáveis.
+"""
+
+# ╔═╡ cbec4c3f-198e-4334-ba18-55d2fbcc8a0d
+md"""
+### Coeficiente de Pearson
+
+O **coeficiente de Pearson** é a estatística mais comum para descrever a relação entre duas variáveis (*Isaaks & Srivastava, 1989*). Essa medida pode ser calculada como:
+
+```math
+r = \frac{\frac{1}{n} \sum_{i=1}^{n} (x_i - \overline{X})(y_i - \overline{Y})}{S_x S_y}
+```
+
+> ⚠️ O numerador da equação acima é uma estatística denominada **covariância**. Portanto, podemos dizer que o coeficiente de Pearson é a covariância normalizada.
+
+O coeficiente de Pearson mede um tipo especial de relação, a **correlação linear**. Basicamente, existem três tipos de padrões:
+
+- **$r > 0$** → correlação linear positiva;
+
+- **$r < 0$** → correlação linear negativa;
+
+- **$r \approx 0$** → ausência de correlação.
+
+> ⚠️ Esse coeficiente assume valores no intervalo **[-1, 1]**. Desse modo, quanto maior é o módulo do coeficiente, maior é a força da correlação linear, seja ela positiva ou negativa.
+
+Podemos utilizar a função `cor` para computar o coeficiente de correlação de Pearson entre os teores de `Cr` e `Co`...
+
+"""
+
+# ╔═╡ e7a33281-7f6d-45cc-bb27-d7d9d2774bee
+cor(dados.Cr, dados.Co)
+
+# ╔═╡ 1f684b7d-3cfb-4ede-aadd-e82b131e017d
+md"""
+Como nossos dados contém sete elementos químicos, podemos calcular uma **matriz de correlação** para facilitar a visualização das relações entre todas as variáveis de uma só vez. Um exemplo de mapa de calor confeccionado a partir de uma matriz de correlação é apresentado na Figura 07.
+
+Selecione as variáveis de interesse nas listas suspensas abaixo para que o coeficiente de Pearson entre elas seja computado:
+"""
+
+# ╔═╡ 98912d9a-d1bb-4b4d-a7eb-f98963bf790d
+md"""Variáveis: $(@bind V₁ Select(TEORES)) e $(@bind V₂ Select(TEORES))"""
+
+# ╔═╡ fce35de6-7f4c-4817-8554-397d2bb19778
 begin
-	scored5 = false
-	if ismissing(dados2)
-		still_missing()
-	elseif dados2 |> DataFrame == (dados |> @filter(_.Cd + _.Co > 18) |> DataFrame)
-		scored5 = true
-		correct()
+	mtz = Matrix(dados[!,TEORES])
+	cor_mtz = cor(mtz)
+	cc = round(cor(dados[!,V₁], dados[!,V₂]), digits=2)
+	
+	heatmap(TEORES, TEORES, cor_mtz, color=:coolwarm, clims=(0,1),
+			title="r($V₁, $V₂) = $cc", colorbartitle="r")
+end
+
+# ╔═╡ ce8762e6-c0d7-4683-8ffe-5ac844b406d4
+md"**Figura 07:** Mapa de calor dos coeficientes de Pearson."
+
+# ╔═╡ d2956461-9a8f-4123-9243-523f623e1f21
+md"""
+##### Observações
+
+- Todos os elementos químicos do banco de dados apresentam correlações lineares positivas entre si;
+- Os elementos `Pb` e `Cu` apresentam a correlação linear mais forte ($r = 0.78$);
+- Os elementos `Cu` e `Cd` apresentam a correlação linear mais fraca ($r = 0.13$).
+"""
+
+# ╔═╡ ab709b9f-a06a-4bed-a36b-f3c5d6e46265
+md"""
+### Diagrama de dispersão
+
+O **diagrama de dispersão**, também chamado de *scatterplot*, é um o dispositivo útil para se verificar a associação entre duas variáveis (*Bussab & Morettin, 2017*). No eixo horizontal é representado pelos valores de uma variável, enquanto o eixo vertical é rotulado com os valores da outra variável.
+
+> ⚠️ É sempre interessante visualizar o diagrama de dispersão (gráfico) em conjunto com o coeficiente de Pearson (estatística) para analisar a relação entre um par de variáveis.
+
+Nas listas suspensas abaixo, selecione as variáveis de interesse para visualizar o diagrama de dispersão (Figura 08).
+
+Variáveis: $(@bind var₁ Select(TEORES)) e $(@bind var₂ Select(TEORES))
+"""
+
+# ╔═╡ 3a75e14e-9ddb-423b-99a5-d7280218b41e
+begin
+	x = dados[!,var₁]
+	y = dados[!,var₂]
+	r = round(cor(x,y), digits=2)
+	
+	scatter(x, y, xlabel="$var₁ (ppm)", ylabel="$var₂ (ppm)",
+			label="r = $r", marker=(:circle,2,:black))
+	
+	vline!([mean(x)], color=:red, ls=:dash, label="Média")
+	hline!([mean(y)], color=:red, ls=:dash, label=false)
+	plot!([mean(x)],[mean(y)], marker=(:square, 4, :red), label=false)
+end
+
+# ╔═╡ 0f9da683-d792-4965-9988-9c80e4e6148f
+md"**Figura 08:** Diagrama de dispersão entre as variáveis $var₁ e $var₂."
+
+# ╔═╡ e34c26f3-4aee-48bc-b164-2347f957a7d7
+md"""
+##### Observações
+
+- O diagrama de dispersão entre as variáveis `Pb` e `Cu` mostra um padrão linear positivo bem definido;
+- O diagrama de dispersão entre as variáveis `Cd` e `Cu` mostra um padrão disperso, sem qualquer alinhamento entre os dados;
+- As variáveis `Cd` e `Cr` apresentam uma relação, mas que não aparenta ser linear. Por esse motivo, o coeficiente de Pearson computado ($r=0.6$) não é tão alto.  
+"""
+
+# ╔═╡ 39b95c2a-df18-40a0-80c6-3c25b2b353e8
+md"""
+### Q-Q plot
+
+O **Q-Q plot** é um dispositivo visual muito útil para comparação de duas distribuições que, por algum motivo, podem ser similares. Os eixos desse gráfico representam os quantis das duas variáveis (*Isaaks & Srivastava, 1989*). O Q-Q plot pode apresentar, essencialmente, três padrões:
+
+- Distribuições com médias e dispersões similares: os dados encontram-se alinhados à reta X=Y;
+- Distribuições com médias distintas e dispersões similares: os dados encontram-se alinhados paralelamente à reta X=Y, mas há uma translação;
+- Distribuições com médias similares e dispersões distintas: os dados encontram-se rotacionados em relação à reta X=Y, mas sem translação.
+
+> ⚠️ Esse gráfico é muito importante durante a **definição dos domínios de estimativa**. Durante essa etapa, geralmente é necessário agrupar os dados em subconjuntos distintos por algum critério de natureza geológica (e.g. litologia, tipologia do minério, zonas de highgrade e lowgrade). Nesse sentido, o Q-Q Plot pode ser utilizado para validar visualmente a definição desses domínios.
+
+Abaixo, utilizamos o Q-Q plot (Figura 09) para verificar se há diferenças significativas entre as distribuições de um mesmo elemento agrupado por litologias...
+"""
+
+# ╔═╡ 0ae3c6dd-63f1-4837-b3f2-f275e06c7d8c
+md"""
+Variável: $(@bind Z Select(TEORES))
+	
+Litologias: $(@bind lito₁ Select(LITO)) e $(@bind lito₂ Select(LITO))
+"""
+
+# ╔═╡ cd0d4cd3-850d-4730-88c3-9d93e7a922f7
+begin
+	# filtragem por litologia
+	dados_lito1 = dados |> @filter(_.Rock == lito₁) |> DataFrame
+	dados_lito2 = dados |> @filter(_.Rock == lito₂) |> DataFrame
+	
+	# cálculo das medianas
+	md₁ = median(dados_lito1[!,Z])
+	md₂ = median(dados_lito2[!,Z])
+	
+	# qq-plot
+	qqplot(dados_lito1[!,Z], dados_lito2[!,Z], xlabel="$Z ($lito₁)",
+		   ylabel="$Z ($lito₂)", color=:black, marker=(:circle,2),
+		   legend=:topleft, label=false)
+	
+	# plotagem das medianas
+	vline!([md₁], color=:red, ls=:dash, label=false)
+	hline!([md₂], color=:red, ls=:dash, label="Mediana")
+	plot!([md₁],[md₂], marker=(:square, 4, :red), label=false)
+end
+
+# ╔═╡ 067878a2-1d5d-4b4b-9857-5a473849007b
+md"""
+**Figura 09:** Q-Q plot entre os teores de $Z (ppm) nas rochas do $lito₁ e $lito₂.
+"""
+
+# ╔═╡ b1f8414f-e004-4cae-8d69-a56b57b5ea11
+md"""
+##### Observações
+
+- Não há uma grande diferença entre as distribuições de `Pb` nas litologias `Sequaniano` e `Kimmeridgiano`. Repare que a maioria dos dados encontra-se alinhada ao longo da reta X=Y;
+- Os teores de `Pb` nas rochas do `Kimmeridgiano` tendem a ser mais elevados do que as concentrações dessa variável nas rochas do `Argoviano`. Repare que a maioria dos dados encontra-se alinhada paralelamente à reta X=Y;
+- Os teores de `Co` nas rochas do `Quaternario` são bem mais altos e erráticos do que nas rochas do `Argoviano`. Repare que há translação e rotação dos dados em relação à reta X=Y.
+"""
+
+# ╔═╡ a5fd7cc5-9460-48d1-ae90-c1a0f0dff265
+md"""
+## 6. Descrição espacial
+
+Nas seções anteriores aprendemos sobre técnicas de visualização do espaço de atributos. Nesta seção, além do espaço de atributos, também iremos visualizar o **espaço geográfico**.
+
+"""
+
+# ╔═╡ e6a85185-8188-42e7-b639-34e8c9a8c515
+md"""
+### Georreferenciamento
+
+Em Julia, o **georreferenciamento dos dados** consiste em informar quais colunas devem ser tratadas como coordenadas geográficas e quais devem ser entendidas como atributos/variáveis. Para georrefenciar os nossos dados, iremos utilizar a função `georef` do pacote [GeoStats](https://juliaearth.github.io/GeoStats.jl/stable/).
+"""
+
+# ╔═╡ 447ead1b-53a3-42a3-ad9d-6bc7c099c40f
+geodados = georef(dados, (:X, :Y))
+
+# ╔═╡ fbeade43-7a37-4d16-bc24-eb857799a732
+md"""
+Note que, após o georreferenciamento dos dados, uma nova coluna `geometry` foi criada no lugar das antigas colunas `X` e `Y`. Esse novo atributo possui valores com geometria do tipo `Point`.
+
+Um objeto georreferenciado apresenta um **domínio**, que representa suas coordenadas geográficas...
+"""
+
+# ╔═╡ 9da25fdb-f91a-45ed-bf30-1b0e3358e9cf
+domain(geodados)
+
+# ╔═╡ 9bcbb66d-47c2-4a38-959a-3df8169a7953
+md"""
+### Mapa de localização
+
+Os **mapas de localização** indicam a posição de cada amostra no espaço geográfico e normalmente é colorido pelos valores da variável de interesse. A Figura 10 mostra um exemplo de mapa de localização.
+
+Quando o objetivo final é a estimativa de recursos, uma prática comum é visualizar a posição das amostras _**highgrade**_ no espaço geográfico. Caso não se tenha muitas informações, é usual adotar a  convenção em que $highgrades > q(0.90)$.
+
+Na lista suspensa abaixo, selecione a variável de interesse e, opcionalmente, marque a caixa para filtrar apenas as amostras _highgrade_...
+"""
+
+# ╔═╡ fc62d1b2-3bf6-4c42-bda2-840673f24e25
+md"""
+Variável: $(@bind Zᵤ Select(TEORES))
+
+Filtrar highgrades $(@bind filtra_hg CheckBox())
+"""
+
+# ╔═╡ 314aaeb2-9550-4662-b84e-357b659c3635
+begin
+	if filtra_hg
+		q90 = quantile(dados[!,Zᵤ], 0.9)
+		hg = filter(Zᵤ => x -> x > q90, dados) |> DataFrame
+		
+		scatter(hg[!,:X], hg[!,:Y], marker_z=hg[!,Zᵤ],
+				color=:coolwarm, legend=:topleft, marker=(:square,2.5),
+				xlabel="X", ylabel="Y", label="$Zᵤ (ppm)",
+				xlims=(0,6), ylims=(0,6), markerstrokewidth=0.3)
+	
 	else
-		keep_working()
+		scatter(dados[!,:X], dados[!,:Y], marker_z=dados[!,Zᵤ],
+				color=:coolwarm, legend=:topleft, marker=(:square,2.5),
+				xlabel="X", ylabel="Y", label="$Zᵤ (ppm)",
+				xlims=(0,6), ylims=(0,6), markerstrokewidth=0.3)
 	end
 end
 
-# ╔═╡ 05072307-77fc-4915-8326-c1450e1766ec
-hint(md"Faça uma analogia com o exemplo anterior...")
+# ╔═╡ 70069594-eb84-42ae-9f52-c5c8fa0aae0b
+md"**Figura 10:** Mapa de localização das amostras de $Zᵤ."
 
-# ╔═╡ af6c6d38-4bb8-4925-9828-9780e68fa608
-begin
-	scored6 = false
-	if ismissing(dados3)
-		still_missing()
-	elseif dados3 |> DataFrame == (dados |> @groupby(_.Rock) |> @map({rocha = key(_),
-											uso = unique(_.Landuse)}) |> DataFrame)
-		scored6 = true
-		correct()
-	else
-		keep_working()
-	end
-end
+# ╔═╡ 7a412bca-ee60-46dc-953f-9fda81d234c2
+md"""
+##### Observações
 
-# ╔═╡ 39d947bb-e575-4b66-bf51-7e2bdeabe503
-hint(md"Utilize um raciocínio análogo ao exemplo anterior e a função `unique`.")
+- As amostras highgrade de `Cd`, `Pb` e `Zn` possivelmente apresentam uma maior continuidade espacial na direção NW-SE;
+- As amostras highgrade de `Co` e `Cr` possivelmente apresentam uma maior continuidade espacial na direção NE-SW.
+"""
 
-# ╔═╡ 1bd337bb-f36a-4bcc-ae15-2e5147db4d4f
-hint(md"O exercício é análogo ao exemplo anterior. No lugar do argumento `group`, utilize `marker_z`. O argumento `color` define a paleta da barra de cores.")
+# ╔═╡ 47cf20cd-62f6-43c2-b531-31eab994aa15
+md"""
+## Referências
+
+*Bussab, W. O.; Morettin, P. A. [Estatística básica](https://www.google.com.br/books/edition/ESTAT%C3%8DSTICA_B%C3%81SICA/vDhnDwAAQBAJ?hl=pt-BR&gbpv=0). 9ª ed. São Paulo: Saraiva, 2017.*
+
+*Goovaerts, P. [Geostatistics for natural resources evaluation](https://www.google.com.br/books/edition/Geostatistics_for_Natural_Resources_Eval/CW-7tHAaVR0C?hl=pt-BR&gbpv=0). New York: Oxford University Press, 1997.*
+
+*Isaaks, E. H.; Srivastava, M. R. [Applied geostatistics](https://www.google.com.br/books/edition/Applied_Geostatistics/gUXQzQEACAAJ?hl=pt-BR). New York: Oxford University Press, 1989.*
+
+*Magalhães, M. N.; De Lima, A. C. P. [Noções de probabilidade e estatística](https://www.google.com.br/books/edition/No%C3%A7%C3%B5es_de_Probabilidade_e_Estat%C3%ADstica/-BAuPwAACAAJ?hl=pt-BR). 7ª ed. São Paulo: Editora da Universidade de São Paulo, 2015.*
+
+*Rossi, M. E.; Deutsch, C. V. [Mineral resource estimation](https://www.google.com.br/books/edition/Mineral_Resource_Estimation/gzK_BAAAQBAJ?hl=pt-BR&gbpv=0). New York: Springer Science & Business Media, 2013.*
+
+*Tukey, J. W. [Exploratory data analysis](https://www.google.com.br/books/edition/Exploratory_Data_Analysis/UT9dAAAAIAAJ?hl=pt-BR&gbpv=0&bsq=exploratory%20data%20analysis). Princeton: Addison-Wesley Publishing Company, 1977.*
+
+"""
+
+# ╔═╡ 5f177c03-cb3d-4268-8c33-3aa7610e337b
+md"""
+## Recursos adicionais
+
+Abaixo, são listados alguns recursos complementares a este notebook:
+
+> [Videoaula Estatística Univariada - LPM/UFRGS](https://www.youtube.com/watch?v=ZRh9d_GHfqM)
+
+> [Videoaula Estatística Univariada - University of Texas](https://www.youtube.com/watch?v=wAcbA2cIqec&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ)
+
+> [Videoaula Estatística Bivariada - LPM/UFRGS](https://www.youtube.com/watch?v=U0sqVJY_mzA)
+"""
+
+# ╔═╡ 0e813b9b-6bb4-4377-b297-f3789f09f42c
+md"""
+## Pacotes utilizados
+
+Os seguintes pacotes foram utilizados neste notebook:
+
+|                       Pacote                             |        Descrição        |
+|:--------------------------------------------------------:|:-----------------------:|
+|[CSV](https://github.com/JuliaData/CSV.jl)                | Arquivos CSV            |
+|[DataFrames](https://github.com/JuliaData/DataFrames.jl)  | Manipulação de tabelas  |
+|[Query](https://github.com/queryverse/Query.jl)           | Realização de consultas |
+|[StatsBase](https://github.com/JuliaStats/StatsBase.jl)   | Cálculo de estatísticas |
+|[Statistics](https://docs.julialang.org/en/v1/)           | Cálculo de estatísticas |
+|[Random](https://docs.julialang.org/en/v1/)               | Números aleatórios      |
+|[GeoStats](https://github.com/JuliaEarth/GeoStats.jl)     | Rotinas geoestatísticas |
+|[PlutoUI](https://github.com/fonsp/PlutoUI.jl)            | Widgets interativos     |
+|[Plots](https://github.com/JuliaPlots/Plots.jl)           | Visualização dos dados  |
+|[StatsPlots](https://github.com/JuliaPlots/StatsPlots.jl) | Visualização dos dados  |
+
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -362,6 +909,7 @@ PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 
 [compat]
@@ -371,6 +919,7 @@ GeoStats = "~0.27.0"
 Plots = "~1.22.2"
 PlutoUI = "~0.7.11"
 Query = "~1.0.0"
+StatsBase = "~0.33.11"
 StatsPlots = "~0.14.27"
 """
 
@@ -1542,10 +2091,10 @@ uuid = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
 version = "1.0.0"
 
 [[StatsBase]]
-deps = ["DataAPI", "DataStructures", "LinearAlgebra", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "8cbbc098554648c84f79a463c9ff0fd277144b6c"
+deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
+git-tree-sha1 = "65fb73045d0e9aaa39ea9a29a5e7506d9ef6511f"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.33.10"
+version = "0.33.11"
 
 [[StatsFuns]]
 deps = ["ChainRulesCore", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
@@ -1912,43 +2461,93 @@ version = "0.9.1+5"
 # ╟─5e44a696-0a3e-40f1-b125-2dec95b5cf79
 # ╟─cfc649b3-e423-4aa9-925b-763e2986e2f5
 # ╟─b53bfda4-60de-43c8-9852-faa1051050e2
-# ╟─21daf2f4-fb73-439b-9fb8-0ffda6265083
+# ╟─b6e565dc-96a2-42e8-9997-a4c513ff748e
+# ╟─f7756000-3e37-436e-b070-6d57afe142d7
+# ╟─bd01593a-53a5-4c36-b5e4-3d738a0c3c08
+# ╟─e28a9056-d62d-4ab6-be00-0174180a73c5
+# ╟─a8c53b89-634b-4526-be62-f51f22c3c607
+# ╟─b8576b51-2a2b-4614-ae62-280394944319
+# ╟─b517b327-27e9-4e7c-a721-3ff8c991ff08
+# ╟─c08e9281-bbc8-4328-b005-b867c77f725c
+# ╟─01280f05-2fc2-4860-add3-8b40d9bd546e
 # ╟─966a59b1-f8b8-4612-ab4d-ff7ec2a569d9
-# ╟─9b819a7c-53c7-407b-b56b-12c07897ba36
 # ╠═6ded7ce7-4239-4a17-a048-c02982dae5f9
 # ╟─e34b3cdf-736d-40b8-8289-bfe968925b17
 # ╠═2d16b0e1-ce43-46a5-a4ce-eced1d88d4e6
 # ╟─778ce45e-1486-433b-8c0a-1b5beddaf352
 # ╟─71004e57-95c2-403d-992e-4cf0875a6d2e
 # ╠═1014b88e-9aad-4e89-ba9d-f7701fc1a812
-# ╟─e5e744d6-41e6-45f3-b4a3-fc8d08911eb1
-# ╠═96d6f64f-fe3d-40e9-93f1-77b2a57cbb39
-# ╠═4cd26967-a0c1-4d14-9ee3-645129d782dd
-# ╟─4737ed5b-73db-4daa-b464-8870bae8e242
-# ╟─c07352bf-7f1f-40bb-a32c-d9f5b62a9b89
-# ╟─f6142765-32bf-46a8-ac66-ea5fd8dc8797
-# ╟─9d2655a0-de38-4fde-9fd0-98c703d8a14e
-# ╠═f0d24d48-2acb-4924-a3fc-21e2231e8959
-# ╟─b1352c54-4336-42d4-afe1-beb20502fc11
-# ╠═1fccec2e-c9aa-4ce8-a1ef-5a3477c44111
-# ╟─ee8b4b8b-425d-4672-8a9b-accb779dd0ca
-# ╟─05072307-77fc-4915-8326-c1450e1766ec
-# ╟─88b48cd9-6a27-47ce-867f-a7b0072802ff
-# ╠═50089575-c317-496f-a2e6-2853ed300f87
-# ╟─17702ab7-6bde-46eb-940c-4824d4411ca2
-# ╟─279b4f1e-5592-4fb4-a38e-599a0b4299b3
-# ╠═2e4356e0-b963-43d9-89a0-9a24616a6303
-# ╟─af6c6d38-4bb8-4925-9828-9780e68fa608
-# ╟─39d947bb-e575-4b66-bf51-7e2bdeabe503
-# ╟─aade9e29-135e-4790-8fac-08e9e5de9b8d
-# ╟─e9b24f45-62e5-4d1e-b092-e9c306f2e36f
-# ╠═d409376e-a795-46ac-9d0d-b90aac30fc17
-# ╟─cc8c8381-bfc5-4f7a-b324-1afb782d133a
-# ╠═639fc300-f464-41a2-8e66-05c5efa45ccf
-# ╟─1bd337bb-f36a-4bcc-ae15-2e5147db4d4f
-# ╟─1ada5973-e579-404f-9748-6dc02168c4f8
-# ╠═5608b405-6f5d-451e-8107-b7b7831b4caa
-# ╟─33b2c85c-e186-4f20-996e-65ef370b561b
-# ╟─e15fb49d-ba55-46d2-ae3c-bf4f1c70c3b8
+# ╟─f25cb0bc-e063-4ff1-9521-50c9e72fcbbe
+# ╟─57891f5d-4db7-4e33-80f0-649c6262e516
+# ╠═fedae49c-c4e5-4bc0-a6ee-af246c966c67
+# ╟─f5bf9985-62be-48d1-8399-ecde710e1dd5
+# ╟─b7820679-6ec3-4580-a502-4e4315ed44f9
+# ╟─e1ff515f-c0d2-4e4b-b768-8d5611347e2d
+# ╠═17cdccaf-a34e-4b49-8156-01f6221ae00b
+# ╟─476e5bc7-5d9c-43fe-ac84-ead5bbbfe4b9
+# ╠═98b6bce7-8cc4-4d7f-b947-21feb4b43bf0
+# ╟─581459c4-312a-4022-a87c-35887f625d6d
+# ╠═79ff3f1a-9bf6-421e-8ab9-7a592fa21bbd
+# ╟─9b546155-55ad-4927-8f94-b021bf58934e
+# ╟─45735824-f693-47e8-b771-2553fb968605
+# ╠═16ba02e8-e555-4dd7-a197-fc4b1b6a7fe3
+# ╟─e23f2abb-37a2-483f-80f1-c24312de1adb
+# ╠═746d33e3-448c-45e4-974c-093e3e001553
+# ╟─b3fb81b8-8f00-4fe5-877c-3c6a1f7ded77
+# ╠═82a219b0-d1ca-4db0-8738-6b3f8e27189b
+# ╟─3e2ea93f-0219-4766-b550-4d3788608ca4
+# ╠═1c851dd2-7e85-4c94-a806-2afea3199291
+# ╟─2ed2fe35-8b11-41cc-8106-cddad3891b89
+# ╠═57414e29-2eee-49a6-8678-94d2fdabb70a
+# ╟─7f94f1b4-9ac8-4137-9787-a722670508bb
+# ╠═cecf023e-5002-48ca-8ea5-0cb294f2e419
+# ╟─4fcf13f4-7f79-4c6d-b365-052c1fb9bb5d
+# ╠═55e2c2b3-2727-48c8-866f-9e18f0dc44f7
+# ╟─b063ec45-fd98-4dc8-aa2f-24f0b101c5e8
+# ╟─64b87701-bf9e-46c9-8700-89d2ef546621
+# ╟─bf03e7f7-82a1-413c-bc6b-3bd19242f65d
+# ╟─ad7306da-0936-4208-9963-b3af1815b43b
+# ╟─f18ea3c8-fbc0-4c8c-a8f6-e2d083809a38
+# ╟─155f6b0f-5156-4f42-93c2-6f867415ef37
+# ╟─0acf95ad-4bd9-4022-b9f9-ce9a886ed1ed
+# ╟─6c227179-d25f-4b13-86b1-f69e3f74bb8f
+# ╟─ef54af89-22e2-4149-9fb4-9fc0b48b76c8
+# ╟─c42132cd-b4e6-4561-a71b-13b276793f13
+# ╟─a2b3a946-5ff3-4127-a797-be2fa4a2b9bf
+# ╟─85ac468b-452a-48b9-ae61-73a6e970c8c8
+# ╟─9093aff6-4dac-4847-96e1-d6ef2c50cce7
+# ╟─4dbd3eca-9a4c-4aa5-8c15-2f294e33e814
+# ╟─49d89445-4ca2-4aab-b0a4-a632ddbb640b
+# ╟─98c18d0a-95fe-4949-9507-240bb90a02b9
+# ╟─c42c2eb0-2047-4490-9ebb-9b0203466836
+# ╟─cbec4c3f-198e-4334-ba18-55d2fbcc8a0d
+# ╠═e7a33281-7f6d-45cc-bb27-d7d9d2774bee
+# ╟─1f684b7d-3cfb-4ede-aadd-e82b131e017d
+# ╟─98912d9a-d1bb-4b4d-a7eb-f98963bf790d
+# ╟─fce35de6-7f4c-4817-8554-397d2bb19778
+# ╟─ce8762e6-c0d7-4683-8ffe-5ac844b406d4
+# ╟─d2956461-9a8f-4123-9243-523f623e1f21
+# ╟─ab709b9f-a06a-4bed-a36b-f3c5d6e46265
+# ╟─3a75e14e-9ddb-423b-99a5-d7280218b41e
+# ╟─0f9da683-d792-4965-9988-9c80e4e6148f
+# ╟─e34c26f3-4aee-48bc-b164-2347f957a7d7
+# ╟─39b95c2a-df18-40a0-80c6-3c25b2b353e8
+# ╟─0ae3c6dd-63f1-4837-b3f2-f275e06c7d8c
+# ╟─cd0d4cd3-850d-4730-88c3-9d93e7a922f7
+# ╟─067878a2-1d5d-4b4b-9857-5a473849007b
+# ╟─b1f8414f-e004-4cae-8d69-a56b57b5ea11
+# ╟─a5fd7cc5-9460-48d1-ae90-c1a0f0dff265
+# ╟─e6a85185-8188-42e7-b639-34e8c9a8c515
+# ╠═447ead1b-53a3-42a3-ad9d-6bc7c099c40f
+# ╟─fbeade43-7a37-4d16-bc24-eb857799a732
+# ╠═9da25fdb-f91a-45ed-bf30-1b0e3358e9cf
+# ╟─9bcbb66d-47c2-4a38-959a-3df8169a7953
+# ╟─fc62d1b2-3bf6-4c42-bda2-840673f24e25
+# ╟─314aaeb2-9550-4662-b84e-357b659c3635
+# ╟─70069594-eb84-42ae-9f52-c5c8fa0aae0b
+# ╟─7a412bca-ee60-46dc-953f-9fda81d234c2
+# ╟─47cf20cd-62f6-43c2-b531-31eab994aa15
+# ╟─5f177c03-cb3d-4268-8c33-3aa7610e337b
+# ╟─0e813b9b-6bb4-4377-b297-f3789f09f42c
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

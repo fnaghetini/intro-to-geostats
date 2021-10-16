@@ -45,16 +45,34 @@ Neste módulo, estudaremos alguns conceitos básicos de lógica de programação
 
 > A linguagem é *simples* como Python e *rápida* como C 🚀
 
-A seguir, serão apresentados alguns conceitos básicos de lógica de programação, além de uma introdução sobre os recursos interativos da linguagem Julia: 
-
-1. Variáveis
-2. Funções
-3. Coleções
-4. Condicionais
-5. Laços
-6. Interatividade
+A seguir, serão apresentados alguns conceitos básicos de lógica de programação, além de uma introdução sobre os recursos interativos da linguagem Julia.
 
 """
+
+# ╔═╡ d076f427-e5bf-45ef-b320-711d27534e17
+html"<hr><hr>"
+
+# ╔═╡ 14db5525-7c0a-433b-a23c-088db728f46b
+md"""
+##### ⚡ Informações Gerais
+
+- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
+
+- Algumas células encontram-se ocultadas. Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
+
+- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
+
+- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."`. Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
+
+- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
+
+- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
+
+- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
+"""
+
+# ╔═╡ 028f6af8-b48c-4c6b-8dc3-a55e3c931348
+html"<hr><hr>"
 
 # ╔═╡ c111da75-d294-4def-93fb-56953c3585ad
 md"""
@@ -68,10 +86,10 @@ As variáveis podem ser **numéricas**...
 """
 
 # ╔═╡ 7ceb9c27-0310-4f97-8349-91286c1f9235
-numero_inteiro = 10
+idade = 24
 
 # ╔═╡ 218bb8c3-729b-43c7-9a53-d3b579cf2d21
-numero_decimal = 15.5
+altura = 1.58
 
 # ╔═╡ 3b3e6955-1573-4620-8109-d80b71cf0708
 md" As variáveis podem armazenar **cadeias de caracteres**... "
@@ -85,9 +103,19 @@ frase = "Olá, mundo! 🌎"
 # ╔═╡ 55a2c622-0f9f-45db-b534-55873c0759d4
 md"""
 
-> **Nota:** as cadeias de caracteres (**strings**) devem ser encapsuladas por áspas duplas.
+> ⚠️ As cadeias de caracteres (**strings**) devem ser encapsuladas por áspas duplas.
 
 """
+
+# ╔═╡ 449c91c3-7f03-4ffd-95e7-02cdb58323fd
+md"""
+Um recurso muito utilizado e presente em diversas linguagens de programação é a **interpolação de strings**. Esse procedimento utiliza o valor de uma variável dentro de uma string, de modo que a string interpolada atua como um "template". Em Julia, usamos o símbolo `$` para interpolar strings.
+
+A célula abaixo mostra um exemplo de interpolação de string, utilizando as variáveis já criadas `nome`, `idade` e `altura`...
+"""
+
+# ╔═╡ 8d463f50-d694-41eb-bbad-c40f93471852
+"Olá! Meu nome é $nome, tenho $idade anos e tenho $altura m de altura."
 
 # ╔═╡ 4d31b989-7a7d-43ca-a1f8-831db58f1c8e
 md"""
@@ -109,6 +137,11 @@ Cique [aqui](https://docs.julialang.org/en/v1/manual/unicode-input/) para acessa
 
 # ╔═╡ 96ced3bd-69e7-490c-b8be-b06a30049a31
 π
+
+# ╔═╡ 3de2d16f-8849-4462-9ef3-0cc1830285c6
+md"""
+> ⚠️ Perceba que o símbolo $π$ já possui um valor associado na linguagem Julia.
+"""
 
 # ╔═╡ d28119c3-6800-430d-9ffe-d6f25e8e5c2a
 md"""
@@ -205,7 +238,7 @@ v₁[1]
 # ╔═╡ e127bdf8-2a53-4534-a628-1463a5735f41
 md"""
 
-> **Nota:** Assim como *R* e diferentemente de *Python* ou *JavaScript*, a numeração do índice se inicia em **1** na linguagem *Julia*.
+> ⚠️ Assim como R e diferentemente de Python ou JavaScript, a numeração do índice se inicia em **1** na linguagem Julia.
 
 Os três primeiros elementos de `v₁` podem ser obtidos como...
 
@@ -297,9 +330,9 @@ end
 # ╔═╡ 3cfbddfb-be59-4019-965f-13bdbac2295a
 md"""
 
-## 5. Laços de Repetição
+## 5. Laços de repetição
 
-Os **laços de repetição** são utilizados quando se deseja repetir determinado trecho do algoritmo múltiplas vezes. O número de repetições pode ser indeterminado, mas necessariamente finito.
+Os **laços de repetição** são utilizados quando se deseja repetir determinado trecho do algoritmo múltiplas vezes. O número de repetições pode ser indeterminado, mas necessariamente finito (*Dauricio, 2015*).
 
 Uma das repetições mais utilizadas é o `for`, que apresenta a seguinte sintaxe:
 
@@ -336,7 +369,7 @@ raiz(v₄) = missing
 
 # ╔═╡ 5eb8ff96-2adf-465d-bf8c-bd4e64fa6342
 md"""
-Podemos utilizar ainda a sintaxe *list comprehension* para criarmos uma tabuada em apenas uma linha!
+Podemos ainda utilizar a sintaxe *list comprehension* para criarmos uma tabuada em apenas uma linha!
 """
 
 # ╔═╡ 0d420048-c4f9-4149-b25b-149ef77f3264
@@ -380,7 +413,7 @@ md"""
 
 #### 🖊️ Exercício
 
-Com seus conhecimentos geológicos, tente identificar qual rocha é exibida na figura a seguir. Escreva o nome da rocha (apenas com letras minúsculas) na caixa de texto abaixo.
+Com seus conhecimentos geológicos, tente identificar qual rocha é exibida na Figura 01. Escreva o nome da rocha (apenas com letras minúsculas) na caixa de texto abaixo.
 
 """
 
@@ -388,7 +421,7 @@ Com seus conhecimentos geológicos, tente identificar qual rocha é exibida na f
 md"""
 ![rocha](http://lh3.googleusercontent.com/-4dxg2gAuqgk/VeqttO0BqSI/AAAAAAAAKq0/j_G5leYIfIg/s720/01465%252520IMG_20150809_104742%252520mylonite.jpg)
 
-Fonte: [sandatlas.org](https://www.sandatlas.org/mylonite/)
+**Figura 01:** Identifique a rocha acima. Extraído de [sandatlas.org](https://www.sandatlas.org/mylonite/).
 """
 
 # ╔═╡ 98a32d2d-7173-406d-92cf-dfa847d47c49
@@ -408,7 +441,7 @@ md"""
 
 #### 🖊️ Exercício
 
-Na lista suspensa seguir, selecione a opção que corresponda à correta subclasse do silicato exibido na figura abaixo.
+Na lista suspensa seguir, selecione a opção que corresponda à correta subclasse do silicato exibido na Figura 02.
 
 """
 
@@ -416,7 +449,7 @@ Na lista suspensa seguir, selecione a opção que corresponda à correta subclas
 md"""
 ![silicato](https://geology.com/minerals/photos/titanite-crystal.jpg)
 
-Fonte: [geology.com](https://geology.com/minerals/titanite.shtml)
+**Figura 02:** Identifique a subclasse do silicato acima. Extraído de: [geology.com](https://geology.com/minerals/titanite.shtml).
 """
 
 # ╔═╡ 87832d6c-525d-4060-a1e8-d06a611b5dfe
@@ -425,17 +458,35 @@ md""" Subclasse: $(@bind silicato Select(["Tectossilicato","Filossilicato",
 										  "Sorossilicato","Nesossilicato"]))
 """
 
+# ╔═╡ a93dd751-a6b3-454d-9f70-b864fdbbd968
+md"""
+## Referências
+
+*Dauricio, J. S. **Algoritmos e Lógica de Programação**. Londrina: Editora e Distribuidora Educacional S.A., 2015.*
+"""
+
 # ╔═╡ 8f866ee4-ce44-4d42-be56-7764168c1c71
 md"""
-## 7. Leituras Recomendadas
+## Recursos adicionais
 
 Abaixo, são listados alguns recursos complementares a este notebook:
 
-- [Algoritmos e Lógica de Programação](https://d1wqtxts1xzle7.cloudfront.net/50512348/LIVRO_ALGORITIMOS__LOGICA_E_PROGRAMACAO-with-cover-page-v2.pdf?Expires=1633802730&Signature=QIowB4JkDT4EX~bRTaUT2W6z7q8d8rZPM95h3QIY-TijjVWtTg5HL7IqOA7o5-zEUJxMeqKJIxvzRxMFfcLsjr6YO85lP6VF5Vud8giQ3uP-n0hvPPkLeR2AqKBgxU71gUm-xwOPws96zjVusfFFi-ETBmMGidq9USwvCgRIN1B~A8GAFdLJohaqdQ7hjHpNt7CUCAlkPraTEK-Ng10f0K90TZ~FqGf8tvFRAm8dOTXWfQf9KHOz-247WotTA9QZnaicbvAePlazORbBjkSssngqcNuEWEeGg9v2OMz95dmYoNQvF8nljSv99sT88Blw2aSH2s9Gi6hwZoCT4DqtlQ__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA)
+> [Documentação da Linguagem Julia](https://docs.julialang.org/en/v1/)
 
-- [Documentação da Linguagem Julia](https://docs.julialang.org/en/v1/)
+> [Canal do YouTube - Julia Language](https://www.youtube.com/c/TheJuliaLanguage)
 
-- [Minicurso de Geoestatística CBMina 2021](https://github.com/juliohm/CBMina2021)
+> [Minicurso de Geoestatística CBMina 2021](https://github.com/juliohm/CBMina2021)
+"""
+
+# ╔═╡ ce463e41-8cb2-46cb-9656-1503997a883e
+md"""
+## Pacotes utilizados
+
+Os seguintes pacotes foram utilizados neste notebook:
+
+|                    Pacote                     |      Descrição      |
+|:---------------------------------------------:|:-------------------:|
+|[PlutoUI](https://github.com/fonsp/PlutoUI.jl) | Widgets interativos |
 
 """
 
@@ -447,7 +498,7 @@ begin
 
 	still_missing(text=md"Troque `missing` pela sua resposta.") = Markdown.MD(Markdown.Admonition("warning", "Aqui vamos nós!", [text]))
 
-	keep_working(text=md"A resposta não está correta 😔") = Markdown.MD(Markdown.Admonition("danger", "Continue trabalhando!", [text]))
+	keep_working(text=md"A resposta não está correta 😔") = Markdown.MD(Markdown.Admonition("danger", "Não desanime, você está quase lá!", [text]))
 
 	yays = [md"Fantástico!", md"Ótimo!", md"Yay ❤", md"Legal! 🎉", md"Muito bem!", md"Bom trabalho!", md"Você conseguiu a resposta certa!", md"Vamos seguir para próxima seção."]
 
@@ -657,6 +708,9 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─deee1735-37ee-4c97-a4df-8fcb61e95d6a
 # ╟─488dcacd-109d-41f2-b904-3d17193e6190
 # ╟─6ca3e113-02db-4cef-ad9e-3941ac7d7a6d
+# ╟─d076f427-e5bf-45ef-b320-711d27534e17
+# ╟─14db5525-7c0a-433b-a23c-088db728f46b
+# ╟─028f6af8-b48c-4c6b-8dc3-a55e3c931348
 # ╟─c111da75-d294-4def-93fb-56953c3585ad
 # ╠═7ceb9c27-0310-4f97-8349-91286c1f9235
 # ╠═218bb8c3-729b-43c7-9a53-d3b579cf2d21
@@ -664,11 +718,14 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╠═f2e6adcd-9095-496f-a8e3-88069537015c
 # ╠═870cbb76-b0c3-4d14-be22-86e0d34ebe58
 # ╟─55a2c622-0f9f-45db-b534-55873c0759d4
+# ╟─449c91c3-7f03-4ffd-95e7-02cdb58323fd
+# ╠═8d463f50-d694-41eb-bbad-c40f93471852
 # ╟─4d31b989-7a7d-43ca-a1f8-831db58f1c8e
 # ╠═b0d01238-1213-45c3-9bef-a443afc6b87c
 # ╠═2cce4c5e-7890-4c6c-bd7c-eecc8437bef3
 # ╠═1b454935-c858-4817-928d-da116011d7b0
 # ╠═96ced3bd-69e7-490c-b8be-b06a30049a31
+# ╟─3de2d16f-8849-4462-9ef3-0cc1830285c6
 # ╟─d28119c3-6800-430d-9ffe-d6f25e8e5c2a
 # ╠═bb495116-8ff9-4a66-9b66-6f6fe990c5d9
 # ╠═a63d4a04-0ceb-4e4f-90ba-30dc798e1b48
@@ -732,7 +789,9 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─87832d6c-525d-4060-a1e8-d06a611b5dfe
 # ╟─8b0df84d-a112-49ec-9f7b-c6e5efd45c48
 # ╟─55298aee-618b-4704-98ff-e81fdbddd9a7
+# ╟─a93dd751-a6b3-454d-9f70-b864fdbbd968
 # ╟─8f866ee4-ce44-4d42-be56-7764168c1c71
+# ╟─ce463e41-8cb2-46cb-9656-1503997a883e
 # ╟─bb899ab7-b3d8-493f-aaa6-85a4710a6690
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

@@ -49,21 +49,30 @@ A seguir, serão apresentados alguns conceitos básicos de lógica de programaç
 
 """
 
+# ╔═╡ d076f427-e5bf-45ef-b320-711d27534e17
+html"<hr><hr>"
+
 # ╔═╡ 14db5525-7c0a-433b-a23c-088db728f46b
 md"""
-#### ⚠️ Informações sobre o notebook
+##### ⚡ Informações Gerais
 
-- Este notebook é constituído por várias células individuais:
-    - Para executá-las, pasta clicar no ícone ▶️, localizado no canto inferior direito da célula.
-    - Algumas células encontram-se ocultadas. Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
-    - Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
+- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
 
-- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."`. Elas são chamadas de **markdown** e representam as células de texto do notebook. Caso deseje aprender um pouco mais sobre a linguagem markdown, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
+- Algumas células encontram-se ocultadas. Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
+
+- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
+
+- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."`. Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
+
+- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
 
 - Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
 
-- Você pode utilizar este notebook da forma que quiser! 🙂 Caso deseje utilizá-lo em algum trabalho, apenas referencie [este link](https://github.com/fnaghetini/intro-to-geostats).
+- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
 """
+
+# ╔═╡ 028f6af8-b48c-4c6b-8dc3-a55e3c931348
+html"<hr><hr>"
 
 # ╔═╡ c111da75-d294-4def-93fb-56953c3585ad
 md"""
@@ -94,7 +103,7 @@ frase = "Olá, mundo! 🌎"
 # ╔═╡ 55a2c622-0f9f-45db-b534-55873c0759d4
 md"""
 
-> **Nota:** as cadeias de caracteres (**strings**) devem ser encapsuladas por áspas duplas.
+> ⚠️ As cadeias de caracteres (**strings**) devem ser encapsuladas por áspas duplas.
 
 """
 
@@ -131,7 +140,7 @@ Cique [aqui](https://docs.julialang.org/en/v1/manual/unicode-input/) para acessa
 
 # ╔═╡ 3de2d16f-8849-4462-9ef3-0cc1830285c6
 md"""
-> **Nota:** perceba que o símbolo $π$ já possui um valor associado na linguagem Julia.
+> ⚠️ Perceba que o símbolo $π$ já possui um valor associado na linguagem Julia.
 """
 
 # ╔═╡ d28119c3-6800-430d-9ffe-d6f25e8e5c2a
@@ -229,7 +238,7 @@ v₁[1]
 # ╔═╡ e127bdf8-2a53-4534-a628-1463a5735f41
 md"""
 
-> **Nota:** Assim como *R* e diferentemente de *Python* ou *JavaScript*, a numeração do índice se inicia em **1** na linguagem *Julia*.
+> ⚠️ Assim como R e diferentemente de Python ou JavaScript, a numeração do índice se inicia em **1** na linguagem Julia.
 
 Os três primeiros elementos de `v₁` podem ser obtidos como...
 
@@ -323,7 +332,7 @@ md"""
 
 ## 5. Laços de repetição
 
-Os **laços de repetição** são utilizados quando se deseja repetir determinado trecho do algoritmo múltiplas vezes. O número de repetições pode ser indeterminado, mas necessariamente finito.
+Os **laços de repetição** são utilizados quando se deseja repetir determinado trecho do algoritmo múltiplas vezes. O número de repetições pode ser indeterminado, mas necessariamente finito (*Dauricio, 2015*).
 
 Uma das repetições mais utilizadas é o `for`, que apresenta a seguinte sintaxe:
 
@@ -360,7 +369,7 @@ raiz(v₄) = missing
 
 # ╔═╡ 5eb8ff96-2adf-465d-bf8c-bd4e64fa6342
 md"""
-Podemos utilizar ainda a sintaxe *list comprehension* para criarmos uma tabuada em apenas uma linha!
+Podemos ainda utilizar a sintaxe *list comprehension* para criarmos uma tabuada em apenas uma linha!
 """
 
 # ╔═╡ 0d420048-c4f9-4149-b25b-149ef77f3264
@@ -449,19 +458,35 @@ md""" Subclasse: $(@bind silicato Select(["Tectossilicato","Filossilicato",
 										  "Sorossilicato","Nesossilicato"]))
 """
 
+# ╔═╡ a93dd751-a6b3-454d-9f70-b864fdbbd968
+md"""
+## Referências
+
+*Dauricio, J. S. **Algoritmos e Lógica de Programação**. Londrina: Editora e Distribuidora Educacional S.A., 2015.*
+"""
+
 # ╔═╡ 8f866ee4-ce44-4d42-be56-7764168c1c71
 md"""
-## 7. Recursos adicionais
+## Recursos adicionais
 
 Abaixo, são listados alguns recursos complementares a este notebook:
 
-> [Algoritmos e Lógica de Programação](https://d1wqtxts1xzle7.cloudfront.net/50512348/LIVRO_ALGORITIMOS__LOGICA_E_PROGRAMACAO-with-cover-page-v2.pdf?Expires=1633802730&Signature=QIowB4JkDT4EX~bRTaUT2W6z7q8d8rZPM95h3QIY-TijjVWtTg5HL7IqOA7o5-zEUJxMeqKJIxvzRxMFfcLsjr6YO85lP6VF5Vud8giQ3uP-n0hvPPkLeR2AqKBgxU71gUm-xwOPws96zjVusfFFi-ETBmMGidq9USwvCgRIN1B~A8GAFdLJohaqdQ7hjHpNt7CUCAlkPraTEK-Ng10f0K90TZ~FqGf8tvFRAm8dOTXWfQf9KHOz-247WotTA9QZnaicbvAePlazORbBjkSssngqcNuEWEeGg9v2OMz95dmYoNQvF8nljSv99sT88Blw2aSH2s9Gi6hwZoCT4DqtlQ__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA)
-
 > [Documentação da Linguagem Julia](https://docs.julialang.org/en/v1/)
 
-> [Canal Oficial da Linguagem Julia](https://www.youtube.com/c/TheJuliaLanguage)
+> [Canal do YouTube - Julia Language](https://www.youtube.com/c/TheJuliaLanguage)
 
 > [Minicurso de Geoestatística CBMina 2021](https://github.com/juliohm/CBMina2021)
+"""
+
+# ╔═╡ ce463e41-8cb2-46cb-9656-1503997a883e
+md"""
+## Pacotes utilizados
+
+Os seguintes pacotes foram utilizados neste notebook:
+
+|                    Pacote                     |      Descrição      |
+|:---------------------------------------------:|:-------------------:|
+|[PlutoUI](https://github.com/fonsp/PlutoUI.jl) | Widgets interativos |
 
 """
 
@@ -683,7 +708,9 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─deee1735-37ee-4c97-a4df-8fcb61e95d6a
 # ╟─488dcacd-109d-41f2-b904-3d17193e6190
 # ╟─6ca3e113-02db-4cef-ad9e-3941ac7d7a6d
+# ╟─d076f427-e5bf-45ef-b320-711d27534e17
 # ╟─14db5525-7c0a-433b-a23c-088db728f46b
+# ╟─028f6af8-b48c-4c6b-8dc3-a55e3c931348
 # ╟─c111da75-d294-4def-93fb-56953c3585ad
 # ╠═7ceb9c27-0310-4f97-8349-91286c1f9235
 # ╠═218bb8c3-729b-43c7-9a53-d3b579cf2d21
@@ -762,7 +789,9 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─87832d6c-525d-4060-a1e8-d06a611b5dfe
 # ╟─8b0df84d-a112-49ec-9f7b-c6e5efd45c48
 # ╟─55298aee-618b-4704-98ff-e81fdbddd9a7
+# ╟─a93dd751-a6b3-454d-9f70-b864fdbbd968
 # ╟─8f866ee4-ce44-4d42-be56-7764168c1c71
+# ╟─ce463e41-8cb2-46cb-9656-1503997a883e
 # ╟─bb899ab7-b3d8-493f-aaa6-85a4710a6690
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

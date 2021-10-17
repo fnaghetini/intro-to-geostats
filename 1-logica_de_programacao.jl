@@ -27,9 +27,7 @@ PlutoUI.TableOfContents(aside=true, title="Sumário",
 
 # ╔═╡ 488dcacd-109d-41f2-b904-3d17193e6190
 md"""
-
 ![ufmg-logo](https://logodownload.org/wp-content/uploads/2015/02/ufmg-logo-2.png)
-
 """
 
 # ╔═╡ 6ca3e113-02db-4cef-ad9e-3941ac7d7a6d

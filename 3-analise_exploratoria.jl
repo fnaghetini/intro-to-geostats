@@ -36,9 +36,7 @@ PlutoUI.TableOfContents(aside=true, title="Sumário",
 
 # ╔═╡ cfc649b3-e423-4aa9-925b-763e2986e2f5
 md"""
-
 ![ufmg-logo](https://logodownload.org/wp-content/uploads/2015/02/ufmg-logo-2.png)
-
 """
 
 # ╔═╡ b53bfda4-60de-43c8-9852-faa1051050e2
@@ -81,7 +79,7 @@ html"<hr><hr>"
 
 # ╔═╡ e28a9056-d62d-4ab6-be00-0174180a73c5
 md"""
-## 1. Conceitos Básicos
+## 1. Conceitos básicos
 
 Nesta primeira seção, iremos aprender/revisar alguns conceitos básicos sobre Estatística Clássica.
 """
@@ -823,13 +821,13 @@ begin
 		hg = filter(Zᵤ => x -> x > q90, dados) |> DataFrame
 		
 		scatter(hg[!,:X], hg[!,:Y], marker_z=hg[!,Zᵤ],
-				color=:coolwarm, legend=:topleft, marker=(:square,2.5),
+				color=:coolwarm, legend=:topright, marker=(:square,2.5),
 				xlabel="X", ylabel="Y", label="$Zᵤ (ppm)",
 				xlims=(0,6), ylims=(0,6), markerstrokewidth=0.3)
 	
 	else
 		scatter(dados[!,:X], dados[!,:Y], marker_z=dados[!,Zᵤ],
-				color=:coolwarm, legend=:topleft, marker=(:square,2.5),
+				color=:coolwarm, legend=:topright, marker=(:square,2.5),
 				xlabel="X", ylabel="Y", label="$Zᵤ (ppm)",
 				xlims=(0,6), ylims=(0,6), markerstrokewidth=0.3)
 	end
@@ -861,7 +859,6 @@ md"""
 *Rossi, M. E.; Deutsch, C. V. [Mineral resource estimation](https://www.google.com.br/books/edition/Mineral_Resource_Estimation/gzK_BAAAQBAJ?hl=pt-BR&gbpv=0). New York: Springer Science & Business Media, 2013.*
 
 *Tukey, J. W. [Exploratory data analysis](https://www.google.com.br/books/edition/Exploratory_Data_Analysis/UT9dAAAAIAAJ?hl=pt-BR&gbpv=0&bsq=exploratory%20data%20analysis). Princeton: Addison-Wesley Publishing Company, 1977.*
-
 """
 
 # ╔═╡ 5f177c03-cb3d-4268-8c33-3aa7610e337b

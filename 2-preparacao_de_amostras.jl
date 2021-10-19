@@ -30,6 +30,7 @@ begin
 	using DataFrames
 	using Query
 	using MeshViz
+	using Plots
 	
 	# configurações de visualização
 	theme = WGLMakie.Theme(
@@ -62,34 +63,28 @@ Os dados utilizados para a avaliação de um projeto de mineração normalmente 
 Ainda que uma grande variedade de dados **diretos** (e.g. furos de sondagem, trincheiras) e **indiretos** (e.g. geofísicos) sejam utilizados em empreendimentos minerários, neste módulo, iremos aprender sobre a preparação de **furos de sondagem**, o tipo de dado mais usual na mineração.
 """
 
-# ╔═╡ a903d72d-80b2-462e-b9d9-967163c22c10
-html"<hr><hr>"
-
 # ╔═╡ eedd9f9b-6425-4b8c-ad1f-7bbedc122072
 md"""
-##### ⚡ Informações Gerais
-
-- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
-
-- Algumas células encontram-se ocultadas. Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
-
-- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
-
-- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."`. Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
-
-- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
-
-- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
-
-- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
+>##### 📚 Sobre este notebook
+>- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
+>- Algumas células encontram-se ocultadas. Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
+>- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
+>- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."` (e.g. esta célula). Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
+>- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
+>- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
+>- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
 """
 
-# ╔═╡ b6762493-69a5-4225-859d-124b545acd41
-html"<hr><hr>"
+# ╔═╡ aa0a8370-7919-41e1-9a05-481df4e48ec7
+md"""
+## 1. Conceitos básicos
+
+Nesta primeira seção, iremos aprender alguns conceitos teóricos essenciais para compreender o conteúdo deste módulo.
+"""
 
 # ╔═╡ 6c867bb6-87d6-420f-8665-fe4581ffd0a9
 md"""
-## 1. Furos de sondagem
+### Furos de sondagem
 
 O registro do **furos de sondagem** é uma das atividades mais comuns e importantes entre geólogos, uma vez que frequentemente os furos são a única informação geológica direta sobre as rochas localizadas em subsuperfície. As informações de sondagem, após registradas em um Sistema de Gerenciamento de Banco de Dados, são utilizadas pelos geólogos para gerar interpretações 3D e estimativas de teores de um depósito (*Abzalov, 2016*).
 
@@ -109,8 +104,20 @@ A tabela **Collar** traz, essencialmente, informações das coordenadas de boca 
 A tabela **Survey** apresenta informações de perfilagem, ou seja, de orientação dos furos (i.e. sentido e ângulo de mergulho).
 
 As tabelas do tipo **Interval** são essencialmente constituídas por colunas de início (`FROM`) e final (`TO`) dos intervalos amostrais, bem como por uma característica geológica. A tabela **Assay**, por exemplo, além dos campos que definem o intervalo, contém os campos de teores amostrais analisados em laboratório. Já a tabela **Litho**, por outro lado, traz informações das litologias descritas pelos geólogos responsáveis.
+"""
 
-> ⚠️ Um furo de sondagem é composto por diversos intervalos cilíndricos, que podem ser desde centimétricos até decamétricos.
+# ╔═╡ 51199548-4ec2-4034-b955-8d1f97ddd5ee
+md""" ### Suporte amostral
+
+Uma característica muito importante dos dados utilizados na mineração é o **suporte amostral**. De forma simples, o suporte está associado ao **tamanho, forma e orientação** das amostras. Os furos de sondagem, por exemplo, são constituídos por diversos intervalos cilíndricos menores (definidos pelos campos `FROM` e `TO`) que podem apresentar tamanhos/comprimentos distintos.
+
+Os exemplos a seguir, extraídos de *Sinclair & Blackwell (2006)*, evidenciam a importância de características geológicas dos depósitos no suporte amostral:
+
+**Exemplo 1:**. Em depósitos estratiformes, como aqueles de Zn-Pb hospedados em folhelhos, um conjunto de amostras lineares contíguas (e.g. intervalos de testemunhos de sondagem) paralelas ao acamamento são, em média, muito mais similares entre si do que um conjunto de amostras do mesmo tipo, mas perpendiculares ao acamamento. Percebemos aqui o impacto da **orientação** das amostras.
+
+**Exemplo 2:** Em zonas auríferas de veios de quartzo, amostras perpendiculares à orientação dos veios apresentarão uma grande variabilidade de teores caso o tamanho do intervalo amostral seja menor do que a distância média entre os veios (algumas amostras podem ter teores nulos!). Por outro lado, amostras perpendiculares aos veios, mas com o tamanho do intervalo amostral superior à distância média entre os veios serão menos erráticas. Percebemos aqui o impacto do **tamanho** das amostras.
+
+Neste módulo, para fins de simplificação, trataremos o conceito de suporte amostral como sinônimo do tamanho/comprimento dos intervalos amostrais de furos de sondagem.
 """
 
 # ╔═╡ dd89a21f-ce6b-4a3c-9c22-1f97ac3863a8
@@ -206,21 +213,49 @@ furosvalidados.pars
 md"""
 ## 3. Compositagem
 
+Normalmente, os dados brutos de sondagem (i.e. sem nenhum processamento prévio) apresentam suportes amostrais distintos e precisam ser combinados para produzir amostras de suporte aproximadamente uniforme (*Sinclair & Blackwell, 2006*). Esse procedimento é denominado **compositagem** e as amostras resultantes são chamadas de **compostas**. Segundo *Yamamoto (2001)*, o cálculo do teor de uma composta ($t_c$) é realizado pela média dos teores brutos ($t_i$) dos intervalos que serão combinados ponderada pelos respectivos suportes/comprimentos ($e_i$):
+
+```math
+t_c = \frac{\sum_{i=1}^{n} t_i e_i}{\sum_{i=1}^{n} e_i}
+```
+
+Você pode estar se perguntando o porque devemos uniformizar o suporte amostral. Imagine que queremos calcular o teor médio de Au entre três amostras:
+
+| Amostra | Teor (g/t) | Suporte (m) |
+|:-------:|:----------:|:-----------:|
+|  AM01   |    2,5     |      2      |
+|  AM02   |    0,5     |     10      |
+|  AM03   |    0,2     |     15      |
+
+O teor médio entre essas amostras é de aproximadamente 1 g/t. Repare que, independentemente do suporte amostral, cada amostra contribui igualmente para o cálculo da média. Entretanto, se fizermos uma análise crítica, perceberemos que uma amostra de 15 m de comprimento não pode ter o mesmo peso no cálculo do que uma amostra de 2 m. Se uniformizarmos o suporte amostral, no entanto, esse problema será sanado.
+
+> ⚠️ A compositagem é realizada com o objetivo de combinar intervalos pequenos em intervalos maiores e uniformes. O processo inverso, ou seja, subdividir intervalos maiores em intervalos menores não é uma prática adequada, pois, nessa situação, criaríamos amostras artificiais.
+
+Segundo *Sinclair & Blackwell (2006)*, a compositagem objetiva:
+1. Reduzir o número de amostras e, consequentemente, diminuir o custo computacional;
+2. Unificar o suporte das amostras;
+3. Reduzir o impacto de valores extremos isolados que podem dificultar a modelagem de variogramas ([módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/4-variografia.jl));
+4. Adequar o suporte amostral à escala de trabalho.
+
+> ⚠️ A **compositagem por bancadas** busca tornar o suporte amostral igual ou próximo à altura das bancadas, ou seja, a escala de trabalho de minas à céu aberto.
+
+Primeiramente, vamos analisar a distribuição do suporte das amostras. Para isso, utilizaremos o histograma, um dos gráficos mais utilizados e que é explicado detalhadamente no [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl).
 """
 
 # ╔═╡ 554a5530-e1ca-4261-a1e3-bf27846250fc
-begin
-	hist_raw = Figure()
-	ax_raw = Axis(hist_raw[1, 1], title="Amostras Brutas",
-				  xlabel = "Comprimento (m)",ylabel = "Freq. Absoluta")
-	
-	hist!(furos.LENGTH, bins=15, color=:honeydew2,
-	 	  strokewidth = 1, strokecolor = :black)
-	
-	ax_raw.xticks = 0.0:0.5:3.5
-	
-	hist_raw
-end
+histogram(furos[!,:LENGTH], bins=:scott, legend=false,
+		  color=:honeydew2, alpha=0.75, xlims=(0,2.6),
+		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
+
+# ╔═╡ 99aac39c-f375-42a9-a422-ee1f7ef3a490
+md"""
+##### Observações
+
+- Existem três grupos de suportes amostrais bem definidos: 0.5 m, 1.0 m e 2.5m;
+- Como as amostras não apresentam um suporte amostral uniforme, iremos compositá-las.
+
+Nas seções a seguir, iremos aprender sobre os dois principais algoritmos de compositagem.
+"""
 
 # ╔═╡ 29c1aa29-d21f-43c2-b5b4-a2c3443cc983
 md"""
@@ -234,22 +269,12 @@ begin
 						   zone=:ROCKTYPE, mode=:equalcomp)
 	
 	cp_fixo = comps_fixo.table
-	last(cp_fixo, 5)
-end
+end;
 
 # ╔═╡ 86161dc5-0980-42e2-8455-6b1b07dddeaf
-begin
-	hist_fixo = Figure()
-	ax_fixo = Axis(hist_fixo[1, 1], title="Compostas - Comprimento Fixo",
-				   xlabel = "Comprimento (m)", ylabel = "Freq. Absoluta")
-	
-	hist!(cp_fixo.LENGTH, bins=15, color=:honeydew2,
-	 	  strokewidth = 1, strokecolor = :black)
-	
-	ax_fixo.xticks = 0:1:10
-	
-	hist_fixo
-end
+histogram(cp_fixo[!,:LENGTH], bins=:scott, legend=false,
+		  color=:honeydew2, alpha=0.75, xlims=(0,11),
+		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
 
 # ╔═╡ 62705acb-a304-4bd4-ae30-cca46037c7dd
 md"""
@@ -263,30 +288,20 @@ begin
 						    zone=:ROCKTYPE, mode=:nodiscard)
 	
 	cp_otimo = comps_otimo.table
-	last(cp_otimo, 5)
-end
+end;
 
 # ╔═╡ 59454ea0-138c-4005-9c4b-e2e8667189c2
-begin
-	hist_otimo = Figure()
-	ax_otimo = Axis(hist_otimo[1, 1], title="Compostas - Comprimento Ótimo",
-				   xlabel = "Comprimento (m)", ylabel = "Freq. Absoluta")
-	
-	hist!(cp_otimo.LENGTH, bins=50, color=:honeydew2,
-	 	  strokewidth = 1, strokecolor = :black)
-	
-	ax_otimo.xticks = 0:1:15
-	
-	hist_otimo
-end
+histogram(cp_otimo[!,:LENGTH], bins=:scott, legend=false,
+		  color=:honeydew2, alpha=0.75, xlims=(0,14),
+		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
 
-# ╔═╡ 0a3aff22-1a41-4db6-b678-751dde5098b5
+# ╔═╡ d50d76db-507e-450e-93a1-e0319edaf98a
 md"""
-### Validação da compositagem
+### Comparação entre os algoritmos
 
 """
 
-# ╔═╡ 0f2117cb-0100-4abc-bde5-37ec8f18ce31
+# ╔═╡ 01514377-5b84-40f8-bdd6-d77320c382f9
 
 
 # ╔═╡ 8da2bffa-62f1-4d74-8629-474f254a8272
@@ -329,31 +344,20 @@ md"""
 """
 
 # ╔═╡ baf8bd0f-07b7-4ce6-8850-4f22c4a20ecf
-begin
-	p90 = quantile(furos.AU, 0.9)
-	
-	md"""
-	Visualizar furos $(@bind viz_furos CheckBox())
-	
-	Filtrar highgrades $(@bind filtra_hg CheckBox())
-	"""
-	
-end
+md"""
+Visualizar furos $(@bind viz_furos CheckBox())
+"""
 
 # ╔═╡ dbddc346-e9dd-416d-abf5-98d96a95f3ec
 begin
 	if viz_furos
+		# remoção de valores faltantes
 		furos_viz = cp_otimo |> @dropna(:AU) |> DataFrame
 
-		if filtra_hg
-			hg = furos_viz |> @filter(_.AU > p90) |> DataFrame
-
-			meshscatter(hg.X, hg.Y, hg.Z, color=hg.AU,
-						markersize=8, colormap=:jet)
-		else
-			meshscatter(furos_viz.X, furos_viz.Y, furos_viz.Z,
-						color=furos_viz.AU, markersize=8, colormap=:jet)
-		end
+		# visualização dos furos
+		meshscatter(furos_viz.X, furos_viz.Y, furos_viz.Z,
+					color=furos_viz.AU, markersize=8, colormap=:jet)
+		
 	end
 end
 
@@ -363,7 +367,11 @@ md"""
 
 *Abzalov, M. [Applied mining geology](https://www.google.com.br/books/edition/Applied_Mining_Geology/Oy3RDAAAQBAJ?hl=pt-BR&gbpv=0). Switzerland: Springer International Publishing, 2016*
 
+*Sinclair, A. J.; Blackwell, G. H. [Applied mineral inventory estimation](https://www.google.com.br/books/edition/Applied_Mineral_Inventory_Estimation/oo7rCrFQJksC?hl=pt-BR&gbpv=0). New York: Cambridge University Press, 2006.*
+
 *Whittle, G.; Stange, W.; Hanson, N. [Optimising project value and robustness](https://www.whittleconsulting.com.au/wp-content/uploads/2017/03/Optimising-Project-Value-and-Robustness.pdf). In: Project Evaluation Conference, v.1, 2007. 147-155.*
+
+*Yamamoto, J. K. [Avaliação e classificação de reservas minerais](https://www.google.com.br/books/edition/Avalia%C3%A7%C3%A3o_e_classifica%C3%A7%C3%A3o_de_reserva/AkmsTIzmblQC?hl=pt-BR&gbpv=0). São Paulo: Editora da Universidade de São Paulo, 2001*
 """
 
 # ╔═╡ 6f69c80c-aafc-4db1-bd64-41d5112287fb
@@ -394,6 +402,7 @@ DrillHoles = "9d36f3b5-8124-4f7e-bcda-df733105c718"
 GeoStats = "dcc97b0b-8ce5-5539-9008-bb190f959ef6"
 JSServe = "824d6782-a2ef-11e9-3a09-e5662e0c26f9"
 MeshViz = "9ecf9c4f-6e5a-4b5e-83ae-06f2c7a661d8"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
@@ -405,6 +414,7 @@ DrillHoles = "~0.1.4"
 GeoStats = "~0.27.0"
 JSServe = "~1.2.3"
 MeshViz = "~0.1.13"
+Plots = "~1.22.6"
 PlutoUI = "~0.7.16"
 Query = "~1.0.0"
 WGLMakie = "~0.4.6"
@@ -839,6 +849,24 @@ version = "1.0.10+0"
 deps = ["Random"]
 uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 
+[[GLFW_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pkg", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll"]
+git-tree-sha1 = "dba1e8614e98949abfa60480b13653813d8f0157"
+uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
+version = "3.3.5+0"
+
+[[GR]]
+deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Printf", "Random", "Serialization", "Sockets", "Test", "UUIDs"]
+git-tree-sha1 = "d189c6d2004f63fd3c91748c458b09f26de0efaa"
+uuid = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
+version = "0.61.0"
+
+[[GR_jll]]
+deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Pkg", "Qt5Base_jll", "Zlib_jll", "libpng_jll"]
+git-tree-sha1 = "cafe0823979a5c9bff86224b3b8de29ea5a44b2e"
+uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
+version = "0.61.0+0"
+
 [[GeoClustering]]
 deps = ["CategoricalArrays", "Clustering", "Distances", "GeoStatsBase", "LinearAlgebra", "MLJModelInterface", "Meshes", "SparseArrays", "Statistics", "TableDistances", "TableOperations", "Tables"]
 git-tree-sha1 = "ef73e439d7ab2bd317600e5fb3bdbd8ac049c86a"
@@ -1119,6 +1147,12 @@ git-tree-sha1 = "c7f1c695e06c01b95a67f0cd1d34994f3e7db104"
 uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 version = "1.2.1"
 
+[[Latexify]]
+deps = ["Formatting", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdown", "Printf", "Requires"]
+git-tree-sha1 = "95d36f32dde312e694c1de5714821efc4b010815"
+uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
+version = "0.15.7"
+
 [[LazyArtifacts]]
 deps = ["Artifacts", "Pkg"]
 uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
@@ -1158,6 +1192,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Libgpg_error_jll", "Pkg"]
 git-tree-sha1 = "64613c82a59c120435c067c2b809fc61cf5166ae"
 uuid = "d4300ac3-e22c-5743-9152-c294e39db1e4"
 version = "1.8.7+0"
+
+[[Libglvnd_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libX11_jll", "Xorg_libXext_jll"]
+git-tree-sha1 = "7739f837d6447403596a75d19ed01fd08d6f56bf"
+uuid = "7e76a0d4-f3c7-5321-8279-8d96eeed0f29"
+version = "1.3.0+3"
 
 [[Libgpg_error_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1273,6 +1313,11 @@ version = "1.0.3"
 [[MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
+
+[[Measures]]
+git-tree-sha1 = "e498ddeee6f9fdb4551ce855a46f54dbd900245f"
+uuid = "442fdcdd-2543-5da2-b0f3-8c86c306513e"
+version = "0.3.1"
 
 [[MeshViz]]
 deps = ["CategoricalArrays", "Makie", "Meshes", "Tables"]
@@ -1462,11 +1507,23 @@ git-tree-sha1 = "a7a7e1a88853564e551e4eba8650f8c38df79b37"
 uuid = "eebad327-c553-4316-9ea0-9fa01ccd7688"
 version = "0.1.1"
 
+[[PlotThemes]]
+deps = ["PlotUtils", "Requires", "Statistics"]
+git-tree-sha1 = "a3a964ce9dc7898193536002a6dd892b1b5a6f1d"
+uuid = "ccf2f8ad-2431-5c83-bf29-c5338b663b6a"
+version = "2.0.1"
+
 [[PlotUtils]]
 deps = ["ColorSchemes", "Colors", "Dates", "Printf", "Random", "Reexport", "Statistics"]
 git-tree-sha1 = "b084324b4af5a438cd63619fd006614b3b20b87b"
 uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
 version = "1.0.15"
+
+[[Plots]]
+deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "GeometryBasics", "JSON", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs"]
+git-tree-sha1 = "ba43b248a1f04a9667ca4a9f782321d9211aa68e"
+uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+version = "1.22.6"
 
 [[PlutoUI]]
 deps = ["Base64", "Dates", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "UUIDs"]
@@ -1519,6 +1576,12 @@ git-tree-sha1 = "afadeba63d90ff223a6a48d2009434ecee2ec9e8"
 uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
 version = "1.7.1"
 
+[[Qt5Base_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "Fontconfig_jll", "Glib_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "OpenSSL_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libxcb_jll", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_keysyms_jll", "Xorg_xcb_util_renderutil_jll", "Xorg_xcb_util_wm_jll", "Zlib_jll", "xkbcommon_jll"]
+git-tree-sha1 = "ad368663a5e20dbb8d6dc2fddeefe4dae0781ae8"
+uuid = "ea2cea3b-5b76-57ae-a6ef-0a8af62496e1"
+version = "5.15.3+0"
+
 [[QuadGK]]
 deps = ["DataStructures", "LinearAlgebra"]
 git-tree-sha1 = "78aadffb3efd2155af139781b8a8df1ef279ea39"
@@ -1560,6 +1623,12 @@ version = "0.4.2"
 git-tree-sha1 = "44a75aa7a527910ee3d1751d1f0e4148698add9e"
 uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 version = "1.1.2"
+
+[[RecipesPipeline]]
+deps = ["Dates", "NaNMath", "PlotUtils", "RecipesBase"]
+git-tree-sha1 = "7ad0dfa8d03b7bcf8c597f59f5292801730c55b8"
+uuid = "01d81517-befc-4cb6-b9ec-a95719d0359c"
+version = "0.4.1"
 
 [[Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
@@ -1887,6 +1956,18 @@ git-tree-sha1 = "bafa1c4ab77626f8d8199209b740e097ae03805f"
 uuid = "276b4fcb-3e11-5398-bf8b-a0c2d153d008"
 version = "0.4.6"
 
+[[Wayland_jll]]
+deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg", "XML2_jll"]
+git-tree-sha1 = "3e61f0b86f90dacb0bc0e73a0c5a83f6a8636e23"
+uuid = "a2964d1f-97da-50d4-b82a-358c7fce9d89"
+version = "1.19.0+0"
+
+[[Wayland_protocols_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Wayland_jll"]
+git-tree-sha1 = "2839f1c1296940218e35df0bbb220f2a79686670"
+uuid = "2381bf8a-dfd0-557d-9999-79630e7b1b91"
+version = "1.18.0+4"
+
 [[WebSockets]]
 deps = ["Base64", "Dates", "HTTP", "Logging", "Sockets"]
 git-tree-sha1 = "f91a602e25fe6b89afc93cf02a4ae18ee9384ce3"
@@ -1929,6 +2010,12 @@ git-tree-sha1 = "4e490d5c960c314f33885790ed410ff3a94ce67e"
 uuid = "0c0b7dd1-d40b-584c-a123-a41640f87eec"
 version = "1.0.9+4"
 
+[[Xorg_libXcursor_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libXfixes_jll", "Xorg_libXrender_jll"]
+git-tree-sha1 = "12e0eb3bc634fa2080c1c37fccf56f7c22989afd"
+uuid = "935fb764-8cf2-53bf-bb30-45bb1f8bf724"
+version = "1.2.0+4"
+
 [[Xorg_libXdmcp_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "4fe47bd2247248125c428978740e18a681372dd4"
@@ -1940,6 +2027,30 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libX11_jll"]
 git-tree-sha1 = "b7c0aa8c376b31e4852b360222848637f481f8c3"
 uuid = "1082639a-0dae-5f34-9b06-72781eeb8cb3"
 version = "1.3.4+4"
+
+[[Xorg_libXfixes_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libX11_jll"]
+git-tree-sha1 = "0e0dc7431e7a0587559f9294aeec269471c991a4"
+uuid = "d091e8ba-531a-589c-9de9-94069b037ed8"
+version = "5.0.3+4"
+
+[[Xorg_libXi_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libXext_jll", "Xorg_libXfixes_jll"]
+git-tree-sha1 = "89b52bc2160aadc84d707093930ef0bffa641246"
+uuid = "a51aa0fd-4e3c-5386-b890-e753decda492"
+version = "1.7.10+4"
+
+[[Xorg_libXinerama_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libXext_jll"]
+git-tree-sha1 = "26be8b1c342929259317d8b9f7b53bf2bb73b123"
+uuid = "d1454406-59df-5ea1-beac-c340f2130bc3"
+version = "1.1.4+4"
+
+[[Xorg_libXrandr_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libXext_jll", "Xorg_libXrender_jll"]
+git-tree-sha1 = "34cea83cb726fb58f325887bf0612c6b3fb17631"
+uuid = "ec84b674-ba8e-5d96-8ba1-2a689ba10484"
+version = "1.5.2+4"
 
 [[Xorg_libXrender_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libX11_jll"]
@@ -1958,6 +2069,54 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "XSLT_jll", "Xorg_libXau_jll
 git-tree-sha1 = "daf17f441228e7a3833846cd048892861cff16d6"
 uuid = "c7cfdc94-dc32-55de-ac96-5a1b8d977c5b"
 version = "1.13.0+3"
+
+[[Xorg_libxkbfile_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libX11_jll"]
+git-tree-sha1 = "926af861744212db0eb001d9e40b5d16292080b2"
+uuid = "cc61e674-0454-545c-8b26-ed2c68acab7a"
+version = "1.1.0+4"
+
+[[Xorg_xcb_util_image_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "0fab0a40349ba1cba2c1da699243396ff8e94b97"
+uuid = "12413925-8142-5f55-bb0e-6d7ca50bb09b"
+version = "0.4.0+1"
+
+[[Xorg_xcb_util_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libxcb_jll"]
+git-tree-sha1 = "e7fd7b2881fa2eaa72717420894d3938177862d1"
+uuid = "2def613f-5ad1-5310-b15b-b15d46f528f5"
+version = "0.4.0+1"
+
+[[Xorg_xcb_util_keysyms_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "d1151e2c45a544f32441a567d1690e701ec89b00"
+uuid = "975044d2-76e6-5fbe-bf08-97ce7c6574c7"
+version = "0.4.0+1"
+
+[[Xorg_xcb_util_renderutil_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "dfd7a8f38d4613b6a575253b3174dd991ca6183e"
+uuid = "0d47668e-0667-5a69-a72c-f761630bfb7e"
+version = "0.3.9+1"
+
+[[Xorg_xcb_util_wm_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "e78d10aab01a4a154142c5006ed44fd9e8e31b67"
+uuid = "c22f9ab0-d5fe-5066-847c-f4bb1cd4e361"
+version = "0.4.1+1"
+
+[[Xorg_xkbcomp_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libxkbfile_jll"]
+git-tree-sha1 = "4bcbf660f6c2e714f87e960a171b119d06ee163b"
+uuid = "35661453-b289-5fab-8a00-3d9160c6a3a4"
+version = "1.4.2+4"
+
+[[Xorg_xkeyboard_config_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xkbcomp_jll"]
+git-tree-sha1 = "5c8424f8a67c3f2209646d4425f3d415fee5931d"
+uuid = "33bec58e-1273-512f-9401-5d533626f822"
+version = "2.27.0+4"
 
 [[Xorg_xtrans_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2030,6 +2189,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "ee567a171cce03570d77ad3a43e90218e38937a9"
 uuid = "dfaa095f-4041-5dcd-9319-2fabd8486b76"
 version = "3.5.0+0"
+
+[[xkbcommon_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Wayland_jll", "Wayland_protocols_jll", "Xorg_libxcb_jll", "Xorg_xkeyboard_config_jll"]
+git-tree-sha1 = "ece2350174195bb31de1a63bea3a41ae1aa593b6"
+uuid = "d8fb68d0-12a3-5cfd-a85a-d49703b185fd"
+version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
@@ -2039,12 +2204,12 @@ version = "3.5.0+0"
 # ╟─ebaf4b98-9f4a-45bc-ad35-54448f26f90c
 # ╟─ffdbdfbd-8627-48d9-8e9c-384455b64ed4
 # ╟─b9b5f9a4-431d-40fc-94fe-8d622ba7c5a8
-# ╟─a903d72d-80b2-462e-b9d9-967163c22c10
 # ╟─eedd9f9b-6425-4b8c-ad1f-7bbedc122072
-# ╟─b6762493-69a5-4225-859d-124b545acd41
+# ╟─aa0a8370-7919-41e1-9a05-481df4e48ec7
 # ╟─6c867bb6-87d6-420f-8665-fe4581ffd0a9
 # ╟─a5bc3c03-856b-4ee2-a71c-8c7e1fe3c641
 # ╟─ae22a6f0-d857-4229-a003-728d43a50d46
+# ╟─51199548-4ec2-4034-b955-8d1f97ddd5ee
 # ╟─dd89a21f-ce6b-4a3c-9c22-1f97ac3863a8
 # ╠═9ce42874-5a58-4e6a-a544-dfea97146cc2
 # ╟─f9fa9a2f-8099-434e-a76c-4b78160f264a
@@ -2061,14 +2226,15 @@ version = "3.5.0+0"
 # ╠═bfbe894b-a205-4d21-8adf-a26a2052573e
 # ╟─48e9011a-dfa3-4665-9e23-2aab30e0d294
 # ╟─554a5530-e1ca-4261-a1e3-bf27846250fc
+# ╟─99aac39c-f375-42a9-a422-ee1f7ef3a490
 # ╟─29c1aa29-d21f-43c2-b5b4-a2c3443cc983
 # ╠═0bdf2bb0-655c-446a-bb79-91746a380701
 # ╟─86161dc5-0980-42e2-8455-6b1b07dddeaf
 # ╟─62705acb-a304-4bd4-ae30-cca46037c7dd
 # ╠═ddbeaaf1-a4e4-4a09-a487-9bbdc489c824
 # ╟─59454ea0-138c-4005-9c4b-e2e8667189c2
-# ╟─0a3aff22-1a41-4db6-b678-751dde5098b5
-# ╠═0f2117cb-0100-4abc-bde5-37ec8f18ce31
+# ╟─d50d76db-507e-450e-93a1-e0319edaf98a
+# ╠═01514377-5b84-40f8-bdd6-d77320c382f9
 # ╟─8da2bffa-62f1-4d74-8629-474f254a8272
 # ╟─c2417c39-3d12-4de0-8428-1bf7dbb2a995
 # ╠═bb877b6e-980c-4c2d-a3d1-0aa07c0e7840

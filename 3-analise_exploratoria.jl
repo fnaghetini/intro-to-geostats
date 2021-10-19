@@ -52,30 +52,17 @@ Neste módulo, iremos aprender sobre algumas das técnicas de AED mais utilizada
 
 """
 
-# ╔═╡ b6e565dc-96a2-42e8-9997-a4c513ff748e
-html"<hr><hr>"
-
 # ╔═╡ f7756000-3e37-436e-b070-6d57afe142d7
 md"""
-##### ⚡ Informações Gerais
-
-- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
-
-- Algumas células encontram-se ocultadas. Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
-
-- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
-
-- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."`. Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
-
-- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
-
-- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
-
-- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
+>##### 📚 Sobre este notebook
+>- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
+>- Algumas células encontram-se ocultadas. Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
+>- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
+>- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."`. Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
+>- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
+>- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
+>- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
 """
-
-# ╔═╡ bd01593a-53a5-4c36-b5e4-3d738a0c3c08
-html"<hr><hr>"
 
 # ╔═╡ e28a9056-d62d-4ab6-be00-0174180a73c5
 md"""
@@ -2458,9 +2445,7 @@ version = "0.9.1+5"
 # ╟─5e44a696-0a3e-40f1-b125-2dec95b5cf79
 # ╟─cfc649b3-e423-4aa9-925b-763e2986e2f5
 # ╟─b53bfda4-60de-43c8-9852-faa1051050e2
-# ╟─b6e565dc-96a2-42e8-9997-a4c513ff748e
 # ╟─f7756000-3e37-436e-b070-6d57afe142d7
-# ╟─bd01593a-53a5-4c36-b5e4-3d738a0c3c08
 # ╟─e28a9056-d62d-4ab6-be00-0174180a73c5
 # ╟─a8c53b89-634b-4526-be62-f51f22c3c607
 # ╟─b8576b51-2a2b-4614-ae62-280394944319

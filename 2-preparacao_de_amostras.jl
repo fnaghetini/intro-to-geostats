@@ -25,11 +25,9 @@ begin
 	# carregando pacotes necessários
 	using DrillHoles
 	using Statistics
-	using GeoStats
 	using PlutoUI
 	using DataFrames
 	using Query
-	using MeshViz
 	using Plots
 	
 	# configurações de visualização
@@ -43,7 +41,7 @@ end;
 
 # ╔═╡ d380ac0f-28a7-48f4-8463-9dbdf7f66a16
 html"""
-<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp<b>Preparação de Amostras</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
+<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp🛠️&nbsp<b>Preparação de Amostras</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
 """
 
 # ╔═╡ ebaf4b98-9f4a-45bc-ad35-54448f26f90c
@@ -65,14 +63,17 @@ Ainda que uma grande variedade de dados **diretos** (e.g. furos de sondagem, tri
 
 # ╔═╡ eedd9f9b-6425-4b8c-ad1f-7bbedc122072
 md"""
->##### 📚 Sobre este notebook
+>##### 📚 Sobre
+>- Você pode exportar este notebook como PDF ou HTML estático. Para isso, clique no ícone 🔺🔴, localizado no canto superior direito da pagina. Entretanto, ambos os formatos não são compatíveis com os recursos interativos do notebook.
 >- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
->- Algumas células encontram-se ocultadas. Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
+>- Algumas células encontram-se ocultadas (e.g. células que geram os plots). Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
+>- A explicação das células que geram os plots está fora do escopo deste notebook. Entretanto, a sintaxe é bem intuitiva e pode ser facilmente compreendida!
 >- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
 >- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."` (e.g. esta célula). Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
 >- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
 >- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
 >- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
+>- Para mais informações acesse o [README](https://github.com/fnaghetini/intro-to-geostats/blob/main/README.md) do projeto 🚀
 """
 
 # ╔═╡ aa0a8370-7919-41e1-9a05-481df4e48ec7
@@ -113,9 +114,9 @@ Uma característica muito importante dos dados utilizados na mineração é o **
 
 Os exemplos a seguir, extraídos de *Sinclair & Blackwell (2006)*, evidenciam a importância de características geológicas dos depósitos no suporte amostral:
 
-**Exemplo 1:**. Em depósitos estratiformes, como aqueles de Zn-Pb hospedados em folhelhos, um conjunto de amostras lineares contíguas (e.g. intervalos de testemunhos de sondagem) paralelas ao acamamento são, em média, muito mais similares entre si do que um conjunto de amostras do mesmo tipo, mas perpendiculares ao acamamento. Percebemos aqui o impacto da **orientação** das amostras.
+> **Exemplo 1:**. Em depósitos estratiformes, como aqueles de Zn-Pb hospedados em folhelhos, um conjunto de amostras lineares contíguas (e.g. intervalos de testemunhos de sondagem) paralelas ao acamamento são, em média, muito mais similares entre si do que um conjunto de amostras do mesmo tipo, mas perpendiculares ao acamamento. Percebemos aqui o impacto da **orientação** das amostras.
 
-**Exemplo 2:** Em zonas auríferas de veios de quartzo, amostras perpendiculares à orientação dos veios apresentarão uma grande variabilidade de teores caso o tamanho do intervalo amostral seja menor do que a distância média entre os veios (algumas amostras podem ter teores nulos!). Por outro lado, amostras perpendiculares aos veios, mas com o tamanho do intervalo amostral superior à distância média entre os veios serão menos erráticas. Percebemos aqui o impacto do **tamanho** das amostras.
+> **Exemplo 2:** Em zonas auríferas de veios de quartzo, amostras perpendiculares à orientação dos veios apresentarão uma grande variabilidade de teores caso o tamanho do intervalo amostral seja menor do que a distância média entre os veios (algumas amostras podem ter teores nulos!). Por outro lado, amostras perpendiculares aos veios, mas com o tamanho do intervalo amostral superior à distância média entre os veios serão menos erráticas. Percebemos aqui o impacto do **tamanho** das amostras.
 
 Neste módulo, para fins de simplificação, trataremos o conceito de suporte amostral como sinônimo do tamanho/comprimento dos intervalos amostrais de furos de sondagem.
 """
@@ -124,7 +125,9 @@ Neste módulo, para fins de simplificação, trataremos o conceito de suporte am
 md"""
 ## 2. Geração de furos
 
-Neste módulo, iremos trabalhar com o **Marvin**, um conjunto de dados de um depósito de Cu-Au Pórfiro fictício, mas que apresenta uma série de caracteríticas típicas de depósitos sulfetados (*Whittle et al., 2007*).
+Neste módulo, iremos trabalhar com o [Marvin](), um conjunto de dados de um depósito de Cu-Au Pórfiro fictício, mas que apresenta uma série de caracteríticas típicas de depósitos sulfetados (*Whittle et al., 2007*). No passado, essa base de dados era utilizada nos tutoriais básicos do software Leapfrog Geo da neozelandeza [Seequent](https://www.seequent.com/).
+
+> ⚠️ Para fins de simplificação, apenas os teores de `Au` foram mantidos.
 
 Para a importação das tabelas Collar, Survey, Assay e Litho e geração dos furos de sondagem, utilizaremos o pacote [DrillHoles.jl](https://github.com/JuliaEarth/DrillHoles.jl).
 """
@@ -169,9 +172,11 @@ Vamos gerar novamente os furos, mas dessa vez importando o arquivo `assay_val.cs
 
 # ╔═╡ 6b7b4fbe-622e-407c-8ffc-9fe888354ced
 begin
+	# importação da tabela assay validada
 	assay_val  = Interval(file = "data/Marvin/assay_val.csv",
 					  	  holeid = :HOLEID, from = :FROM, to = :TO)
 	
+	# 
 	furosvalidados = drillhole(collar, survey, [assay_val, litho])
 end
 
@@ -213,12 +218,19 @@ furosvalidados.pars
 md"""
 ## 3. Compositagem
 
-Normalmente, os dados brutos de sondagem (i.e. sem nenhum processamento prévio) apresentam suportes amostrais distintos e precisam ser combinados para produzir amostras de suporte aproximadamente uniforme (*Sinclair & Blackwell, 2006*). Esse procedimento é denominado **compositagem** e as amostras resultantes são chamadas de **compostas**. Segundo *Yamamoto (2001)*, o cálculo do teor de uma composta ($t_c$) é realizado pela média dos teores brutos ($t_i$) dos intervalos que serão combinados ponderada pelos respectivos suportes/comprimentos ($e_i$):
+Normalmente, os dados brutos de sondagem (i.e. sem nenhum processamento prévio) apresentam suportes amostrais distintos e precisam ser combinados para produzir amostras de suporte aproximadamente uniforme (*Sinclair & Blackwell, 2006*). Esse procedimento é denominado **compositagem** e as amostras (combinadas) resultantes são chamadas de **compostas**.
+
+> ⚠️ A compositagem é realizada com o objetivo de combinar intervalos pequenos em intervalos maiores e uniformes. O processo inverso, ou seja, subdividir intervalos maiores em intervalos menores não é uma prática adequada, pois haveria uma suavização da distribuição espacial dos teores que não corresponde à realidade (*Abzalov, 2016*).
+
+Segundo *Yamamoto (2001)*, o cálculo do teor de uma composta ($t_c$) é realizado pela média dos teores brutos ($t_i$) dos intervalos que serão combinados ponderada pelos respectivos suportes ($e_i$):
 
 ```math
 t_c = \frac{\sum_{i=1}^{n} t_i e_i}{\sum_{i=1}^{n} e_i}
 ```
+"""
 
+# ╔═╡ 3f55ecbb-8f26-4813-ac3e-97588830d987
+md"""
 Você pode estar se perguntando o porque devemos uniformizar o suporte amostral. Imagine que queremos calcular o teor médio de Au entre três amostras:
 
 | Amostra | Teor (g/t) | Suporte (m) |
@@ -227,19 +239,20 @@ Você pode estar se perguntando o porque devemos uniformizar o suporte amostral.
 |  AM02   |    0,5     |     10      |
 |  AM03   |    0,2     |     15      |
 
-O teor médio entre essas amostras é de aproximadamente 1 g/t. Repare que, independentemente do suporte amostral, cada amostra contribui igualmente para o cálculo da média. Entretanto, se fizermos uma análise crítica, perceberemos que uma amostra de 15 m de comprimento não pode ter o mesmo peso no cálculo do que uma amostra de 2 m. Se uniformizarmos o suporte amostral, no entanto, esse problema será sanado.
+O teor médio entre essas amostras é de aproximadamente 1 g/t. Repare que, independentemente do suporte amostral, cada amostra contribui igualmente para o cálculo da média. Entretanto, se fizermos uma análise crítica, perceberemos que uma amostra de 15 m de comprimento não pode ter o mesmo peso no cálculo do que uma amostra de 2 m. Se regularizarmos o suporte amostral, no entanto, esse problema será sanado.
+"""
 
-> ⚠️ A compositagem é realizada com o objetivo de combinar intervalos pequenos em intervalos maiores e uniformes. O processo inverso, ou seja, subdividir intervalos maiores em intervalos menores não é uma prática adequada, pois, nessa situação, criaríamos amostras artificiais.
-
+# ╔═╡ c3e6a7e8-c4a2-42ad-9302-cd4be7ee0920
+md"""
 Segundo *Sinclair & Blackwell (2006)*, a compositagem objetiva:
 1. Reduzir o número de amostras e, consequentemente, diminuir o custo computacional;
-2. Unificar o suporte das amostras;
+2. Regularizar o suporte amostral;
 3. Reduzir o impacto de valores extremos isolados que podem dificultar a modelagem de variogramas ([módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/4-variografia.jl));
 4. Adequar o suporte amostral à escala de trabalho.
 
 > ⚠️ A **compositagem por bancadas** busca tornar o suporte amostral igual ou próximo à altura das bancadas, ou seja, a escala de trabalho de minas à céu aberto.
 
-Primeiramente, vamos analisar a distribuição do suporte das amostras. Para isso, utilizaremos o histograma, um dos gráficos mais utilizados e que é explicado detalhadamente no [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl).
+Primeiramente, vamos analisar a distribuição do suporte das amostras. Para isso, utilizaremos o histograma (Figura 02), um gráfico univariado muito útil e que é explicado detalhadamente no [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl).
 """
 
 # ╔═╡ 554a5530-e1ca-4261-a1e3-bf27846250fc
@@ -247,99 +260,165 @@ histogram(furos[!,:LENGTH], bins=:scott, legend=false,
 		  color=:honeydew2, alpha=0.75, xlims=(0,2.6),
 		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
 
+# ╔═╡ 4d5eab4d-8510-45ed-97f9-31c6e3af6ab4
+md"**Figura 02:** Distribuição do suporte das amostras brutas."
+
 # ╔═╡ 99aac39c-f375-42a9-a422-ee1f7ef3a490
 md"""
 ##### Observações
 
 - Existem três grupos de suportes amostrais bem definidos: 0.5 m, 1.0 m e 2.5m;
 - Como as amostras não apresentam um suporte amostral uniforme, iremos compositá-las.
+"""
 
-Nas seções a seguir, iremos aprender sobre os dois principais algoritmos de compositagem.
+# ╔═╡ e615de83-bcc4-4a84-8e94-140989508805
+md"""
+Utilizaremos a função `composite` do pacote [DrillHoles.jl](https://github.com/JuliaEarth/DrillHoles.jl) para realizar a compositagem dos furos brutos. Os parâmetros dessa função são apresentados abaixo:
+
+```julia
+composite(dh, interval=1.0, zone=nothing, mode=:equalcomp, mincomp=0.5)
+```
+
+- `dh`: objeto de furos de sondagem que será compositado;
+- `interval`: comprimento do intervalo das compostas (novo suporte);
+- `zone`: coluna de zona. Se considerado, os intervalos só poderão ser combinados caso apresentem o mesmo valor de zona. Podemos utilizar a coluna de litologia `ROCKTYPE`, por exemplo;
+- `mode`: método de compositagem;
+- `mincomp`: comprimento mínimo do intervalo das compostas. Intervalos menores serão descartados.
+
+> ⚠️ Caso você tenha familiaridade com o software Studio RM da [Datamine](https://www.dataminesoftware.com/), perceberá que a função `composite` é muito similar ao processo `COMPDH`.
+
+A seguir, aprenderemos sobre os dois principais métodos de compositagem de furos de sondagem: **comprimento fixo** e **comprimento ótimo**. Como dito anteriormente, a estratégia de compositagem é definida pelo parâmetro `mode`.
 """
 
 # ╔═╡ 29c1aa29-d21f-43c2-b5b4-a2c3443cc983
 md"""
-### Algoritmo do comprimento fixo
+### Método do comprimento fixo
 
+O **método do comprimento fixo** visa criar compostas com exatamente o mesmo comprimento `interval`. Além disso, é necessário definir um parâmetro de comprimento mínimo de composta `mincomp` que, por sua vez, é utilizado para decidir se as "bordas" das amostras serão mantidas ou descartadas. Caso as bordas possuam um comprimento inferior a `mincomp`, elas serão descartadas e, caso contrário, serão mantidas.
+
+Perceba que, embora busque gerar compostas de tamanho fixo, a estratégia de comprimento fixo pode levar ao descarte de muitas amostras. Essa é a principal limitação deste método (*Abzalov, 2016*).
+
+Abaixo, realizaremos uma compositagem dos furos pelo método do comprimento fixo, que é representado por `mode=:equalcomp`. O comprimento/suporte das compostas será igual a 10 metros e a coluna `ROCKTYPE` é adotada como campo de zona. O suporte mínimo `mincomp` que uma composta poderá apresentar é de 5 metros. A distribuição do suporte das compostas resultantes é apresesentada pelo histograma da Figura 03.
 """
 
 # ╔═╡ 0bdf2bb0-655c-446a-bb79-91746a380701
 begin
+	# compositagem por comprimento fixo
 	comps_fixo = composite(furosvalidados, interval=10.0,
-						   zone=:ROCKTYPE, mode=:equalcomp)
+						   zone=:ROCKTYPE, mode=:equalcomp, mincomp=5)
 	
+	# tabela de compostas
 	cp_fixo = comps_fixo.table
 end;
 
 # ╔═╡ 86161dc5-0980-42e2-8455-6b1b07dddeaf
 histogram(cp_fixo[!,:LENGTH], bins=:scott, legend=false,
-		  color=:honeydew2, alpha=0.75, xlims=(0,11),
+		  color=:honeydew2, alpha=0.75, xlims=(4.5,11),
 		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
+
+# ╔═╡ 66b7f878-c620-4fee-84c0-273bdbc46440
+md"**Figura 03:** Distribuição do suporte das compostas resultantes do método do comprimento fixo."
+
+# ╔═╡ 7d398c89-f763-4d3b-b196-2949bd91ae9a
+md"""
+##### Observações
+
+- A grande maioria das compostas agora apresenta suporte igual a 10 metros;
+- A distribuição apresenta uma forte assimetria negativa (cauda alongada à esquerda). Esse padrão é típico quando se realiza a compositagem pelo método do comprimento fixo. Os tipos de assimetria serão discutidos no [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl). 
+"""
 
 # ╔═╡ 62705acb-a304-4bd4-ae30-cca46037c7dd
 md"""
-### Algoritmo do comprimento ótimo
+### Método do comprimento ótimo
 
+O **método do comprimento ótimo** parte do princípio que as amostras não devem ser descartadas. Essa estratégia faz com que todas as bordas de amostras (maiores que `mincomp`) sejam incluídas em alguma das compostas, de modo que o suporte resultante seja o mais próximo possível do comprimento `interval` definido (*Abzalov, 2016*). O comprimento máximo que uma amostra pode apresentar é igual a `1.5 × interval`.
+
+O fato de essa estratégia ser mais flexível que o método do comprimento fixo faz com que menos amostras sejam descartadas, ainda que as compostas não apresentem um suporte exatamente igual ao `interval` definido.
+
+A seguir, realizaremos uma compositagem dos furos pelo método do comprimento ótimo, que é representado por `mode=:nodiscard`. Os demais parâmetros da função `composite` são configurados da mesma forma que o exemplo anterior. A distribuição do suporte das compostas resultantes é apresesentada pelo histograma da Figura 04.
 """
 
 # ╔═╡ ddbeaaf1-a4e4-4a09-a487-9bbdc489c824
 begin
+	# compositagem por comprimento ótimo
 	comps_otimo = composite(furosvalidados, interval=10.0,
-						    zone=:ROCKTYPE, mode=:nodiscard)
+						    zone=:ROCKTYPE, mode=:nodiscard, mincomp=5)
 	
+	# tabela de compostas
 	cp_otimo = comps_otimo.table
 end;
 
 # ╔═╡ 59454ea0-138c-4005-9c4b-e2e8667189c2
 histogram(cp_otimo[!,:LENGTH], bins=:scott, legend=false,
-		  color=:honeydew2, alpha=0.75, xlims=(0,14),
+		  color=:honeydew2, alpha=0.75, xlims=(4,14),
 		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
+
+# ╔═╡ 0d9d4d97-e1ff-47a5-9a58-c76788b55468
+md"**Figura 04:** Distribuição do suporte das compostas resultantes do método do comprimento ótimo."
+
+# ╔═╡ 959927f2-74b6-411d-89f8-034c031d7422
+md"""
+##### Observações
+
+- A grande maioria das compostas agora apresenta comprimentos entre 9 e 11 metros;
+- A distribuição é aproximadamente simétrica. Esse padrão é típico quando se realiza a compositagem pelo método do comprimento ótimo.
+"""
 
 # ╔═╡ d50d76db-507e-450e-93a1-e0319edaf98a
 md"""
 ### Comparação entre os algoritmos
 
+Até o momento, já aprendemos que:
+
+> O **método do comprimento fixo**, por ser mais rígido, pode resultar no descarte de muitas amostras. A distribuição do suporte das compostas é tipicamente assimétrica negativa.
+
+> O **método do comprimento ótimo**, ainda que não gere compostas de suporte fixo, evita o descarte de amostras. A distribuição do suporte das compostas é aproximadamente simétrica.
+
+Ademais, podemos realizar uma comparação estatística entre as amostras brutas e as compostas resultantes de ambos os métodos. Para isso, iremos considerar os seguintes critérios:
+1. Metragem total de amostras;
+2. Desvio padrão do comprimento das amostras;
+3. Média do teor de Au (g/t).
+
+Idealmente, a metragem total das compostas deve coincidir com a das amostras brutas. Para o cálculo da metragem total, utilizaremos a função `sum`.
+
+Como o objetivo da compositagem é regularizar o suporte amostral, a variabilidade (dispersão) do comprimento das amostras deve ser mínima. Mediremos a variabilidade com a função `std`, que representa o desvio padrão.
+
+A compositagem não deve alterar significativamente o teor metalífero médio das amostras. Qualquer mudança superior a 5% deve ser investigada (*Abzalov, 2016*). Para o cálculo do teor médio de Au (g/t), utilizaremos a função `mean`.
+
+Vamos criar uma função `compvalid` que remova eventuais valores faltantes de Au e retorne um sumário estatístico com essas três informações... 
 """
 
-# ╔═╡ 01514377-5b84-40f8-bdd6-d77320c382f9
+# ╔═╡ 3d52dfab-40d2-4947-9dfe-cc4e6100d75c
+function compvalid(amostras::DataFrame, id::String)
+	
+	s = amostras |> @dropna(:AU) |> DataFrame
+	
+	report = DataFrame(Amostras   = id,
+					   Metragem   = sum(amostras.LENGTH),
+					   DP_suporte = std(amostras.LENGTH),
+					   Média_Au   = mean(s.AU))
+	return report
+end
 
-
-# ╔═╡ 8da2bffa-62f1-4d74-8629-474f254a8272
+# ╔═╡ 98d43ce9-d4a6-4b5f-8777-a0af67eddf9f
 md"""
-## 4. Capeamento
-
+Agora podemos aplicar a função `compvalid` para calcular as estatísticas de cada um dos grupos de amostras (i.e. brutas, compostas fixas e compostas ótimas) e concatenar (verticalmente) as medidas em uma única tabela. Essa concatenação é bastante intuitiva...
 """
 
-# ╔═╡ c2417c39-3d12-4de0-8428-1bf7dbb2a995
+# ╔═╡ 58fd4e5b-da58-4cf1-8c99-32892a146bdd
+[compvalid(furos, "Brutas")
+ compvalid(cp_fixo, "Comp. Fixo")
+ compvalid(cp_otimo, "Comp. Ótimo")]
+
+# ╔═╡ 5431903b-e7b0-47f8-a225-9db66468256e
 md"""
-### Detecção de valores extremos
+##### Observações
 
 """
-
-# ╔═╡ bb877b6e-980c-4c2d-a3d1-0aa07c0e7840
-
-
-# ╔═╡ 9d3dc7c5-1908-4076-b10b-bdd7d19392a7
-md"""
-### Tratamento de valores extremos
-
-"""
-
-# ╔═╡ 00633d38-8308-4b4b-8846-887486028236
-
-
-# ╔═╡ e9a74bd9-3f31-44a9-8ef2-706fb9a50a49
-md"""
-### Validação do capeamento
-
-"""
-
-# ╔═╡ 7fcb9e30-30a1-4396-9b70-40cfcc0ae33a
-
 
 # ╔═╡ 447e2730-0bd4-4953-ac2e-c6d12cb5e341
 md"""
-## 5. Visualização dos furos
+## 4. Visualização dos furos
 
 """
 
@@ -357,8 +436,12 @@ begin
 		# visualização dos furos
 		meshscatter(furos_viz.X, furos_viz.Y, furos_viz.Z,
 					color=furos_viz.AU, markersize=8, colormap=:jet)
-		
 	end
+end
+
+# ╔═╡ d9cd1583-abec-4dc1-a9db-5bbcf74a48c8
+if viz_furos
+	md"""**Figura 05:** Visualização dos teores das compostas."""
 end
 
 # ╔═╡ 96ae1d18-a0fd-4846-9d4a-843952e14caa
@@ -371,7 +454,16 @@ md"""
 
 *Whittle, G.; Stange, W.; Hanson, N. [Optimising project value and robustness](https://www.whittleconsulting.com.au/wp-content/uploads/2017/03/Optimising-Project-Value-and-Robustness.pdf). In: Project Evaluation Conference, v.1, 2007. 147-155.*
 
-*Yamamoto, J. K. [Avaliação e classificação de reservas minerais](https://www.google.com.br/books/edition/Avalia%C3%A7%C3%A3o_e_classifica%C3%A7%C3%A3o_de_reserva/AkmsTIzmblQC?hl=pt-BR&gbpv=0). São Paulo: Editora da Universidade de São Paulo, 2001*
+*Yamamoto, J. K. [Avaliação e classificação de reservas minerais](https://www.google.com.br/books/edition/Avalia%C3%A7%C3%A3o_e_classifica%C3%A7%C3%A3o_de_reserva/AkmsTIzmblQC?hl=pt-BR&gbpv=0). São Paulo: Editora da Universidade de São Paulo, 2001*.
+"""
+
+# ╔═╡ 0b874268-8410-43fd-9c60-d13e4f2eec0b
+md"""
+## Recursos adicionais
+
+Um outro tópico importante na fase de preparação de amostras é o *top cut*, comumente chamado de "capeamento". Ainda que esse assunto esteja fora do escopo deste notebook, o podcast abaixo é uma excelente introdução ao tema! 
+
+> [Podcast Top Cut - Optiro Mining Industry Consultants](https://open.spotify.com/episode/6Wbho2xFwntNVrU86t32KJ)
 """
 
 # ╔═╡ 6f69c80c-aafc-4db1-bd64-41d5112287fb
@@ -385,12 +477,11 @@ Os seguintes pacotes foram utilizados neste notebook:
 |[JSServe](https://github.com/SimonDanisch/JSServe.jl)     | Aplicações interativas  |
 |[DrillHoles](https://github.com/JuliaEarth/DrillHoles.jl) | Furos de sondagem       |
 |[Statistics](https://docs.julialang.org/en/v1/)           | Cálculo de estatísticas |
-|[GeoStats](https://github.com/JuliaEarth/GeoStats.jl)     | Rotinas geoestatísticas |
 |[PlutoUI](https://github.com/fonsp/PlutoUI.jl)            | Widgets interativos     |
 |[DataFrames](https://github.com/JuliaData/DataFrames.jl)  | Manipulação de tabelas  |
 |[Query](https://github.com/queryverse/Query.jl)           | Realização de consultas |
-|[MeshViz](https://github.com/JuliaGeometry/MeshViz.jl)    | Plotagem de meshes      |
-|[WGLMakie](https://github.com/JuliaPlots/Makie.jl)        | Backend para o Makie.jl |
+|[Plots](https://github.com/JuliaPlots/Plots.jl)           | Visualização dos dados  |
+|[WGLMakie](https://github.com/JuliaPlots/Makie.jl)        | Plotagem interativa     |
 
 """
 
@@ -399,9 +490,7 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DrillHoles = "9d36f3b5-8124-4f7e-bcda-df733105c718"
-GeoStats = "dcc97b0b-8ce5-5539-9008-bb190f959ef6"
 JSServe = "824d6782-a2ef-11e9-3a09-e5662e0c26f9"
-MeshViz = "9ecf9c4f-6e5a-4b5e-83ae-06f2c7a661d8"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
@@ -411,9 +500,7 @@ WGLMakie = "276b4fcb-3e11-5398-bf8b-a0c2d153d008"
 [compat]
 DataFrames = "~1.2.2"
 DrillHoles = "~0.1.4"
-GeoStats = "~0.27.0"
 JSServe = "~1.2.3"
-MeshViz = "~0.1.13"
 Plots = "~1.22.6"
 PlutoUI = "~0.7.16"
 Query = "~1.0.0"
@@ -447,11 +534,6 @@ git-tree-sha1 = "e81c509d2c8e49592413bfb0bb3b08150056c79d"
 uuid = "27a7e980-b3e6-11e9-2bcd-0b925532e340"
 version = "0.4.1"
 
-[[ArgCheck]]
-git-tree-sha1 = "dedbbb2ddb876f899585c4ec4433265e3017215a"
-uuid = "dce04be8-c92d-5529-be00-80e4d2c0e197"
-version = "2.1.0"
-
 [[ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 
@@ -470,37 +552,14 @@ git-tree-sha1 = "d50976f217489ce799e366d9561d56a98a30d7fe"
 uuid = "67c07d97-cdcb-5c2c-af73-a7f9c32a568b"
 version = "0.8.2"
 
-[[AverageShiftedHistograms]]
-deps = ["LinearAlgebra", "RecipesBase", "Statistics", "StatsBase", "UnicodePlots"]
-git-tree-sha1 = "8bdad2055f64dd71a25826d752e0222726f25f20"
-uuid = "77b51b56-6f8f-5c3a-9cb4-d71f9594ea6e"
-version = "0.8.7"
-
 [[AxisAlgorithms]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "WoodburyMatrices"]
 git-tree-sha1 = "66771c8d21c8ff5e3a93379480a2307ac36863f7"
 uuid = "13072b0f-2c55-5437-9ae7-d433b7a33950"
 version = "1.0.1"
 
-[[AxisArrays]]
-deps = ["Dates", "IntervalSets", "IterTools", "RangeArrays"]
-git-tree-sha1 = "d127d5e4d86c7680b20c35d40b503c74b9a39b5e"
-uuid = "39de3d68-74b9-583c-8d2d-e117c070f3a9"
-version = "0.4.4"
-
-[[BangBang]]
-deps = ["Compat", "ConstructionBase", "Future", "InitialValues", "LinearAlgebra", "Requires", "Setfield", "Tables", "ZygoteRules"]
-git-tree-sha1 = "0ad226aa72d8671f20d0316e03028f0ba1624307"
-uuid = "198e06fe-97b7-11e9-32a5-e1d131e6ad66"
-version = "0.3.32"
-
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
-
-[[Baselet]]
-git-tree-sha1 = "aebf55e6d7795e02ca500a689d326ac979aaf89e"
-uuid = "9718e550-a3fa-408a-8086-8db961cd8217"
-version = "0.1.1"
 
 [[Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -525,35 +584,11 @@ git-tree-sha1 = "f2202b55d816427cd385a9a4f3ffb226bee80f99"
 uuid = "83423d85-b0ee-5818-9007-b63ccbeb887a"
 version = "1.16.1+0"
 
-[[CategoricalArrays]]
-deps = ["DataAPI", "Future", "Missings", "Printf", "Requires", "Statistics", "Unicode"]
-git-tree-sha1 = "fbc5c413a005abdeeb50ad0e54d85d000a1ca667"
-uuid = "324d7699-5711-5eae-9e2f-1d82baa6b597"
-version = "0.10.1"
-
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
 git-tree-sha1 = "2f294fae04aa5069a67964a3366e151e09ea7c09"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 version = "1.9.0"
-
-[[CircularArrays]]
-deps = ["OffsetArrays"]
-git-tree-sha1 = "0598a9ea22c65bfde7f07f21485ebf60deee3302"
-uuid = "7a955b69-7140-5f4e-a0ed-f168c5e2e749"
-version = "1.3.0"
-
-[[Clustering]]
-deps = ["Distances", "LinearAlgebra", "NearestNeighbors", "Printf", "SparseArrays", "Statistics", "StatsBase"]
-git-tree-sha1 = "75479b7df4167267d75294d14b58244695beb2ac"
-uuid = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
-version = "0.14.2"
-
-[[CoDa]]
-deps = ["AxisArrays", "Distances", "Distributions", "FillArrays", "LinearAlgebra", "Printf", "Random", "ScientificTypes", "StaticArrays", "Statistics", "StatsBase", "TableOperations", "Tables", "UnicodePlots"]
-git-tree-sha1 = "110c70f633e0358ab5f71b54684d71a7e8fc3831"
-uuid = "5900dafe-f573-5c72-b367-76665857777b"
-version = "0.6.6"
 
 [[CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -591,17 +626,6 @@ git-tree-sha1 = "417b0ed7b8b838aa6ca0a87aadf1bb9eb111ce40"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
 version = "0.12.8"
 
-[[Combinatorics]]
-git-tree-sha1 = "08c8b6831dc00bfea825826be0bc8336fc369860"
-uuid = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
-version = "1.0.2"
-
-[[CommonSubexpressions]]
-deps = ["MacroTools", "Test"]
-git-tree-sha1 = "7b8a93dba8af7e3b42fecabf646260105ac373f7"
-uuid = "bbf7d656-a473-5ed7-a52c-81e309532950"
-version = "0.3.0"
-
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
 git-tree-sha1 = "31d0151f5716b655421d9d75b7fa74cc4e744df2"
@@ -612,28 +636,11 @@ version = "3.39.0"
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 
-[[CompositionsBase]]
-git-tree-sha1 = "455419f7e328a1a2493cabc6428d79e951349769"
-uuid = "a33af91c-f02d-484b-be07-31d278c5ca2b"
-version = "0.1.1"
-
-[[ConstructionBase]]
-deps = ["LinearAlgebra"]
-git-tree-sha1 = "f74e9d5388b8620b4cee35d4c5a618dd4dc547f4"
-uuid = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
-version = "1.3.0"
-
 [[Contour]]
 deps = ["StaticArrays"]
 git-tree-sha1 = "9f02045d934dc030edad45944ea80dbd1f0ebea7"
 uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
 version = "0.5.7"
-
-[[CpuId]]
-deps = ["Markdown"]
-git-tree-sha1 = "32d125af0fb8ec3f8935896122c5e345709909e5"
-uuid = "adafc99b-e345-5852-983c-f28acb93d879"
-version = "0.3.0"
 
 [[Crayons]]
 git-tree-sha1 = "3f71217b538d7aaee0b69ab47d9b7724ca8afa0d"
@@ -672,44 +679,9 @@ version = "0.4.13"
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 
-[[DefineSingletons]]
-git-tree-sha1 = "77b4ca280084423b728662fe040e5ff8819347c5"
-uuid = "244e2a9f-e319-4986-a169-4d1fe445cd52"
-version = "0.1.1"
-
 [[DelimitedFiles]]
 deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
-
-[[DensityRatioEstimation]]
-deps = ["LinearAlgebra", "Parameters", "Requires", "Statistics", "StatsBase"]
-git-tree-sha1 = "9fd052a2fab80e2e033c9c28dc014a35aaf7da4b"
-uuid = "ab46fb84-d57c-11e9-2f65-6f72e4a7229f"
-version = "0.4.3"
-
-[[Dictionaries]]
-deps = ["Indexing", "Random"]
-git-tree-sha1 = "719bc5b965b414aa67630417351c5d8406707d80"
-uuid = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
-version = "0.3.13"
-
-[[DiffResults]]
-deps = ["StaticArrays"]
-git-tree-sha1 = "c18e98cba888c6c25d1c3b048e4b3380ca956805"
-uuid = "163ba53b-c6d8-5494-b064-1a9d43ac40c5"
-version = "1.0.3"
-
-[[DiffRules]]
-deps = ["NaNMath", "Random", "SpecialFunctions"]
-git-tree-sha1 = "7220bc21c33e990c14f4a9a319b1d242ebc5b269"
-uuid = "b552c78f-8df3-52c6-915a-8e097449b14b"
-version = "1.3.1"
-
-[[Distances]]
-deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
-git-tree-sha1 = "9f46deb4d4ee4494ffb5a40a27a2aced67bdd838"
-uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
-version = "0.10.4"
 
 [[Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
@@ -791,12 +763,6 @@ git-tree-sha1 = "8756f9935b7ccc9064c6eef0bff0ad643df733a3"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
 version = "0.12.7"
 
-[[FiniteDiff]]
-deps = ["ArrayInterface", "LinearAlgebra", "Requires", "SparseArrays", "StaticArrays"]
-git-tree-sha1 = "8b3c09b56acaf3c0e581c66638b85c8650ee9dca"
-uuid = "6a86dc24-6348-571c-b903-95158fe2bd41"
-version = "2.8.1"
-
 [[FixedPointNumbers]]
 deps = ["Statistics"]
 git-tree-sha1 = "335bfdceacc84c5cdf16aadc768aa5ddfc5383cc"
@@ -814,12 +780,6 @@ deps = ["Printf"]
 git-tree-sha1 = "8339d61043228fdd3eb658d86c926cb282ae72a8"
 uuid = "59287772-0a20-5a39-b81b-1366585eb4c0"
 version = "0.4.2"
-
-[[ForwardDiff]]
-deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "LinearAlgebra", "NaNMath", "Preferences", "Printf", "Random", "SpecialFunctions", "StaticArrays"]
-git-tree-sha1 = "63777916efbcb0ab6173d09a658fb7f2783de485"
-uuid = "f6369f11-7733-5829-9624-2563aa707210"
-version = "0.10.21"
 
 [[FreeType]]
 deps = ["CEnum", "FreeType2_jll"]
@@ -866,42 +826,6 @@ deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "
 git-tree-sha1 = "cafe0823979a5c9bff86224b3b8de29ea5a44b2e"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
 version = "0.61.0+0"
-
-[[GeoClustering]]
-deps = ["CategoricalArrays", "Clustering", "Distances", "GeoStatsBase", "LinearAlgebra", "MLJModelInterface", "Meshes", "SparseArrays", "Statistics", "TableDistances", "TableOperations", "Tables"]
-git-tree-sha1 = "ef73e439d7ab2bd317600e5fb3bdbd8ac049c86a"
-uuid = "7472b188-6dde-460e-bd07-96c4bc049f7e"
-version = "0.2.5"
-
-[[GeoEstimation]]
-deps = ["Distances", "GeoStatsBase", "KrigingEstimators", "LinearAlgebra", "Meshes", "NearestNeighbors", "Variography"]
-git-tree-sha1 = "c62b273af5154e0e27383abb1aca09ead6994818"
-uuid = "a4aa24f8-9f24-4d1a-b848-66d123bfa54d"
-version = "0.8.2"
-
-[[GeoLearning]]
-deps = ["Distributions", "GeoStatsBase", "MLJModelInterface", "Meshes", "TableOperations", "Tables"]
-git-tree-sha1 = "98cf61e86b2c4511bdc875b4bdd8ed770726fb6f"
-uuid = "90c4468e-a93e-43b4-8fb5-87d804bc629f"
-version = "0.1.5"
-
-[[GeoSimulation]]
-deps = ["CpuId", "Distributions", "FFTW", "GeoStatsBase", "KrigingEstimators", "LinearAlgebra", "Meshes", "Statistics", "Variography"]
-git-tree-sha1 = "728892f1ddc46df1e59da0f56b521a40ca526659"
-uuid = "220efe8a-9139-4e14-a4fa-f683d572f4c5"
-version = "0.4.1"
-
-[[GeoStats]]
-deps = ["DensityRatioEstimation", "Distances", "GeoClustering", "GeoEstimation", "GeoLearning", "GeoSimulation", "GeoStatsBase", "KrigingEstimators", "LossFunctions", "Meshes", "PointPatterns", "Reexport", "Variography"]
-git-tree-sha1 = "0ae88763877d21f1aae4e185bce203245ba59686"
-uuid = "dcc97b0b-8ce5-5539-9008-bb190f959ef6"
-version = "0.27.0"
-
-[[GeoStatsBase]]
-deps = ["AverageShiftedHistograms", "CSV", "CategoricalArrays", "Combinatorics", "DensityRatioEstimation", "Distances", "Distributed", "Distributions", "LinearAlgebra", "LossFunctions", "MLJModelInterface", "Meshes", "Optim", "Parameters", "RecipesBase", "ScientificTypes", "StaticArrays", "Statistics", "StatsBase", "TableOperations", "Tables", "Transducers", "TypedTables"]
-git-tree-sha1 = "1f84ae3fe77f06b9569fae9da25ed233e70dfb65"
-uuid = "323cb8eb-fbf6-51c0-afd0-f8fba70507b2"
-version = "0.21.13"
 
 [[GeometryBasics]]
 deps = ["EarCut_jll", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
@@ -1008,11 +932,6 @@ git-tree-sha1 = "87f7662e03a649cffa2e05bf19c303e168732d3e"
 uuid = "905a6f67-0a94-5f89-b386-d35d92009cd1"
 version = "3.1.2+0"
 
-[[Indexing]]
-git-tree-sha1 = "ce1566720fd6b19ff3411404d4b977acd4814f9f"
-uuid = "313cdc1a-70c2-5d6a-ae34-0150d3930a38"
-version = "1.1.1"
-
 [[IndirectArrays]]
 git-tree-sha1 = "012e604e1c7458645cb8b436f8fba789a51b257f"
 uuid = "9b13fd28-a010-5f03-acff-a1bbcff69959"
@@ -1028,11 +947,6 @@ deps = ["Test"]
 git-tree-sha1 = "098e4d2c533924c921f9f9847274f2ad89e018b8"
 uuid = "83e8ac13-25f8-5344-8a64-a9f2b223428f"
 version = "0.5.0"
-
-[[InitialValues]]
-git-tree-sha1 = "7f6a4508b4a6f46db5ccd9799a3fc71ef5cad6e6"
-uuid = "22cec73e-a1b8-11e9-2c92-598750a2cf9c"
-version = "0.2.11"
 
 [[IntelOpenMP_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1124,12 +1038,6 @@ git-tree-sha1 = "591e8dc09ad18386189610acafb970032c519707"
 uuid = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"
 version = "0.6.3"
 
-[[KrigingEstimators]]
-deps = ["Combinatorics", "GeoStatsBase", "LinearAlgebra", "Meshes", "Statistics", "Variography"]
-git-tree-sha1 = "9a7807a56384477d476835b432a9813eac104626"
-uuid = "d293930c-a38c-56c5-8ebb-12008647b47a"
-version = "0.8.2"
-
 [[LAME_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "f6250b16881adf048549549fba48b1161acdac8c"
@@ -1156,11 +1064,6 @@ version = "0.15.7"
 [[LazyArtifacts]]
 deps = ["Artifacts", "Pkg"]
 uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
-
-[[LearnBase]]
-git-tree-sha1 = "a0d90569edd490b82fdc4dc078ea54a5a800d30a"
-uuid = "7f8f8fb0-2700-5f03-b4bd-41f8cfc144b6"
-version = "0.4.1"
 
 [[LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -1229,12 +1132,6 @@ git-tree-sha1 = "7f3efec06033682db852f8b3bc3c1d2b0a0ab066"
 uuid = "38a345b3-de98-5d2b-a5d3-14cd9215e700"
 version = "2.36.0+0"
 
-[[LineSearches]]
-deps = ["LinearAlgebra", "NLSolversBase", "NaNMath", "Parameters", "Printf"]
-git-tree-sha1 = "f27132e551e959b3667d8c93eae90973225032dd"
-uuid = "d3d80556-e9d4-5f37-9878-2ab0fcc64255"
-version = "7.1.1"
-
 [[LinearAlgebra]]
 deps = ["Libdl"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -1248,23 +1145,11 @@ version = "0.3.3"
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
-[[LossFunctions]]
-deps = ["InteractiveUtils", "LearnBase", "Markdown", "RecipesBase", "StatsBase"]
-git-tree-sha1 = "0f057f6ea90a84e73a8ef6eebb4dc7b5c330020f"
-uuid = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
-version = "0.7.2"
-
 [[MKL_jll]]
 deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg"]
 git-tree-sha1 = "5455aef09b40e5020e1520f551fa3135040d4ed0"
 uuid = "856f044c-d86e-5d09-b602-aeab76dc8ba7"
 version = "2021.1.1+2"
-
-[[MLJModelInterface]]
-deps = ["Random", "ScientificTypesBase", "StatisticalTraits"]
-git-tree-sha1 = "91ef121a2c458806973c8aaeb502c57b2f0d74b3"
-uuid = "e80e1ace-859a-464e-9ed9-23947d8ae3ea"
-version = "1.3.2"
 
 [[MacroTools]]
 deps = ["Markdown", "Random"]
@@ -1319,24 +1204,6 @@ git-tree-sha1 = "e498ddeee6f9fdb4551ce855a46f54dbd900245f"
 uuid = "442fdcdd-2543-5da2-b0f3-8c86c306513e"
 version = "0.3.1"
 
-[[MeshViz]]
-deps = ["CategoricalArrays", "Makie", "Meshes", "Tables"]
-git-tree-sha1 = "92c6f11650ef9199da4da1dfb5867d2120949b14"
-uuid = "9ecf9c4f-6e5a-4b5e-83ae-06f2c7a661d8"
-version = "0.1.13"
-
-[[Meshes]]
-deps = ["CategoricalArrays", "CircularArrays", "Distances", "IterTools", "IteratorInterfaceExtensions", "LinearAlgebra", "NearestNeighbors", "Random", "RecipesBase", "ReferenceFrameRotations", "SimpleTraits", "SparseArrays", "SpecialFunctions", "StaticArrays", "StatsBase", "TableTraits", "Tables"]
-git-tree-sha1 = "7ede93163f44583b364394e1bf72933ee6261f99"
-uuid = "eacbb407-ea5a-433e-ab97-5258b1ca43fa"
-version = "0.17.16"
-
-[[MicroCollections]]
-deps = ["BangBang", "Setfield"]
-git-tree-sha1 = "4f65bdbbe93475f6ff9ea6969b21532f88d359be"
-uuid = "128add7d-3638-4c79-886c-908ea0c25c34"
-version = "0.1.1"
-
 [[Missings]]
 deps = ["DataAPI"]
 git-tree-sha1 = "bf210ce90b6c9eed32d25dbcae1ebc565df2687f"
@@ -1361,22 +1228,10 @@ git-tree-sha1 = "a8cbf066b54d793b9a48c5daa5d586cf2b5bd43d"
 uuid = "99f44e22-a591-53d1-9472-aa23ef4bd671"
 version = "1.1.0"
 
-[[NLSolversBase]]
-deps = ["DiffResults", "Distributed", "FiniteDiff", "ForwardDiff"]
-git-tree-sha1 = "144bab5b1443545bc4e791536c9f1eacb4eed06a"
-uuid = "d41bc354-129a-5804-8e4c-c37616107c6c"
-version = "7.8.1"
-
 [[NaNMath]]
 git-tree-sha1 = "bfe47e760d60b82b66b61d2d44128b62e3a369fb"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
 version = "0.3.5"
-
-[[NearestNeighbors]]
-deps = ["Distances", "StaticArrays"]
-git-tree-sha1 = "16baacfdc8758bc374882566c9187e785e85c2f0"
-uuid = "b8a86587-4115-5ab1-83bc-aa920d37bbce"
-version = "0.4.9"
 
 [[Netpbm]]
 deps = ["FileIO", "ImageCore"]
@@ -1432,12 +1287,6 @@ git-tree-sha1 = "13652491f6856acfd2db29360e1bbcd4565d04f1"
 uuid = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
 version = "0.5.5+0"
 
-[[Optim]]
-deps = ["Compat", "FillArrays", "LineSearches", "LinearAlgebra", "NLSolversBase", "NaNMath", "Parameters", "PositiveFactorizations", "Printf", "SparseArrays", "StatsBase"]
-git-tree-sha1 = "7863df65dbb2a0fa8f85fcaf0a41167640d2ebed"
-uuid = "429524aa-4258-5aef-a3af-852621145aeb"
-version = "1.4.1"
-
 [[Opus_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "51a08fb14ec28da2ec7a927c4337e4332c2a4720"
@@ -1478,12 +1327,6 @@ deps = ["OffsetArrays"]
 git-tree-sha1 = "646eed6f6a5d8df6708f15ea7e02a7a2c4fe4800"
 uuid = "5432bcbf-9aad-5242-b902-cca2824c8663"
 version = "0.5.10"
-
-[[Parameters]]
-deps = ["OrderedCollections", "UnPack"]
-git-tree-sha1 = "34c0e9ad262e5f7fc75b10a9952ca7692cfc5fbe"
-uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
-version = "0.12.3"
 
 [[Parsers]]
 deps = ["Dates"]
@@ -1531,12 +1374,6 @@ git-tree-sha1 = "4c8a7d080daca18545c56f1cac28710c362478f3"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 version = "0.7.16"
 
-[[PointPatterns]]
-deps = ["Distributions", "GeoStatsBase", "Meshes"]
-git-tree-sha1 = "3debcdc078d2cda0eaaa64750b8a1665f93f1ade"
-uuid = "e61b41b6-3414-4803-863f-2b69057479eb"
-version = "0.3.9"
-
 [[PolygonOps]]
 git-tree-sha1 = "77b3d3605fc1cd0b42d95eba87dfcd2bf67d5ff6"
 uuid = "647866c9-e3ac-4575-94e7-e3d426903924"
@@ -1547,12 +1384,6 @@ deps = ["DataAPI", "Future"]
 git-tree-sha1 = "a193d6ad9c45ada72c14b731a318bedd3c2f00cf"
 uuid = "2dfb63ee-cc39-5dd5-95bd-886bf059d720"
 version = "1.3.0"
-
-[[PositiveFactorizations]]
-deps = ["LinearAlgebra"]
-git-tree-sha1 = "17275485f373e6673f7e7f97051f703ed5b15b20"
-uuid = "85a6dd25-e78a-55b7-8502-1745935b8125"
-version = "0.2.4"
 
 [[Preferences]]
 deps = ["TOML"]
@@ -1608,11 +1439,6 @@ uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 deps = ["Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
-[[RangeArrays]]
-git-tree-sha1 = "b9039e93773ddcfc828f12aadf7115b4b4d225f5"
-uuid = "b3c3ace0-ae52-54e7-9d0b-2c1406fd6b9d"
-version = "0.3.2"
-
 [[Ratios]]
 deps = ["Requires"]
 git-tree-sha1 = "01d341f502250e81f6fec0afe662aa861392a3aa"
@@ -1634,12 +1460,6 @@ version = "0.4.1"
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
 uuid = "189a3867-3050-52da-a836-e630ba90ab69"
 version = "1.2.2"
-
-[[ReferenceFrameRotations]]
-deps = ["Crayons", "LinearAlgebra", "Printf", "StaticArrays"]
-git-tree-sha1 = "b2fc23750e12df6c8bc72cbb328020ed9a572e90"
-uuid = "74f56ac7-18b3-5285-802d-d4bd4f104033"
-version = "2.0.0"
 
 [[RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1679,17 +1499,6 @@ git-tree-sha1 = "9cc2955f2a254b18be655a4ee70bc4031b2b189e"
 uuid = "7b38b023-a4d7-4c5e-8d43-3f3097f304eb"
 version = "0.3.0"
 
-[[ScientificTypes]]
-deps = ["CategoricalArrays", "ColorTypes", "Dates", "Distributions", "PrettyTables", "Reexport", "ScientificTypesBase", "StatisticalTraits", "Tables"]
-git-tree-sha1 = "b58ef9adeba0d96ae1add87e8df5a7128342e312"
-uuid = "321657f4-b219-11e9-178b-2701a2544e81"
-version = "2.3.2"
-
-[[ScientificTypesBase]]
-git-tree-sha1 = "185e373beaf6b381c1e7151ce2c2a722351d6637"
-uuid = "30f210dd-8aff-4c5f-94ba-8e64358c1161"
-version = "2.3.0"
-
 [[Scratch]]
 deps = ["Dates"]
 git-tree-sha1 = "0b4b7f1393cff97c33891da2a0bf69c6ed241fda"
@@ -1704,12 +1513,6 @@ version = "1.3.7"
 
 [[Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
-
-[[Setfield]]
-deps = ["ConstructionBase", "Future", "MacroTools", "Requires"]
-git-tree-sha1 = "def0718ddbabeb5476e51e5a43609bee889f285d"
-uuid = "efcf1570-3423-57d1-acb7-fd33fddbac46"
-version = "0.8.0"
 
 [[ShaderAbstractions]]
 deps = ["ColorTypes", "FixedPointNumbers", "GeometryBasics", "LinearAlgebra", "Observables", "StaticArrays", "StructArrays", "Tables"]
@@ -1733,12 +1536,6 @@ git-tree-sha1 = "d263a08ec505853a5ff1c1ebde2070419e3f28e9"
 uuid = "73760f76-fbc4-59ce-8f25-708e95d2df96"
 version = "0.4.0"
 
-[[SimpleTraits]]
-deps = ["InteractiveUtils", "MacroTools"]
-git-tree-sha1 = "5d7e3f4e11935503d3ecaf7186eac40602e7d231"
-uuid = "699a6c99-e7fa-54fc-8d76-47d257e15c1d"
-version = "0.9.4"
-
 [[Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
@@ -1758,18 +1555,6 @@ git-tree-sha1 = "793793f1df98e3d7d554b65a107e9c9a6399a6ed"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
 version = "1.7.0"
 
-[[SplitApplyCombine]]
-deps = ["Dictionaries", "Indexing"]
-git-tree-sha1 = "3cdd86a92737fa0c8af19aecb1141e71057dc2db"
-uuid = "03a91e81-4c3e-53e1-a0a4-9c0c8f19dd66"
-version = "1.1.4"
-
-[[SplittablesBase]]
-deps = ["Setfield", "Test"]
-git-tree-sha1 = "39c9f91521de844bad65049efd4f9223e7ed43f9"
-uuid = "171d559e-b47b-412a-8079-5efa626c420e"
-version = "0.1.14"
-
 [[StackViews]]
 deps = ["OffsetArrays"]
 git-tree-sha1 = "46e589465204cd0c08b4bd97385e4fa79a0c770c"
@@ -1787,12 +1572,6 @@ deps = ["LinearAlgebra", "Random", "Statistics"]
 git-tree-sha1 = "3c76dde64d03699e074ac02eb2e8ba8254d428da"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
 version = "1.2.13"
-
-[[StatisticalTraits]]
-deps = ["ScientificTypesBase"]
-git-tree-sha1 = "730732cae4d3135e2f2182bd47f8d8b795ea4439"
-uuid = "64bff920-2084-43da-a3e6-9bb72801c0c9"
-version = "2.1.0"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
@@ -1815,12 +1594,6 @@ git-tree-sha1 = "95072ef1a22b057b1e80f73c2a89ad238ae4cfff"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 version = "0.9.12"
 
-[[StringDistances]]
-deps = ["Distances", "StatsAPI"]
-git-tree-sha1 = "00e86048552d34bb486cad935754dd9516bdb46e"
-uuid = "88034a9c-02f8-509d-84a9-84ec65e18404"
-version = "0.11.1"
-
 [[StructArrays]]
 deps = ["Adapt", "DataAPI", "StaticArrays", "Tables"]
 git-tree-sha1 = "2ce41e0d042c60ecd131e9fb7154a3bfadbf50d3"
@@ -1840,18 +1613,6 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 [[TOML]]
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
-
-[[TableDistances]]
-deps = ["CategoricalArrays", "CoDa", "Distances", "ScientificTypes", "Statistics", "StringDistances", "TableOperations", "Tables"]
-git-tree-sha1 = "4f72aef044ab8dcebb29a0349b415734231a1747"
-uuid = "e5d66e97-8c70-46bb-8b66-04a2d73ad782"
-version = "0.1.0"
-
-[[TableOperations]]
-deps = ["SentinelArrays", "Tables", "Test"]
-git-tree-sha1 = "019acfd5a4a6c5f0f38de69f2ff7ed527f1881da"
-uuid = "ab02a1b2-a7df-11e8-156e-fb1833f50b87"
-version = "1.1.0"
 
 [[TableShowUtils]]
 deps = ["DataValues", "Dates", "JSON", "Markdown", "Test"]
@@ -1903,18 +1664,6 @@ git-tree-sha1 = "216b95ea110b5972db65aa90f88d8d89dcb8851c"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 version = "0.9.6"
 
-[[Transducers]]
-deps = ["Adapt", "ArgCheck", "BangBang", "Baselet", "CompositionsBase", "DefineSingletons", "Distributed", "InitialValues", "Logging", "Markdown", "MicroCollections", "Requires", "Setfield", "SplittablesBase", "Tables"]
-git-tree-sha1 = "dec7b7839f23efe21770b3b1307ca77c13ed631d"
-uuid = "28d57a85-8fef-5791-bfe6-a80928e7c999"
-version = "0.4.66"
-
-[[TypedTables]]
-deps = ["Adapt", "Dictionaries", "Indexing", "SplitApplyCombine", "Tables", "Unicode"]
-git-tree-sha1 = "f91a10d0132310a31bc4f8d0d29ce052536bd7d7"
-uuid = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9"
-version = "1.4.0"
-
 [[URIs]]
 git-tree-sha1 = "97bbe755a53fe859669cd907f2d96aee8d2c1355"
 uuid = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
@@ -1924,11 +1673,6 @@ version = "1.3.0"
 deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
-[[UnPack]]
-git-tree-sha1 = "387c1f73762231e86e0c9c5443ce3b4a0a9a0c2b"
-uuid = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
-version = "1.0.2"
-
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
@@ -1937,18 +1681,6 @@ deps = ["REPL"]
 git-tree-sha1 = "53915e50200959667e78a92a418594b428dffddf"
 uuid = "1cfade01-22cf-5700-b092-accc4b62d6e1"
 version = "0.4.1"
-
-[[UnicodePlots]]
-deps = ["Crayons", "Dates", "SparseArrays", "StatsBase"]
-git-tree-sha1 = "f1d09f14722f5f3cef029bcb031be91a92613ae9"
-uuid = "b8865327-cd53-5732-bb35-84acbb429228"
-version = "2.4.6"
-
-[[Variography]]
-deps = ["Distances", "GeoStatsBase", "InteractiveUtils", "LinearAlgebra", "Meshes", "NearestNeighbors", "Optim", "Parameters", "Printf", "RecipesBase", "Setfield", "SpecialFunctions", "Transducers"]
-git-tree-sha1 = "424f22e94483a9c8f1cdd1557666a54b5e92adf2"
-uuid = "04a0146e-e6df-5636-8d7f-62fa9eb0b20c"
-version = "0.12.20"
 
 [[WGLMakie]]
 deps = ["Colors", "FileIO", "FreeTypeAbstraction", "GeometryBasics", "Hyperscript", "ImageMagick", "JSServe", "LinearAlgebra", "Makie", "Observables", "ShaderAbstractions", "StaticArrays"]
@@ -2134,12 +1866,6 @@ git-tree-sha1 = "cc4bf3fdde8b7e3e9fa0351bdeedba1cf3b7f6e6"
 uuid = "3161d3a3-bdf6-5164-811a-617609db77b4"
 version = "1.5.0+0"
 
-[[ZygoteRules]]
-deps = ["MacroTools"]
-git-tree-sha1 = "8c1a8e4dfacb1fd631745552c8db35d0deb09ea0"
-uuid = "700de1a5-db45-46bc-99cf-38207098b444"
-version = "0.2.2"
-
 [[isoband_jll]]
 deps = ["Libdl", "Pkg"]
 git-tree-sha1 = "a1ac99674715995a536bbce674b068ec1b7d893d"
@@ -2225,27 +1951,33 @@ version = "0.9.1+5"
 # ╟─b1ec589e-35af-4e34-a663-c72f4b0afe02
 # ╠═bfbe894b-a205-4d21-8adf-a26a2052573e
 # ╟─48e9011a-dfa3-4665-9e23-2aab30e0d294
+# ╟─3f55ecbb-8f26-4813-ac3e-97588830d987
+# ╟─c3e6a7e8-c4a2-42ad-9302-cd4be7ee0920
 # ╟─554a5530-e1ca-4261-a1e3-bf27846250fc
+# ╟─4d5eab4d-8510-45ed-97f9-31c6e3af6ab4
 # ╟─99aac39c-f375-42a9-a422-ee1f7ef3a490
+# ╟─e615de83-bcc4-4a84-8e94-140989508805
 # ╟─29c1aa29-d21f-43c2-b5b4-a2c3443cc983
 # ╠═0bdf2bb0-655c-446a-bb79-91746a380701
 # ╟─86161dc5-0980-42e2-8455-6b1b07dddeaf
+# ╟─66b7f878-c620-4fee-84c0-273bdbc46440
+# ╟─7d398c89-f763-4d3b-b196-2949bd91ae9a
 # ╟─62705acb-a304-4bd4-ae30-cca46037c7dd
 # ╠═ddbeaaf1-a4e4-4a09-a487-9bbdc489c824
 # ╟─59454ea0-138c-4005-9c4b-e2e8667189c2
+# ╟─0d9d4d97-e1ff-47a5-9a58-c76788b55468
+# ╟─959927f2-74b6-411d-89f8-034c031d7422
 # ╟─d50d76db-507e-450e-93a1-e0319edaf98a
-# ╠═01514377-5b84-40f8-bdd6-d77320c382f9
-# ╟─8da2bffa-62f1-4d74-8629-474f254a8272
-# ╟─c2417c39-3d12-4de0-8428-1bf7dbb2a995
-# ╠═bb877b6e-980c-4c2d-a3d1-0aa07c0e7840
-# ╟─9d3dc7c5-1908-4076-b10b-bdd7d19392a7
-# ╠═00633d38-8308-4b4b-8846-887486028236
-# ╟─e9a74bd9-3f31-44a9-8ef2-706fb9a50a49
-# ╠═7fcb9e30-30a1-4396-9b70-40cfcc0ae33a
+# ╠═3d52dfab-40d2-4947-9dfe-cc4e6100d75c
+# ╟─98d43ce9-d4a6-4b5f-8777-a0af67eddf9f
+# ╠═58fd4e5b-da58-4cf1-8c99-32892a146bdd
+# ╠═5431903b-e7b0-47f8-a225-9db66468256e
 # ╟─447e2730-0bd4-4953-ac2e-c6d12cb5e341
 # ╟─baf8bd0f-07b7-4ce6-8850-4f22c4a20ecf
 # ╟─dbddc346-e9dd-416d-abf5-98d96a95f3ec
+# ╟─d9cd1583-abec-4dc1-a9db-5bbcf74a48c8
 # ╟─96ae1d18-a0fd-4846-9d4a-843952e14caa
+# ╟─0b874268-8410-43fd-9c60-d13e4f2eec0b
 # ╟─6f69c80c-aafc-4db1-bd64-41d5112287fb
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

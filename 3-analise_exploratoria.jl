@@ -138,7 +138,7 @@ Neste módulo, iremos trabalhar com o banco de dados [Jura](https://rdrr.io/cran
 
 > ⚠️ Algumas modificações no banco de dados foram realizadas pelo autor para exemplificar algumas rotinas típicas da AED.
 
-Os dados estão no formato CSV no arquivo `data/jura.csv`. Para carregá-los no notebook, utilizaremos os pacotes [CSV.jl](https://github.com/JuliaData/CSV.jl) e [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl).
+Os dados estão no formato CSV no arquivo `data/Jura.csv`. Para carregá-los no notebook, utilizaremos os pacotes [CSV.jl](https://github.com/JuliaData/CSV.jl) e [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl).
 
 Especificamos o caminho do arquivo e redirecionamos o resultado para uma tabela `DataFrame` utilizando o operador `|>`, conhecido como *pipe*.
 

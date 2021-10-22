@@ -34,7 +34,7 @@ begin
 	theme = WGLMakie.Theme(
 		resolution = (650,500),
 		aspect = :data,
-		markersize = 2
+		colormap=:jet
 	)
 	WGLMakie.set_theme!(theme)
 end;
@@ -114,18 +114,18 @@ Uma característica muito importante dos dados utilizados na mineração é o **
 
 Os exemplos a seguir, extraídos de *Sinclair & Blackwell (2006)*, evidenciam a importância de características geológicas dos depósitos no suporte amostral:
 
-> **Exemplo 1:**. Em depósitos estratiformes, como aqueles de Zn-Pb hospedados em folhelhos, um conjunto de amostras lineares contíguas (e.g. intervalos de testemunhos de sondagem) paralelas ao acamamento são, em média, muito mais similares entre si do que um conjunto de amostras do mesmo tipo, mas perpendiculares ao acamamento. Percebemos aqui o impacto da **orientação** das amostras.
+> **Exemplo 1:**. Em depósitos estratiformes, como aqueles de Zn-Pb hospedados em folhelhos, um conjunto de amostras lineares contíguas (e.g. intervalos de testemunhos de sondagem) paralelas ao acamamento são, em média, muito mais similares entre si do que um conjunto de amostras do mesmo tipo, mas perpendiculares ao acamamento. Percebemos aqui a importância da **orientação** das amostras.
 
-> **Exemplo 2:** Em zonas auríferas de veios de quartzo, amostras perpendiculares à orientação dos veios apresentarão uma grande variabilidade de teores caso o tamanho do intervalo amostral seja menor do que a distância média entre os veios (algumas amostras podem ter teores nulos!). Por outro lado, amostras perpendiculares aos veios, mas com o tamanho do intervalo amostral superior à distância média entre os veios serão menos erráticas. Percebemos aqui o impacto do **tamanho** das amostras.
+> **Exemplo 2:** Em zonas de veios auríferos, amostras perpendiculares à orientação dos veios apresentarão uma grande variabilidade de teores, caso o tamanho do intervalo amostral seja menor do que a distância média entre os veios (algumas amostras podem ter teores nulos!). Por outro lado, amostras perpendiculares aos veios, mas com o tamanho do intervalo amostral superior à distância média entre os veios serão menos erráticas. Percebemos aqui a importância do **tamanho** das amostras.
 
-Neste módulo, para fins de simplificação, trataremos o conceito de suporte amostral como sinônimo do tamanho/comprimento dos intervalos amostrais de furos de sondagem.
+> ⚠️ Neste módulo, para fins de simplificação, trataremos o conceito de **suporte amostral** como sinônimo do **tamanho/comprimento** dos intervalos amostrais dos furos de sondagem.
 """
 
 # ╔═╡ dd89a21f-ce6b-4a3c-9c22-1f97ac3863a8
 md"""
 ## 2. Geração de furos
 
-Neste módulo, iremos trabalhar com o [Marvin](), um conjunto de dados de um depósito de Cu-Au Pórfiro fictício, mas que apresenta uma série de caracteríticas típicas de depósitos sulfetados (*Whittle et al., 2007*). No passado, essa base de dados era utilizada nos tutoriais básicos do software Leapfrog Geo da neozelandeza [Seequent](https://www.seequent.com/).
+Neste módulo, iremos trabalhar com o [Marvin](), um conjunto de dados de um depósito de Cu-Au Pórfiro fictício, mas que apresenta uma série de caracteríticas típicas de depósitos sulfetados (*Whittle et al., 2007*).
 
 > ⚠️ Para fins de simplificação, apenas os teores de `Au` foram mantidos.
 
@@ -222,7 +222,7 @@ Normalmente, os dados brutos de sondagem (i.e. sem nenhum processamento prévio)
 
 > ⚠️ A compositagem é realizada com o objetivo de combinar intervalos pequenos em intervalos maiores e uniformes. O processo inverso, ou seja, subdividir intervalos maiores em intervalos menores não é uma prática adequada, pois haveria uma suavização da distribuição espacial dos teores que não corresponde à realidade (*Abzalov, 2016*).
 
-Segundo *Yamamoto (2001)*, o cálculo do teor de uma composta ($t_c$) é realizado pela média dos teores brutos ($t_i$) dos intervalos que serão combinados ponderada pelos respectivos suportes ($e_i$):
+Ao compositar as amostras, os teores são recalculados. Segundo *Yamamoto (2001)*, o cálculo do teor composto $t_c$ é realizado pela média dos teores brutos $t_i$ dos intervalos que serão combinados ponderada pelos respectivos tamanhos $e_i$:
 
 ```math
 t_c = \frac{\sum_{i=1}^{n} t_i e_i}{\sum_{i=1}^{n} e_i}
@@ -233,13 +233,13 @@ t_c = \frac{\sum_{i=1}^{n} t_i e_i}{\sum_{i=1}^{n} e_i}
 md"""
 Você pode estar se perguntando o porque devemos uniformizar o suporte amostral. Imagine que queremos calcular o teor médio de Au entre três amostras:
 
-| Amostra | Teor (g/t) | Suporte (m) |
+| Amostra | Teor (g/t) | Tamanho (m) |
 |:-------:|:----------:|:-----------:|
 |  AM01   |    2,5     |      2      |
 |  AM02   |    0,5     |     10      |
 |  AM03   |    0,2     |     15      |
 
-O teor médio entre essas amostras é de aproximadamente 1 g/t. Repare que, independentemente do suporte amostral, cada amostra contribui igualmente para o cálculo da média. Entretanto, se fizermos uma análise crítica, perceberemos que uma amostra de 15 m de comprimento não pode ter o mesmo peso no cálculo do que uma amostra de 2 m. Se regularizarmos o suporte amostral, no entanto, esse problema será sanado.
+O teor médio entre essas amostras é de aproximadamente 1 g/t. Repare que, independentemente do tamanho, cada amostra contribui igualmente para o cálculo da média. Entretanto, se fizermos uma análise crítica, perceberemos que uma amostra de 15 metros de comprimento não pode ter o mesmo peso no cálculo do que uma amostra de 2 metros. Se regularizarmos o suporte amostral, no entanto, esse problema será mitigado.
 """
 
 # ╔═╡ c3e6a7e8-c4a2-42ad-9302-cd4be7ee0920
@@ -267,8 +267,8 @@ md"**Figura 02:** Distribuição do suporte das amostras brutas."
 md"""
 ##### Observações
 
-- Existem três grupos de suportes amostrais bem definidos: 0.5 m, 1.0 m e 2.5m;
-- Como as amostras não apresentam um suporte amostral uniforme, iremos compositá-las.
+- Existem três grupos de tamanhos de amostras bem definidos: 0.5 m, 1.0 m e 2.5m;
+- Como as amostras não estão regularizadas, iremos compositá-las.
 """
 
 # ╔═╡ e615de83-bcc4-4a84-8e94-140989508805
@@ -298,14 +298,14 @@ O **método do comprimento fixo** visa criar compostas com exatamente o mesmo co
 
 Perceba que, embora busque gerar compostas de tamanho fixo, a estratégia de comprimento fixo pode levar ao descarte de muitas amostras. Essa é a principal limitação deste método (*Abzalov, 2016*).
 
-Abaixo, realizaremos uma compositagem dos furos pelo método do comprimento fixo, que é representado por `mode=:equalcomp`. O comprimento/suporte das compostas será igual a 10 metros e a coluna `ROCKTYPE` é adotada como campo de zona. O suporte mínimo `mincomp` que uma composta poderá apresentar é de 5 metros. A distribuição do suporte das compostas resultantes é apresesentada pelo histograma da Figura 03.
+Abaixo, realizaremos uma compositagem dos furos pelo método do comprimento fixo, que é representado por `mode=:equalcomp`. O comprimento/suporte das compostas será igual a 10 metros e a coluna `ROCKTYPE` é adotada como campo de zona. O suporte mínimo `mincomp` que uma composta poderá apresentar é de 4 metros. A distribuição do suporte das compostas resultantes é apresesentada pelo histograma da Figura 03.
 """
 
 # ╔═╡ 0bdf2bb0-655c-446a-bb79-91746a380701
 begin
 	# compositagem por comprimento fixo
 	comps_fixo = composite(furosvalidados, interval=10.0,
-						   zone=:ROCKTYPE, mode=:equalcomp, mincomp=5)
+						   zone=:ROCKTYPE, mode=:equalcomp, mincomp=4)
 	
 	# tabela de compostas
 	cp_fixo = comps_fixo.table
@@ -313,7 +313,7 @@ end;
 
 # ╔═╡ 86161dc5-0980-42e2-8455-6b1b07dddeaf
 histogram(cp_fixo[!,:LENGTH], bins=:scott, legend=false,
-		  color=:honeydew2, alpha=0.75, xlims=(4.5,11),
+		  color=:honeydew2, alpha=0.75, xlims=(3.5,11),
 		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
 
 # ╔═╡ 66b7f878-c620-4fee-84c0-273bdbc46440
@@ -335,14 +335,14 @@ O **método do comprimento ótimo** parte do princípio que as amostras não dev
 
 O fato de essa estratégia ser mais flexível que o método do comprimento fixo faz com que menos amostras sejam descartadas, ainda que as compostas não apresentem um suporte exatamente igual ao `interval` definido.
 
-A seguir, realizaremos uma compositagem dos furos pelo método do comprimento ótimo, que é representado por `mode=:nodiscard`. Os demais parâmetros da função `composite` são configurados da mesma forma que o exemplo anterior. A distribuição do suporte das compostas resultantes é apresesentada pelo histograma da Figura 04.
+A seguir, realizaremos uma compositagem dos furos pelo método do comprimento ótimo, que é representado por `mode=:nodiscard`. Para uma posterior comparação entre as estratégias, os demais parâmetros da função `composite` são configurados da mesma forma que o exemplo anterior. A distribuição do suporte das compostas resultantes é apresesentada pelo histograma da Figura 04.
 """
 
 # ╔═╡ ddbeaaf1-a4e4-4a09-a487-9bbdc489c824
 begin
 	# compositagem por comprimento ótimo
 	comps_otimo = composite(furosvalidados, interval=10.0,
-						    zone=:ROCKTYPE, mode=:nodiscard, mincomp=5)
+						    zone=:ROCKTYPE, mode=:nodiscard, mincomp=4)
 	
 	# tabela de compostas
 	cp_otimo = comps_otimo.table
@@ -370,22 +370,22 @@ md"""
 
 Até o momento, já aprendemos que:
 
-> O **método do comprimento fixo**, por ser mais rígido, pode resultar no descarte de muitas amostras. A distribuição do suporte das compostas é tipicamente assimétrica negativa.
+> O **método do comprimento fixo**, por ser mais rígido, pode resultar no descarte de muitas amostras. A distribuição do tamanho das compostas é tipicamente assimétrica negativa.
 
-> O **método do comprimento ótimo**, ainda que não gere compostas de suporte fixo, evita o descarte de amostras. A distribuição do suporte das compostas é aproximadamente simétrica.
+> O **método do comprimento ótimo**, ainda que não gere compostas de suporte fixo, mitiga o descarte de amostras. A distribuição do tamanho das compostas é aproximadamente simétrica.
 
-Ademais, podemos realizar uma comparação estatística entre as amostras brutas e as compostas resultantes de ambos os métodos. Para isso, iremos considerar os seguintes critérios:
+Ademais, podemos realizar uma comparação estatística entre as amostras brutas e as compostas resultantes de ambos os métodos. Para isso, iremos considerar os seguintes critérios (*Abzalov, 2016*):
 1. Metragem total de amostras;
 2. Desvio padrão do comprimento das amostras;
 3. Média do teor de Au (g/t).
 
 Idealmente, a metragem total das compostas deve coincidir com a das amostras brutas. Para o cálculo da metragem total, utilizaremos a função `sum`.
 
-Como o objetivo da compositagem é regularizar o suporte amostral, a variabilidade (dispersão) do comprimento das amostras deve ser mínima. Mediremos a variabilidade com a função `std`, que representa o desvio padrão.
+Como o objetivo da compositagem é regularizar o suporte amostral, a variabilidade (dispersão) do comprimento das amostras `LENGTH` deve ser reduzida. Mediremos a variabilidade com a função `std`, que representa o desvio padrão.
 
 A compositagem não deve alterar significativamente o teor metalífero médio das amostras. Qualquer mudança superior a 5% deve ser investigada (*Abzalov, 2016*). Para o cálculo do teor médio de Au (g/t), utilizaremos a função `mean`.
 
-Vamos criar uma função `compvalid` que remova eventuais valores faltantes de Au e retorne um sumário estatístico com essas três informações... 
+Vamos criar uma função `compvalid` que remova eventuais valores faltantes de Au (para o cálculo do teor médio) e retorne um sumário estatístico com essas três informações... 
 """
 
 # ╔═╡ 3d52dfab-40d2-4947-9dfe-cc4e6100d75c
@@ -414,12 +414,25 @@ Agora podemos aplicar a função `compvalid` para calcular as estatísticas de c
 md"""
 ##### Observações
 
+- Quando se compara a metragem de amostras brutas com a metragem das compostas, nota-se que, na estratégia do comprimento fixo, mais amostras foram descartadas (185 metros) do que no método do comprimento ótimo (9,5 metros);
+- O método do comprimento fixo aumentou a dispersão do comprimento das amostras, enquanto a estratégia do comprimento ótimo reduziu;
+- Nota-se uma redução do teor médio de Au após a compositagem pelos dois métodos. Essa redução já era esperada, uma vez que, ao combinar as amostras, há uma diluição dos teores. Entretanto, a mudança na média não foi tão expressiva em ambos os casos (< 3%);
+- Pelo menos neste exemplo, o algoritmo do comprimento ótimo mostrou uma melhor performance na compositagem do que a estratégia do comprimento fixo. Ainda sim, sugere-se sempre comparar os dois métodos, se possível. O método do comprimento fixo, por vezes, pode apresentar um bom desempenho.
 """
 
 # ╔═╡ 447e2730-0bd4-4953-ac2e-c6d12cb5e341
 md"""
 ## 4. Visualização dos furos
 
+Agora que realizamos a comparação entre os dois métodos de compositagem e escolhemos as compostas ótimas, podemos visualizá-las interativamente com o pacote [Makie.jl](https://github.com/JuliaPlots/Makie.jl). Esse pacote, ainda relativamente instável, fornece incríveis recursos interativos de visualização 3D!
+
+Neste notebook, adotaremos o backend [WGLMakie](https://github.com/JuliaPlots/Makie.jl/tree/master/WGLMakie), por ser interativo e compatível com o visualizações no navegador.
+
+> ⚠️ Caso queira aprender como configurar esse backend, clique no ícone 👁️ para exibir o conteúdo das duas primeiras células deste notebook.
+
+Clique na caixa abaixo para visualizar os teores compostos de Au...
+
+> ⚠️ Ao clicar pela primeira vez, a exibição do plot pode demorar alguns segundos. Entretanto, nos próximos cliques, as compostas serão exibidas instantaneamente! Caso não queira mais visualizá-las, desmarque a caixa para não tornar a execução das demais células lenta.
 """
 
 # ╔═╡ baf8bd0f-07b7-4ce6-8850-4f22c4a20ecf
@@ -432,16 +445,20 @@ begin
 	if viz_furos
 		# remoção de valores faltantes
 		furos_viz = cp_otimo |> @dropna(:AU) |> DataFrame
-
+		
 		# visualização dos furos
-		meshscatter(furos_viz.X, furos_viz.Y, furos_viz.Z,
-					color=furos_viz.AU, markersize=8, colormap=:jet)
+		fig, ax, p = meshscatter(furos_viz.X, furos_viz.Y, furos_viz.Z,
+								 color=furos_viz.AU, markersize=8)
+		
+		Colorbar(fig[1, 2], p, label="Au (g/t)")
+		
+		fig
 	end
 end
 
 # ╔═╡ d9cd1583-abec-4dc1-a9db-5bbcf74a48c8
 if viz_furos
-	md"""**Figura 05:** Visualização dos teores das compostas."""
+	md"""**Figura 05:** Visualização dos teores compostos de Au (método do comprimento ótimo)."""
 end
 
 # ╔═╡ 96ae1d18-a0fd-4846-9d4a-843952e14caa
@@ -1971,7 +1988,7 @@ version = "0.9.1+5"
 # ╠═3d52dfab-40d2-4947-9dfe-cc4e6100d75c
 # ╟─98d43ce9-d4a6-4b5f-8777-a0af67eddf9f
 # ╠═58fd4e5b-da58-4cf1-8c99-32892a146bdd
-# ╠═5431903b-e7b0-47f8-a225-9db66468256e
+# ╟─5431903b-e7b0-47f8-a225-9db66468256e
 # ╟─447e2730-0bd4-4953-ac2e-c6d12cb5e341
 # ╟─baf8bd0f-07b7-4ce6-8850-4f22c4a20ecf
 # ╟─dbddc346-e9dd-416d-abf5-98d96a95f3ec

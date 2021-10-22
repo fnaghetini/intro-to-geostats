@@ -27,7 +27,7 @@ end;
 
 # ╔═╡ 67ed7bd0-32cc-49bf-8c30-6c34ad29c88a
 html"""
-<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp<b>Análise Exploratória</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
+<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp📊&nbsp<b>Análise Exploratória</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
 """
 
 # ╔═╡ 5e44a696-0a3e-40f1-b125-2dec95b5cf79
@@ -36,9 +36,7 @@ PlutoUI.TableOfContents(aside=true, title="Sumário",
 
 # ╔═╡ cfc649b3-e423-4aa9-925b-763e2986e2f5
 md"""
-
 ![ufmg-logo](https://logodownload.org/wp-content/uploads/2015/02/ufmg-logo-2.png)
-
 """
 
 # ╔═╡ b53bfda4-60de-43c8-9852-faa1051050e2
@@ -54,34 +52,24 @@ Neste módulo, iremos aprender sobre algumas das técnicas de AED mais utilizada
 
 """
 
-# ╔═╡ b6e565dc-96a2-42e8-9997-a4c513ff748e
-html"<hr><hr>"
-
 # ╔═╡ f7756000-3e37-436e-b070-6d57afe142d7
 md"""
-##### ⚡ Informações Gerais
-
-- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
-
-- Algumas células encontram-se ocultadas. Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
-
-- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
-
-- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."`. Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
-
-- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
-
-- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
-
-- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
+>##### 📚 Sobre
+>- Você pode exportar este notebook como PDF ou HTML estático. Para isso, clique no ícone 🔺🔴, localizado no canto superior direito da pagina. Entretanto, ambos os formatos não são compatíveis com os recursos interativos do notebook.
+>- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
+>- Algumas células encontram-se ocultadas (e.g. células que geram os plots). Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
+>- A explicação das células que geram os plots está fora do escopo deste notebook. Entretanto, a sintaxe é bem intuitiva e pode ser facilmente compreendida!
+>- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
+>- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."` (e.g. esta célula). Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
+>- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
+>- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
+>- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
+>- Para mais informações acesse o [README](https://github.com/fnaghetini/intro-to-geostats/blob/main/README.md) do projeto 🚀
 """
-
-# ╔═╡ bd01593a-53a5-4c36-b5e4-3d738a0c3c08
-html"<hr><hr>"
 
 # ╔═╡ e28a9056-d62d-4ab6-be00-0174180a73c5
 md"""
-## 1. Conceitos Básicos
+## 1. Conceitos básicos
 
 Nesta primeira seção, iremos aprender/revisar alguns conceitos básicos sobre Estatística Clássica.
 """
@@ -150,7 +138,7 @@ Neste módulo, iremos trabalhar com o banco de dados [Jura](https://rdrr.io/cran
 
 > ⚠️ Algumas modificações no banco de dados foram realizadas pelo autor para exemplificar algumas rotinas típicas da AED.
 
-Os dados estão no formato CSV no arquivo `data/jura.csv`. Para carregá-los no notebook, utilizaremos os pacotes [CSV.jl](https://github.com/JuliaData/CSV.jl) e [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl).
+Os dados estão no formato CSV no arquivo `data/Jura.csv`. Para carregá-los no notebook, utilizaremos os pacotes [CSV.jl](https://github.com/JuliaData/CSV.jl) e [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl).
 
 Especificamos o caminho do arquivo e redirecionamos o resultado para uma tabela `DataFrame` utilizando o operador `|>`, conhecido como *pipe*.
 
@@ -823,13 +811,13 @@ begin
 		hg = filter(Zᵤ => x -> x > q90, dados) |> DataFrame
 		
 		scatter(hg[!,:X], hg[!,:Y], marker_z=hg[!,Zᵤ],
-				color=:coolwarm, legend=:topleft, marker=(:square,2.5),
+				color=:coolwarm, legend=:topright, marker=(:square,2.5),
 				xlabel="X", ylabel="Y", label="$Zᵤ (ppm)",
 				xlims=(0,6), ylims=(0,6), markerstrokewidth=0.3)
 	
 	else
 		scatter(dados[!,:X], dados[!,:Y], marker_z=dados[!,Zᵤ],
-				color=:coolwarm, legend=:topleft, marker=(:square,2.5),
+				color=:coolwarm, legend=:topright, marker=(:square,2.5),
 				xlabel="X", ylabel="Y", label="$Zᵤ (ppm)",
 				xlims=(0,6), ylims=(0,6), markerstrokewidth=0.3)
 	end
@@ -861,7 +849,6 @@ md"""
 *Rossi, M. E.; Deutsch, C. V. [Mineral resource estimation](https://www.google.com.br/books/edition/Mineral_Resource_Estimation/gzK_BAAAQBAJ?hl=pt-BR&gbpv=0). New York: Springer Science & Business Media, 2013.*
 
 *Tukey, J. W. [Exploratory data analysis](https://www.google.com.br/books/edition/Exploratory_Data_Analysis/UT9dAAAAIAAJ?hl=pt-BR&gbpv=0&bsq=exploratory%20data%20analysis). Princeton: Addison-Wesley Publishing Company, 1977.*
-
 """
 
 # ╔═╡ 5f177c03-cb3d-4268-8c33-3aa7610e337b
@@ -2461,9 +2448,7 @@ version = "0.9.1+5"
 # ╟─5e44a696-0a3e-40f1-b125-2dec95b5cf79
 # ╟─cfc649b3-e423-4aa9-925b-763e2986e2f5
 # ╟─b53bfda4-60de-43c8-9852-faa1051050e2
-# ╟─b6e565dc-96a2-42e8-9997-a4c513ff748e
 # ╟─f7756000-3e37-436e-b070-6d57afe142d7
-# ╟─bd01593a-53a5-4c36-b5e4-3d738a0c3c08
 # ╟─e28a9056-d62d-4ab6-be00-0174180a73c5
 # ╟─a8c53b89-634b-4526-be62-f51f22c3c607
 # ╟─b8576b51-2a2b-4614-ae62-280394944319

@@ -430,7 +430,7 @@ Neste notebook, adotaremos o backend [WGLMakie](https://github.com/JuliaPlots/Ma
 
 > ⚠️ Caso queira aprender como configurar esse backend, clique no ícone 👁️ para exibir o conteúdo das duas primeiras células deste notebook.
 
-Clique na caixa abaixo para visualizar os teores compostos de Au...
+Clique na caixa abaixo para visualizar os teores compostos de Au (Figura 05)...
 
 > ⚠️ Ao clicar pela primeira vez, a exibição do plot pode demorar alguns segundos. Entretanto, nos próximos cliques, as compostas serão exibidas instantaneamente! Caso não queira mais visualizá-las, desmarque a caixa para não tornar a execução das demais células lenta.
 """
@@ -478,7 +478,7 @@ md"""
 md"""
 ## Recursos adicionais
 
-Um outro tópico importante na fase de preparação de amostras é o *top cut*, comumente chamado de "capeamento". Ainda que esse assunto esteja fora do escopo deste notebook, o podcast abaixo é uma excelente introdução ao tema! 
+Um outro tópico importante na fase de preparação de amostras é o *top cut*, comumente chamado de *capping* ou "capeamento". Ainda que esse assunto esteja fora do escopo deste notebook, o podcast abaixo é uma excelente introdução ao tema! 
 
 > [Podcast Top Cut - Optiro Mining Industry Consultants](https://open.spotify.com/episode/6Wbho2xFwntNVrU86t32KJ)
 """

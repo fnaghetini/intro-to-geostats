@@ -28,7 +28,7 @@ end;
 
 # ╔═╡ f8909bd5-9167-42ea-a302-a7a50bdc365c
 html"""
-<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp📌&nbsp<b>Variografia</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
+<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp🗺️&nbsp<b>Variografia</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
 """
 
 # ╔═╡ 3bd915e1-2f58-451c-a0fb-8aec6d6f75d9
@@ -41,7 +41,17 @@ md"""
 """
 
 # ╔═╡ 029c1951-054b-4f48-bc05-341250ce9f6a
-md" # 📌 Variografia"
+md"""
+# 🗺️ Variografia
+
+Um aspecto fundamental da modelagem geoestatística é o estabelecimento de medidas quantitativas de **continuidade espacial** que são utilizadas posteriormente na estimativa e/ou simulação. Nas últimas décadas, a modelagem da continuidade espacial se tornou uma prática essencial para qualquer geólogos de recursos (*Rossi & Deutsch, 2013*).
+
+Neste módulo, teremos uma breve introdução sobre uma ferrameta amplamente utilizada na descrição da variabilidade espacial, o **variograma**.
+
+> ⚠️ Enfatiza-se que, como a variografia é um assunto muito amplo, neste módulo, focaremos apenas em seus aspectos mais básicos. Caso deseje se aprofundar no tema, consulte as seções *Referências* e *Recursos adicionais* deste notebook.
+
+Ao final da variografia (i.e. modelagem da continuidade de valores), teremos em mãos um **modelo de variograma** representativo da estrutura espacial de uma variável de interesse e que será utilizado como entrada para a estimativa. Veremos que a variografia permite inserir interpretações geológicas na estimativa de recursos.
+"""
 
 # ╔═╡ 1e211855-33b8-429f-a4e1-b01e8ad88bab
 md"""
@@ -58,46 +68,57 @@ md"""
 >- Para mais informações acesse o [README](https://github.com/fnaghetini/intro-to-geostats/blob/main/README.md) do projeto 🚀
 """
 
+# ╔═╡ 363b1ca8-1cb4-465d-89b3-a15570d5dc7f
+md"""
+## 1. Conceitos básicos
+
+Nesta primeira seção, iremos aprender sobre conceitos cruciais para o entendimento de variogramas: *continuidade espacial* e *anisotropia*. Veremos que essas propriedades estão intimamente ligadas às características geológicas dos depósitos minerais.
+"""
+
+# ╔═╡ e1502221-f2ee-4f76-b442-f83dbf454743
+md"""
+### Continuidade espacial
+
+Segundo *Sinclair & Blackwell (2006)*, o termo **continuidade espacial** é comumente utilizado de forma ambígua para se referir tanto às ocorrências físicas de características geológicas que controlam a mineralização (e.g. zonas de cisalhamento, veios, falhas), quanto aos teores metalíferos.
+
+Na tentativa de clarear essa ambiguidade, *Sinclair & Vallée (1994)* definem dois tipos de continuidade espacial:
+
+> **Continuidade geológica:** manifestações físicas de características geológicas, como veios, zonas de cisalhamento e estratos mineralizados. Esse tipo de continuidade é interpretada durante a modelagem geológica e impacta diretamente toda a estimativa de recursos.
+
+> **Continuidade de valores:** distribuição espacial de caracteristicas quantitativamente mensuradas, como teores metalíferos, densidade e espessura das mineralizações. Esse tipo de continuidade é quantificada a partir de alguma função de autocorrelação (e.g. variograma).
+
+Neste módulo, aprenderemos sobre a continuidade de valores. Da mesma forma que um depósito mineral não ocorre aleatoriamente na natureza, a distribuição de teores metalíferos, por ser resultado da interação entre diversos processos metalogenéticos, também apresenta uma certa estrutura (ou organização) espacial.
+"""
+
+# ╔═╡ faee9091-89aa-46ff-9a90-42eb71dcdd6a
+md"""
+### Anisotropia
+
+Se você já teve aulas de Mineralogia, provavelmente já se deparou com o termo **anisotropia**. Nas aulas dessa disciplina, aprendemos que a dureza da cianita, um aluminossilicato típico de rochas metamórficas de média a alta pressão, é anisotrópica. Isso quer dizer que, se testada paralelamente à sua maior elongação, a dureza é de 4,5 a 5 na escala de Mohs, enquanto que, se testada perpendicularmente à essa direção, a dureza é de 6,5 a 7.
+
+> Quando uma propriedade assume valores distintos para diferentes direções, diz-se que essa propriedade é **anisotrópica**.
+
+A distribuição de teores nos depósitos minerais é frequentemente anisotrópica e, portanto, precisamos de ferramentas de modelagem da continuidade que reconheçam anisotropia (e.g. variograma). Imagine um extenso platô de bauxita. É intuitivo pensar que os teores de Al₂O₃ são mais contínuos lateralmente e menos contínuos verticalmente. Nesse exemplo, Al₂O₃ é um fenômeno anisotrópico.
+"""
+
 # ╔═╡ 51107168-29ca-40b1-a658-9361199be3b1
 md"""
 
-## 1. Função variograma
+## 2. Variograma
 
-O **variograma** é uma função matemática que mapeia/descreve a continuidade espacial de uma variável regionalizada (VR).
-- *Exemplos de VR:* Au(g/t), Cu(%), Pb(%), Ag(ppb).
+O **variograma** é uma função matemática que mapeia/descreve a continuidade espacial de uma variável regionalizada (i.e. variável que exibe certa estrutura espacial). Podemos utilizar o variograma, por exemplo, para descrever a continuidade espacial dos teores de Au em um depósito.
 
-O variograma, quando existe, é único e válido para todo o domínio de estimativa.
-
-A **função variograma** pode ser anisotrópica, sendo sensível à direção, mas não ao sentido.
-- *Exemplo:* $γ(000°)$ ≠ $γ(045°)$.
-- *Exemplo:* $γ(000°)$ = $γ(180°)$.
-
-Função variograma:
-
-```math
-2\gamma(h) = \frac{1}{n} \sum_{i=1}^{n} [Z(x_i) - Z(x_i + h)]^2
-
-```
-
-Função semivariograma:
+Matematicamente, a função variograma pode ser definida como a diferença quadrática média entre dois valores amostrais separados por um vetor distância $h$ (*Rossi & Deutsch, 2013*):
 
 ```math
 \gamma(h) = \frac{1}{2n} \sum_{i=1}^{n} [Z(x_i) - Z(x_i + h)]^2
-
 ```
 
--  $γ(h)$: valor do variograma $γ(h)$ para uma distância $h$ entre dois pontos.
+em que $γ(h)$ é o valor do variograma para uma distância $h$ entre dois pontos, $n$ é o número de pares de amostras, $Z(x_i)$ é o valor da variável $Z$ na posição $(x_i)$ e $Z(x_i + h)$ é valor da variável $Z$ na posição $(x_i+h)$.
 
--  $n$: número de pares de pontos.
+> ⚠️ Em seus estudos, você provavelmente irá se deparar (ou já se deparou) com o termo **semivariograma**, por vezes utilizado para enfatizar o termo $\frac{1}{2n}$ da equação mostrada. Entretanto, para fins de simplificação, adotaremos o termo variograma nesse para se referir a essa equação.
 
--  $Z(x_i)$: valor da variável $Z$ na posição $(x_i)$.
-
--  $Z(x_i + h)$: valor da variável $Z$ na posição $(x_i+h)$.
-
-> **Nota:** o termo semivariograma foi cunhado para enfatizar o termo $\frac{1}{2n}$ da função. Entretanto, atualmente, ele é considerado obsoleto e, por isso, o termo variograma tende a ser mais utilizado.
-
-Ao final da variografia, teremos em mãos um **modelo de variograma** representativo da continuidade espacial de uma variável e que será utilizado como entrada no sistema linear de krigagem.
-
+A função variograma pode ser anisotrópica, sendo sensível à direção, mas não ao sentido. Por exemplo, um variograma de orientação 000° é diferente de um variograma 045°, mas igual a um variograma 180°. 
 """
 
 # ╔═╡ d4775d05-4943-4493-897e-4340f01475be
@@ -109,11 +130,15 @@ end;
 
 # ╔═╡ 0c00aee8-9db5-4fca-b92d-e19aa4fe5c1b
 md"""
-## 2. Variogramas experimentais
+## 3. Variograma experimental
 
-A resolução da **função variograma** apresentada acima é representada graficamente e recebe o nome de **variograma experimental** (*Figura 1*).
+Podemos utilizar a equação apresentada acima para calcular diversos valores de variograma para diferentes distâncias $h$. Essa informação é sumarizada graficamente a partir do **variograma experimental** (Figura 01).
 
-Pode-se unir os pontos do variograma experimental para simplesmente facilitar a sua interpretação.
+Cada ponto do variograma experimental representa a média das diferenças quadráticas entre pares de amostras separados por uma distância $h$. Quanto maior é o número de pares de amostras, maior é a altura das barras e mais representativo é o valor de $\gamma(h)$ encontrado.
+
+Note que, no variograma experimental, o valor de $\gamma$ é calculado apenas para um número limitado de distâncias $h$. Para fins de visualização, é comum unir os pontos do variograma experimental por segmentos de reta. Clique na caixa abaixo, caso queira unir os pontos do gráfico.
+
+> ⚠️ Ainda que a ligação dos pontos seja um recurso comum na maioria dos softwares geoestatísticos, devemos lembrar que o variograma experimental é discreto, ou seja, a partir dele, não sabemos os valores de $\gamma$ para todos os valores de $h$.
 
 """
 
@@ -136,29 +161,16 @@ Unir pontos do variograma: $(@bind join_points CheckBox())
 # ╔═╡ 8cfef844-5e4d-44c8-817c-0021eecbcaa2
 # Ploting experimental variogram
 plot(γ₁, legend = false, ylims = (0,1.0), xlims = (0,60),
-	 title = "Variograma Experimental", color = :orange,
-	 line = join_points)
+	 color = :orange, line = join_points)
 
 # ╔═╡ 528f0bb5-4030-4006-a323-29f9cbc1efc0
-html"""
-
-<p align="center">
-    <b>Figura 1</b>: Exemplo de variograma experimental.
-</p>
-
+md"""
+**Figura 01:** Exemplo de variograma experimental.
 """
 
 # ╔═╡ 5e623ea7-03f9-46a9-ba54-6d48d1a64057
 md"""
-
-Perceba que $h$ é a **distância cartesiana** entre duas amostras, enquanto $γ(h)$ é a **distância estatística** entre essas amostras. Portanto, o variograma experimental é a ferramenta que converte a distância geográfica $h$ em distância estatística $γ(h)$.
-
-Note que a função variograma é uma **função discreta**, ou seja, os valores de $γ(h)$ são calculados apenas para $h$ específicos.
-
-Cada ponto no variograma experimental representa o valor $γ(h)$ médio de um conjunto de pares de amostras separadas por uma distância $h$.
-
-O número de pares de amostras é proporcional à altura das barras presentes no gráfico.
-
+Os valores $\gamma(h)$ podem ser entendidos como uma medida de **variabilidade espacial** entre pares de amostras. Nesse sentido, é intuitivo pensar que, quanto maior é a distância $h$ entre duas amostras, mais diferentes são os seus respectivos teores. Esse padrão pode ser observado na Figura 01 e é típico dos variogramas experimentais.
 """
 
 # ╔═╡ 4b136ca1-f46f-43dc-9a1d-0659f1ef5e61
@@ -166,12 +178,11 @@ md""" ### Parâmetros para cálculo do variograma experimental
 
 Para calcular variogramas experimentais, devemos definir alguns parâmetros:
 
-- Direção
-- Tamanho do passo
-- Tolerância linear
-- Tolerância angular
-- Largura da banda
-
+- Direção;
+- Tamanho do passo;
+- Tolerância linear;
+- Tolerância angular;
+- Largura da banda.
 """
 
 # ╔═╡ c782a92c-cc4d-44bc-8521-2f70ad222bd5
@@ -181,9 +192,9 @@ md"""
 
 Como visto anteriormente, os variogramas experimentais podem ser anisotrópicos, ou seja, variam de acordo com a direção. Nesse sentido, como os depósitos minerais são anisotrópicos, devemos escolher uma direção de cálculo para o variograma experimental.
 
-- No contexto 2D, informamos apenas o azimute.
+- No contexto 2D, informamos apenas o azimute (e.g. 170°).
 
-- No contexto 3D, informamos o azimute e o mergulho.
+- No contexto 3D, informamos o azimute e o mergulho (e.g. 170°/30°).
 
 No exemplo 2D abaixo, percebemos que quando variamos o azimute, o variograma experimental também sofre uma variação.
 
@@ -649,7 +660,7 @@ No caso de **malhas amostrais irregulares**, os parâmetros de variograma experi
 # ╔═╡ e80e5e16-59fb-4ec0-a9f0-6b8b97bc8d36
 md"""
 
-## 3. Modelos teóricos
+## 4. Modelos teóricos
 
 A partir dos variogramas experimentais só é possível obter valores médios de variograma $γ(h)$ para distâncias iguais a múltiplos do tamanho de passo $h$ escolhido.
 
@@ -925,7 +936,7 @@ html"""
 # ╔═╡ 8b4ee7b2-2a01-44ae-8539-27f1815fe634
 md"""
 
-## 4. Tipos de anisotropia
+## 5. Tipos de anisotropia
 
 Na geoestatística, a **anisotropia** existe quando um ou mais elementos do variograma variam com a mudança da direção. Existem três tipos (*Figura 11*):
 
@@ -989,7 +1000,7 @@ html"""
 # ╔═╡ 0f28a997-4945-47fe-83b9-058726bc8041
 md"""
 
-## 5. Estruturas imbricadas
+## 6. Estruturas imbricadas
 
 A **estrutura do variograma** é a porção da equação do ajuste teórico em que o valor de $C$ cresce com o aumento da distância $h$.
 
@@ -1078,7 +1089,7 @@ html"""
 # ╔═╡ 538bf67b-33c6-45c3-b5bf-328922debb26
 md"""
 
-## 6. Variograma anisotrópico
+## 7. Variograma anisotrópico
 
 Como a continuidade espacial de fenômenos naturais tende a ser anisotrópica e o objetivo da variografia é justamente descrever a continuidade espacial desses fenômenos, é plausível que o variograma seja anisotrópico.
 
@@ -1163,7 +1174,7 @@ html"""
 # ╔═╡ 6feb0cb4-7bff-4635-ae38-4400affe89f3
 md"""
 
-## 7. Modelo de variograma x estimativas
+## 8. Modelo de variograma x estimativas
 
 Sabe-se que o modelo de variograma é utilizado como entrada na estimativa por krigagem. Nesse sentido, cada um de seus parâmetros e elementos exerce uma influência no modelo de teores estimados:
 
@@ -1364,6 +1375,12 @@ html"""
 # ╔═╡ d5de8d26-7e90-4615-bd3b-cdfd002f98b2
 md"""
 ## Referências
+
+*Rossi, M. E.; Deutsch, C. V. [Mineral resource estimation](https://www.google.com.br/books/edition/Mineral_Resource_Estimation/gzK_BAAAQBAJ?hl=pt-BR&gbpv=0). New York: Springer Science & Business Media, 2013.*
+
+*Sinclair, A. J.; Blackwell, G. H. [Applied mineral inventory estimation](https://www.google.com.br/books/edition/Applied_Mineral_Inventory_Estimation/oo7rCrFQJksC?hl=pt-BR&gbpv=0). New York: Cambridge University Press, 2006.*
+
+*Sinclair, A. J.; Vallée, M. [Reviewing continuity: an essential element of quality control for deposit and reserve estimation](https://www.google.com.br/books/edition/Applied_Mineral_Inventory_Estimation/oo7rCrFQJksC?hl=pt-BR&gbpv=0). Exploration and Mining Geology, 3(2), 1994. 95-108.*
 """
 
 # ╔═╡ 838f3147-299c-4e12-a4b0-a9f29d19f2d7
@@ -2913,6 +2930,9 @@ version = "0.9.1+5"
 # ╟─faa9d295-ae72-4912-bfca-925c4e7b9b35
 # ╟─029c1951-054b-4f48-bc05-341250ce9f6a
 # ╟─1e211855-33b8-429f-a4e1-b01e8ad88bab
+# ╟─363b1ca8-1cb4-465d-89b3-a15570d5dc7f
+# ╟─e1502221-f2ee-4f76-b442-f83dbf454743
+# ╟─faee9091-89aa-46ff-9a90-42eb71dcdd6a
 # ╟─51107168-29ca-40b1-a658-9361199be3b1
 # ╟─d4775d05-4943-4493-897e-4340f01475be
 # ╟─0c00aee8-9db5-4fca-b92d-e19aa4fe5c1b

@@ -27,7 +27,7 @@ end;
 
 # ╔═╡ 67ed7bd0-32cc-49bf-8c30-6c34ad29c88a
 html"""
-<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp📊&nbsp<b>Análise Exploratória</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
+<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp🔎&nbsp<b>Análise Exploratória</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
 """
 
 # ╔═╡ 5e44a696-0a3e-40f1-b125-2dec95b5cf79
@@ -40,7 +40,7 @@ md"""
 """
 
 # ╔═╡ b53bfda4-60de-43c8-9852-faa1051050e2
-md""" # 📊 Análise Exploratória
+md""" # 🔎 Análise Exploratória
 
 A **Análise Exploratória dos Dados (AED)** consiste em uma abordagem para organizar e sumarizar um determinado conjunto de dados, a partir de estatísticas descritivas e técnicas de visualização de dados. Segundo *Tukey (1977)*, pesquisador que propôs o termo, a AED pode ser comparada ao trabalho de investigação realizado por um detetive. Pode-se dizer ainda que, durante a AED, *os dados são transformados em informações*.
 

@@ -150,6 +150,11 @@ function areatriangulo(b,h)
 	return A
 end
 
+# ╔═╡ 9cf1d023-1421-4adb-af35-64aa6a8ddb53
+md"""
+> ⚠️ O comando `return` foi utilizado aqui apenas por fins didáticos. Entretanto, poderíamos omití-lo.
+"""
+
 # ╔═╡ 5b168a45-b5a2-4415-80f4-e2347c21730a
 diagonal = l -> l * √2
 
@@ -715,6 +720,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─d28119c3-6800-430d-9ffe-d6f25e8e5c2a
 # ╠═bb495116-8ff9-4a66-9b66-6f6fe990c5d9
 # ╠═a63d4a04-0ceb-4e4f-90ba-30dc798e1b48
+# ╟─9cf1d023-1421-4adb-af35-64aa6a8ddb53
 # ╠═5b168a45-b5a2-4415-80f4-e2347c21730a
 # ╠═1a1ac9a0-b8f0-46d1-9d89-21b6bc0e6aec
 # ╟─784426f8-ac63-4555-adb2-cbfb9b37fdda

@@ -46,9 +46,9 @@ md"""
 
 Um aspecto fundamental da modelagem geoestatística é o estabelecimento de medidas quantitativas de **continuidade espacial** que são utilizadas posteriormente na estimativa e/ou simulação. Nas últimas décadas, a modelagem da continuidade espacial se tornou uma prática essencial para qualquer geólogos de recursos (*Rossi & Deutsch, 2013*).
 
-Neste módulo, teremos uma breve introdução sobre uma ferrameta amplamente utilizada na descrição da variabilidade espacial, o **variograma**.
+Diferentemente do [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl), em que aprendemos sobre técnicas da Estatística Clássica, neste módulo, teremos uma breve introdução sobre uma ferrameta geoestatística amplamente utilizada na descrição da variabilidade espacial, o **variograma**.
 
-> ⚠️ Enfatiza-se que, como a variografia é um assunto muito amplo, neste módulo, focaremos apenas em seus aspectos mais básicos. Caso deseje se aprofundar no tema, consulte as seções *Referências* e *Recursos adicionais* deste notebook.
+> ⚠️ Enfatiza-se que, como a variografia é um assunto muito amplo, neste módulo, focaremos apenas em seus aspectos mais básicos. Caso deseje se aprofundar no tema, consulte as seções *Referências* e *Recursos adicionais* deste notebook. Por esse mesmo motivo, as células de código não serão discutidas em profundidade neste notebook.
 
 Ao final da variografia (i.e. modelagem da continuidade de valores), teremos em mãos um **modelo de variograma** representativo da estrutura espacial de uma variável de interesse e que será utilizado como entrada para a estimativa. Veremos que a variografia permite inserir interpretações geológicas na estimativa de recursos.
 """
@@ -72,7 +72,7 @@ md"""
 md"""
 ## 1. Conceitos básicos
 
-Nesta primeira seção, iremos aprender sobre conceitos cruciais para o entendimento de variogramas: *continuidade espacial* e *anisotropia*. Veremos que essas propriedades estão intimamente ligadas às características geológicas dos depósitos minerais.
+Nesta primeira seção, iremos aprender sobre conceitos cruciais para o entendimento de variogramas: *continuidade espacial* e *anisotropia*. Veremos que essas propriedades estão intimamente ligadas às características geológicas dos depósitos minerais. Além disso, discutiremos um pouco sobre o principal banco de dados utilizado neste módulo.
 """
 
 # ╔═╡ e1502221-f2ee-4f76-b442-f83dbf454743
@@ -96,14 +96,43 @@ md"""
 
 Se você já teve aulas de Mineralogia, provavelmente já se deparou com o termo **anisotropia**. Nas aulas dessa disciplina, aprendemos que a dureza da cianita, um aluminossilicato típico de rochas metamórficas de média a alta pressão, é anisotrópica. Isso quer dizer que, se testada paralelamente à sua maior elongação, a dureza é de 4,5 a 5 na escala de Mohs, enquanto que, se testada perpendicularmente à essa direção, a dureza é de 6,5 a 7.
 
-> Quando uma propriedade assume valores distintos para diferentes direções, diz-se que essa propriedade é **anisotrópica**.
+> Quando uma propriedade assume valores distintos para diferentes direções, diz-se que essa propriedade é **anisotrópica**. Por outro lado, uma propriedade que não varia com a direção é dita **isotrópica**.
 
-A distribuição de teores nos depósitos minerais é frequentemente anisotrópica e, portanto, precisamos de ferramentas de modelagem da continuidade que reconheçam anisotropia (e.g. variograma). Imagine um extenso platô de bauxita. É intuitivo pensar que os teores de Al₂O₃ são mais contínuos lateralmente e menos contínuos verticalmente. Nesse exemplo, Al₂O₃ é um fenômeno anisotrópico.
+A distribuição de teores nos depósitos minerais é frequentemente anisotrópica e, portanto, precisamos de ferramentas de modelagem da continuidade que reconheçam anisotropia (e.g. variograma). Imagine um extenso platô de bauxita. É intuitivo pensar que os teores de Al₂O₃ são mais contínuos lateralmente e menos contínuos verticalmente. Nesse exemplo, a distribuição do teor de Al₂O₃ é um fenômeno anisotrópico.
 """
+
+# ╔═╡ 12770ca7-be19-4b11-88b5-0b65a05cefd6
+md"""
+### Banco de dados
+
+Neste módulo, iremos trabalhar com o banco de dados [Walker Lake]() do excelente livro de *Isaaks & Srivastava (1989)*. Segundo os autores, esse banco de dados foi gerado a partir de um modelo digital de elevação da região de Walker Lake, situada no estado de Nevada (EUA).
+
+Originalmente, *Isaaks & Srivastava (1989)* adaptaram essa informação de elevação para gerar duas variáveis anônimas `U` e `V`. Entretanto, ao realizar manipulações nessa base de dados, o autor deste material irá se referir a essas variáveis como teores fictícios de `Ag` (em ppm) e `Pb` (em %), respectivamente.
+
+Vamos importar e georreferenciar essa base de dados. Para isso, iremos utilizar apenas as colunas `X`, `Y` e `Pb` e removeremos os valores faltantes...
+"""
+
+# ╔═╡ 57bf7106-7316-43f7-8578-f59f01f04b79
+begin
+	# variáveis de interesse
+	VARS = [:X,:Y,:Pb]
+	# diretório dos dados
+	DIR = "data/Walker_Lake.csv"
+	
+	# importação dos dados
+	walkerlake = CSV.File(DIR, type = Float64) |> DataFrame
+	
+	# seleção das variáveis de interesse e remoção dos valores faltantes
+	f1(dados) = select(dados, VARS)
+	f2(dados) = dropmissing(dados)
+	wl = walkerlake |> f1 |> f2 |> DataFrame
+	
+	# georreferenciamento dos dados
+	geowl = georef(wl, (:X,:Y))
+end
 
 # ╔═╡ 51107168-29ca-40b1-a658-9361199be3b1
 md"""
-
 ## 2. Variograma
 
 O **variograma** é uma função matemática que mapeia/descreve a continuidade espacial de uma variável regionalizada (i.e. variável que exibe certa estrutura espacial). Podemos utilizar o variograma, por exemplo, para descrever a continuidade espacial dos teores de Au em um depósito.
@@ -116,38 +145,98 @@ Matematicamente, a função variograma pode ser definida como a diferença quadr
 
 em que $γ(h)$ é o valor do variograma para uma distância $h$ entre dois pontos, $n$ é o número de pares de amostras, $Z(x_i)$ é o valor da variável $Z$ na posição $(x_i)$ e $Z(x_i + h)$ é valor da variável $Z$ na posição $(x_i+h)$.
 
-> ⚠️ Em seus estudos, você provavelmente irá se deparar (ou já se deparou) com o termo **semivariograma**, por vezes utilizado para enfatizar o termo $\frac{1}{2n}$ da equação mostrada. Entretanto, para fins de simplificação, adotaremos o termo variograma nesse para se referir a essa equação.
+> ⚠️ Em seus estudos, você provavelmente irá se deparar (ou já se deparou) com o termo **semivariograma**, por vezes utilizado para enfatizar o termo $\frac{1}{2n}$ da equação mostrada. Entretanto, para fins de simplificação, adotaremos o termo variograma para se referir a essa mesma equação.
 
-A função variograma pode ser anisotrópica, sendo sensível à direção, mas não ao sentido. Por exemplo, um variograma de orientação 000° é diferente de um variograma 045°, mas igual a um variograma 180°. 
+A função variograma pode ser anisotrópica, sendo sensível à direção, mas não ao sentido. Por exemplo, um variograma de orientação 000° é diferente de um variograma 045°, mas igual a um variograma 180°.
+
+> ⚠️ Utilizaremos o pacote [GeoStats.jl](https://github.com/JuliaEarth/GeoStats.jl) para o cálculo de variogramas que, por sua vez, conta com um algoritmo sofisticado capaz de lidar de forma eficiente com um grande volume de dados (*Hoffimann & Zadrozny, 2019*).
 """
 
-# ╔═╡ d4775d05-4943-4493-897e-4340f01475be
-# Convert geologic orientation to cartesian orientation
-function sph2cart(azi)
-	θ = deg2rad(azi)
-	sin(θ), cos(θ)
-end;
+# ╔═╡ ea67e941-496f-45a3-8b0f-058d573291d8
+md"""
+
+### Elementos do variograma
+
+O variograma apresenta alguns elementos que o descreve. São eles:
+1. Alcance
+2. Patamar
+3. Efeito Pepita
+
+"""
+
+# ╔═╡ 03a46b21-c522-4036-a710-bd6ce0a26a1b
+md"""
+À medida que a distância $h$ entre duas amostras aumenta, o valor de $\gamma$ correspondente tende também a aumentar. Entretanto, a partir de determinado $h$, o aumento da distância entre duas amostras não é mais acompanhado pelo aumento dos valores de $\gamma$ e o variograma atinge seu platô (*Isaaks & Srivastava, 1989*).
+
+O **alcance** $a$, também chamado de amplitude ou *range*, é definido como a distância $h$ para a qual o variograma atinge seu platô (*Isaaks & Srivastava, 1989*). Pode-se pensar que o alcance é a distância máxima até onde se consegue estabelecer alguma interdependência espacial entre pares de amostras. Em outras palavras, para $h > a$, os pares de amostras não possuem mais correlação espacial entre si.
+
+O **patamar** $C_0+C$, também chamado de *sill*, corresponde ao valor de $\gamma$ para o qual o variograma atinge seu platô (*Samson & Deutsch, 2021*). Durante a modelagem do variograma, que iremos discutir mais a frente, o patamar é normalmente definido como a o valor da variância amostral da variável de interesse.
+
+> ⚠️ Caso queira se aprofundar mais sobre o patamar do variograma, confira *Samson & Deutsch (2021)*.
+
+O **efeito pepita** $C_0$, também chamado de *nugget effect*, graficamente, é entendido como a descontinuidade na origem do variograma (*Morgan, 2011*). Ressalta-se, entretanto, que o efeito pepita corresponde ao valor de $\gamma$ quando $h$ *tende* a zero, uma vez que o valor de $\gamma$ é zero quando $h=0$ (*Camana & Deutsch, 2019*).
+
+> ⚠️ O efeito pepita também pode ser definido como um fenômeno presente em variáveis regionalizadas que representa uma variabilidade adicional a curtas distâncias. Para mais detalhes, confira *Camana & Deutsch (2019)*.
+
+Utilize os sliders abaixo para modificar os elementos do variograma mostrado pela Figura 01...
+"""
+
+# ╔═╡ 3a03cb21-0dd0-488d-9950-92ee2ed8d697
+md"""
+Ef. Pepita: $(@bind c₀ Slider(0.0:0.1:0.5, default=0.1, show_value=true))
+
+Patamar: $(@bind cₜ Slider(0.5:0.1:1.0, default=1.0, show_value=true))
+
+Alcance: $(@bind a Slider(5.0:10:45.0, default=25.0, show_value=true)) m
+"""
+
+# ╔═╡ 8519999f-2062-41b7-a8ae-4e190b2df860
+begin
+	# modelo de variograma
+	γ_ = SphericalVariogram(nugget=Float64(c₀),
+							sill=Float64(cₜ),
+							range=Float64(a))
+	
+	# plotagem do modelo de variograma
+	plot(γ_, color = :black, lw = 2, label = false,
+		 legend = :topleft, ylims = (0.,1.5), xlims = (0.,65.))
+	
+	# plotagem ef. pepita
+	hline!([c₀], color = :red, ls = :dash, label = "Ef. Pepita")
+	annotate!(55,c₀+0.05,text("C₀",10,:red))
+	
+	# plotagem patamar
+	hline!([cₜ], color = :green, ls = :dash, label = "Patamar")
+	annotate!(55,cₜ+0.05,text("C + C₀",10,:green))
+	
+	# plotagem alcance
+	vline!([a], color = :blue, ls = :dash, label = "Alcance")
+	annotate!(a,-0.05,text("a",10,:blue))
+end
+
+# ╔═╡ 59c0673a-e117-4669-8156-6d3a8eb861e8
+md" **Figura 01:** Elementos do variograma."
 
 # ╔═╡ 0c00aee8-9db5-4fca-b92d-e19aa4fe5c1b
 md"""
 ## 3. Variograma experimental
 
-Podemos utilizar a equação apresentada acima para calcular diversos valores de variograma para diferentes distâncias $h$. Essa informação é sumarizada graficamente a partir do **variograma experimental** (Figura 01).
+Podemos utilizar a equação apresentada acima para calcular diversos valores de variograma para diferentes distâncias $h$. Essa informação é sumarizada graficamente a partir do **variograma experimental** (Figura 02).
 
 Cada ponto do variograma experimental representa a média das diferenças quadráticas entre pares de amostras separados por uma distância $h$. Quanto maior é o número de pares de amostras, maior é a altura das barras e mais representativo é o valor de $\gamma(h)$ encontrado.
 
 Note que, no variograma experimental, o valor de $\gamma$ é calculado apenas para um número limitado de distâncias $h$. Para fins de visualização, é comum unir os pontos do variograma experimental por segmentos de reta. Clique na caixa abaixo, caso queira unir os pontos do gráfico.
 
-> ⚠️ Ainda que a ligação dos pontos seja um recurso comum na maioria dos softwares geoestatísticos, devemos lembrar que o variograma experimental é discreto, ou seja, a partir dele, não sabemos os valores de $\gamma$ para todos os valores de $h$.
+> ⚠️ Ainda que a ligação dos pontos seja um recurso comum na maioria dos softwares geoestatísticos, devemos lembrar que o variograma experimental é discreto, ou seja, a partir dele, sabemos apenas alguns valores de $\gamma$ para $h$ específicos.
 
 """
 
 # ╔═╡ 4b12eecc-0645-4f46-b3be-8b8a095af599
 begin
-	# Sample image
+	# importação de dados de uma imagem
 	image = geostatsimage("Gaussian30x10")
 
-	# Calculating experimental variogram
+	# cálculo do variograma experimental
 	γ₁ = EmpiricalVariogram(image, :Z, maxlag=60., nlags = 6)
 end;
 
@@ -165,7 +254,7 @@ plot(γ₁, legend = false, ylims = (0,1.0), xlims = (0,60),
 
 # ╔═╡ 528f0bb5-4030-4006-a323-29f9cbc1efc0
 md"""
-**Figura 01:** Exemplo de variograma experimental.
+**Figura 02:** Exemplo de variograma experimental.
 """
 
 # ╔═╡ 5e623ea7-03f9-46a9-ba54-6d48d1a64057
@@ -180,81 +269,61 @@ Para calcular variogramas experimentais, devemos definir alguns parâmetros:
 
 - Direção;
 - Tamanho do passo;
-- Tolerância linear;
-- Tolerância angular;
+- Tolerância do passo;
 - Largura da banda.
+
+> ⚠️ Um outro parâmetro frequentemente utilizado em softwares geoestatísticos é a *tolerância angular*. Como o GeoStats.jl não adota esse parâmetro, ele não será abordado neste módulo. Caso deseje saber mais sobre a tolerância angular, confira *Deutsch (2015)* ou [este notebook](https://github.com/fnaghetini/Variograms).
 """
 
 # ╔═╡ c782a92c-cc4d-44bc-8521-2f70ad222bd5
 md"""
-
 #### Direção
 
-Como visto anteriormente, os variogramas experimentais podem ser anisotrópicos, ou seja, variam de acordo com a direção. Nesse sentido, como os depósitos minerais são anisotrópicos, devemos escolher uma direção de cálculo para o variograma experimental.
+Processos naturais não levam a distribuições espaciais isotrópicas. Normalmente, há um plano de maior continuidade (e.g. estrato ou zona de cisalhamento mineralizada) e uma direção de menor continuidade perpendicular a esse plano. Portanto, em contextos 3D, devemos encontrar as três direções principais de um fenômeno (ortogonais entre si) que descrevem a sua continuidade (*Deutsch, 2015*). Essas direções são chamadas de *primária*, *secundária* e *terciária* e definem um **elipsoide de anisotropia**.
 
-- No contexto 2D, informamos apenas o azimute (e.g. 170°).
+Por outro lado, em contextos 2D, precisamos encontrar apenas as duas direções principais (também ortogonais entre si) que descrevem a continuidade espacial do fenômeno. Essas direções, denominadas *primária* e *secundária* definem uma **elipse de anisotropia**.
 
-- No contexto 3D, informamos o azimute e o mergulho (e.g. 170°/30°).
+> ⚠️ Em contextos 2D, a direção é definida apenas pelo azimute, enquanto que, em contextos 3D, a direção é definida pelo azimute e ângulo de mergulho.
 
-No exemplo 2D abaixo, percebemos que quando variamos o azimute, o variograma experimental também sofre uma variação.
-
-Variogramas experimentais que assumem anisotropia são denominados **variogramas direcionais** (*Figura 2*).
-
+Variogramas experimentais calculados ao longo de uma direção específica são chamados de **variogramas direcionais**. Nesse caso, os pares de amostras utilizados para calcular os valores de $\gamma(h)$ devem estar alinhados ao longo da direção de cálculo. Por exemplo, se estamos calculando um variograma experimental na direção 170°, apenas os pares de amostras orientados a 170° (ou a 350°) entre si são selecionados.  
 """
 
-# ╔═╡ bdf7046f-f955-446c-8437-f889be9e22c5
-begin
-	# Defining data URL
-	url = "https://raw.githubusercontent.com/fnaghetini/Variograms/main/data/walker_lake_proj.csv"
-	
-	# Downloading data
-	data = download(url)
-	
-	# Importing Walker Lake dataset
-	walker_lake = CSV.File(data, type = Float64) |> DataFrame
-	
-	# Select just necessary columns
-	wl = walker_lake[:,[:X,:Y,:PB]]
-	
-	# Droping missing values
-	dropmissing!(wl)
-	
-	# Georeferencing data
-	wl_georef = georef(wl, (:X,:Y))
-end;
+# ╔═╡ 81dc06f6-79a0-4022-9219-c0ae97a20ab6
+md"""
+> ###### Função `sph2cart`
+> Em geral, geólogos (principal público-alvo deste material) não estão muito acostumados a informar orientações em coordenadas cartesianas. Por exemplo, levaria um tempo para você descobrir que o azimute de 045° é representado como ($\frac{\sqrt2}{2}$, $\frac{\sqrt2}{2}$) em coordenadas cartesianas. Como no GeoStats.jl devemos informar orientações em coordenadas cartesianas, iremos criar uma função `sph2cart` que converte azimutes em coordenadas cartesianas. Por exemplo, ao invés de informarmos a direção de cálculo como ($\frac{\sqrt2}{2}$, $\frac{\sqrt2}{2}$), podemos simplesmente escrever `sph2cart(45)`.
+"""
+
+# ╔═╡ d4775d05-4943-4493-897e-4340f01475be
+function sph2cart(azi)
+	θ = deg2rad(azi)
+	sin(θ), cos(θ)
+end
+
+# ╔═╡ 73cded81-c93e-4609-80ae-ca1dfcb79ec7
+md"""
+Na Figura 03, temos um exemplo de variograma direcional. Utilize o slider abaixo para alterar a direção de cálculo do variograma experimental. Note que o variograma calculado para o azimute 000° é idêntico àquele calculado para a direção 180°.
+"""
 
 # ╔═╡ 43bc79ba-bb97-48bd-a8e4-c478bdc3a60b
 md"""
-
 Azimute: $(@bind azm Slider(0:45:180, default=0, show_value = true))°
-
 """
 
 # ╔═╡ 3f39dcf2-055e-4aa8-8caa-09223175a5fa
 begin
-	# Directional variogram
-    γ₂ = DirectionalVariogram(sph2cart(azm), wl_georef, :PB,
+	# variograma direcional
+    γ₂ = DirectionalVariogram(sph2cart(azm), geowl, :Pb,
                               maxlag = 200, nlags = 7)
 	
-	# Ploting directional variogram
+	# plotagem do variograma direcional
 	plot(γ₂, legend = false, xlims = (0,200), ylims = (0,15),
 		 title = "$(azm)°", color = :orange)
 end
 
 # ╔═╡ facdf937-4056-4699-b505-d9cada0c8ce3
-html"""
-
-<p align="center">
-    <b>Figura 2</b>: Exemplo de variogramas direcionais.
-</p>
-
-"""
-
-# ╔═╡ 1704bcbf-004c-4e30-a09a-6325f116b53c
 md"""
-
-> **Nota:** repare que $γ(000°) = γ(180°)$.
-
+**Figura 03:** Exemplo de variograma direcional.
 """
 
 # ╔═╡ 5cb62b37-fe28-4816-b7ed-f5f40df255dc
@@ -262,399 +331,170 @@ md"""
 
 #### Tamanho do passo
 
-O **tamanho do passo (lag)** é a distância média entre as amostras vizinhas na direção em que o variograma experimental está sendo calculado.
+O **tamanho do passo**, também chamado de *lag*, é a distância média entre as amostras vizinhas na direção em que o variograma experimental está sendo calculado (*Deutsch, 2015*).
 
-Abaixo, tem-se um exemplo de cálculo de variograma experimental na direção E-W para uma **malha amostral regular** (*Figura 3*). Adotou-se um tamanho de passo igual a 1 m.
-
-
+Na Figura 04, tem-se um exemplo de busca de pares de amostras na direção W-E (indicado pela seta vermelha) em uma malha regular. Utilize o slider `Passo` para aumentar o tamanho do passo e os sliders `W-E` e `N-S` para modificar a posição inicial e final do vetor $h$.
 """
 
 # ╔═╡ f4e189ac-5d12-4de5-80e1-516103e5950f
 md"""
-
 W-E: $(@bind ix₁ Slider(1:1:4, default=1))
 N-S: $(@bind iy₁ Slider(1:1:5, default=1))
 
 Passo: $(@bind h Slider(1:1:3, default=1, show_value = true)) m
-
 """
 
 # ╔═╡ c3135efd-e69c-4270-8b45-b3f9f2dd586c
 begin
-	# Random seed
+	# semente aleatória
 	Random.seed!(42)
 	
-	# Generating samples
+	# geração de amostras aleatórias
 	values₁ = DataFrame(Au = rand(25))
 	coords₁ = PointSet([(i,j) for i in 1:5 for j in 1:5])
 	
-	# Georeferencing samples
+	# amostras georreferenciadas
 	samples₁ = georef(values₁, coords₁)
 
-	# Ploting samples
+	# plotagem de amostras
 	plot(samples₁, xlims = (0,6), ylims = (0,6), title = "Au (g/t)",
 		 xlabel = "X(m)", ylabel = "Y(m)", clims = (0,1))
 	
-	# Ploting h vector
+	# plotagem do vetor h
 	plot!([(ix₁,iy₁),(ix₁+h,iy₁)], arrow = true, color = :red, lw = 2)
 end
 
 # ╔═╡ 8923e1c1-914d-47b5-a4b4-5f0c53c4e810
-html"""
-
-<p align="center">
-    <b>Figura 3</b>: Exemplo de busca de pares de amostras em uma malha regular.
-</p>
-
-"""
-
-# ╔═╡ 4d6946ec-3d4b-40bd-9ba6-40fb68c80142
 md"""
-
-Note que, quanto maior é o número de passos e menor é o tamanho do passo definido, mais o variograma experimental apresenta aspecto de "eletrocardiograma" (*Figura 4*).
-
-"""
-
-# ╔═╡ 472e42d3-00ba-49f9-93ae-438f6cccae08
-md"""
-
-N° de passos: $(@bind num_lags Slider(2:1:35, default=6, show_value=true))
-
-"""
-
-# ╔═╡ d0455ea3-9ab0-4545-bb06-ae8809d99290
-begin
-	# Directional variogram
-    γ_lag = DirectionalVariogram(sph2cart(0), wl_georef, :PB,
-                              maxlag = 200, nlags = num_lags)
-	
-	# Ploting directional variogram
-	plot(γ_lag, legend = false, xlims = (0,200), ylims = (0,15),
-		 title = "Variograma Experimental", color = :orange)
-end
-
-# ╔═╡ 1bdc6f70-b3b3-4f9d-aacd-3038fbe3dfa8
-html"""
-
-<p align="center">
-    <b>Figura 4</b>: Influência do número de passos no variograma experimental.
-</p>
-
+**Figura 04:** Exemplo de busca de pares de amostras em uma malha regular. A seta vermelha indica o vetor $h$.
 """
 
 # ╔═╡ 3d25e2bc-9a6d-4712-92ed-de31dbdea3f2
 md"""
+#### Tolerância do passo
 
-#### Tolerância linear
+Sabe-se que, na maioria dos casos, as malhas de sondagem são irregulares. Nesse caso, poucos pares de pontos serão buscados, já que as amostras não se encontram equidistantes entre si.
 
-Sabe-se que, na maioria dos casos, as malhas de sondagem são irregulares. Nesse caso, poucos pares de pontos serão buscados, já que as amostras não se encontram equidistantes entre si (*Figura 5*).
-
+A Figura 05 mostra um exemplo de malha irregular. Tente utilizar o slider `Passo` para encontrar o tamanho de passo ideal para a malha. Você perceberá que, independentemente do tamanho escolhido, pouquíssimas amostras serão buscadas...
 """
 
 # ╔═╡ 874544a1-07af-4509-a34d-68d77558aaae
 md"""
-
 W-E: $(@bind ix₂ Slider(0.0:0.001:1.0, default=0.015))
 N-S: $(@bind iy₂ Slider(0.0:0.001:1.0, default=0.172))
 
-Tamanho do passo: $(@bind lag_size Slider(0.05:0.05:1.0, default=0.3,
+Passo: $(@bind lag_size Slider(0.05:0.05:1.0, default=0.3,
 										  show_value = true)) m
-
 """
 
 # ╔═╡ 2965ea0b-9b5e-4460-a735-e555733b2d83
 begin
-	# Random seed
+	# semente aleatóia
 	Random.seed!(42)
 	
-	# Generating georeferenced samples
+	# amostras georreferenciadas
 	table₂ = georef(values₁, PointSet(rand(2,25)))
 	
-	# Ploting samples
+	# plotagem das amostras
 	plot(table₂, xlims = (-0.2,1.2), ylims = (-0.2,1.2), title = "Au (g/t)",
 		 xlabel = "X(m)", ylabel = "Y(m)", clims = (0,1))
 	
-	# Ploting h vector
+	# plotagem do vetor h
 	plot!([(ix₂,iy₂),(ix₂+lag_size,iy₂)], arrow = true, color = :red, lw = 2)
 end
 
 # ╔═╡ 9d60b923-72e7-42c8-8ef3-d4a590e3f600
-html"""
-
-<p align="center">
-    <b>Figura 5</b>: Exemplo de busca de pares de amostras em uma malha irregular.
-</p>
-
+md"""
+**Figura 05:** Exemplo de busca de pares de amostras em uma malha irregular.
 """
 
 # ╔═╡ 7c00b7a2-5c09-46f5-ba8d-03786fd606b8
 md"""
 
-Uma alternativa comumente utilizada é a definição de uma **tolerância de passo (lagtol)** para que mais amostras sejam buscadas.
+Uma alternativa comumente utilizada é a definição de uma **tolerância de passo** para que mais amostras sejam buscadas.
 
-A tolerância do passo é definida como metade do tamanho do passo:
+A tolerância do passo é normalmente definida como metade do tamanho do passo *(Deutsch, 2015)*:
 
 ```math
 lagtol = \frac{lag}{2} 
-
 ```
 
-Essa abordagem permite que:
+Se houver poucos dados, uma tolerância maior pode ser necessária, o que pode resultar intervalos de tolerância sobrepostos e um variograma mais estável. Por outro lado, em caso de malhas densas ou aproximadamente regulares, uma tolerância de passo menor pode ser adotada *(Deutsch, 2015)*.
 
-- Não haja overlap de amostras. As amostras são utilizadas apenas em um passo.
+A Figura 06 apresenta amostras colineares de uma malha amostral irregular. Utilize o slider `W-E` para transladar o vetor $h$ e marque a caixa para visualizar a tolerância do passo.
 
-- Não haja gap de amostras. As amostras serão sempre utilizadas em algum dos passos.
-
+Note que, quando a tolerância de passo é adotada, todos os pontos inseridos entre as linhas tracejadas podem ser buscados. Por outro lado, caso essa tolerância não fosse adotada, apenas um par de pontos seria buscado para o cálculo do variograma.
 """
-
-# ╔═╡ f1f163f7-eabc-4808-82e4-98ecfeddc730
-md"""
-
-O exemplo abaixo ilustra amostras colineares de uma **malha amostral irregular** (*Figura 6*). Note que, caso a tolerância de passo não fosse adotada, apenas um par de pontos seria buscado para o cálculo do variograma.
-
-"""
-
-# ╔═╡ 8bd1b52b-b6a8-489e-ae74-be2931eef4ee
-begin
-	# Random seed
-	Random.seed!(42)
-	
-	# Generating samples
-	coords₃ = [(1.,1.),(1.6,1.),(1.9,1.),(2.2,1.),(2.8,1.),(3.6,1.),(3.8,1.)]
-	values₃ = DataFrame(Au = rand(7))
-	
-	# Georeferencing samples
-	samples₃ = georef(values₃, coords₃)
-end;
 
 # ╔═╡ 841ffdd2-16b4-4c19-8f03-70942a4ebb2e
 md"""
-
 W-E: $(@bind ix₃ Slider(1.:0.1:2.8, default=1))
 
 Tolerância de passo: $(@bind lag_tol CheckBox())
-
 """
 
 # ╔═╡ f738e56e-7725-4d52-a700-960ce372f025
 begin
+	# semente aleatória
+	Random.seed!(42)
+	
+	# geração de amostras aleatórias
+	coords₃ = [(1.,1.),(1.6,1.),(1.9,1.),(2.2,1.),(2.8,1.),(3.6,1.),(3.8,1.)]
+	values₃ = DataFrame(Au = rand(7))
+	
+	# amostras georreferenciadas
+	samples₃ = georef(values₃, coords₃)
 	
 	if lag_tol
-		# Ploting samples
-		plot(samples₃, xlims = (0.,4.5), ylims = (0,2), title = "Au (g/t)",
-			 xlabel = "X(m)", ylabel = "Y(m)", clims = (0,1))
+		# plotagem de amostras
+		plot(samples₃, xlims = (0.,4.5), ylims = (0,2), colorbar_title="Au (g/t)",
+			 title="", xlabel = "X(m)", ylabel = "Y(m)", clims = (0,1))
 		
-		# Ploting h vector
+		# plotagem do vetor h
 		plot!([(ix₃,1.),(ix₃+1,1.)], arrow = true, color = :red, lw = 2)
 
-		# Ploting lag - ½ lag dashed line
+		# plotagem da linha tracejada lag - ½ lag
 		vline!([ix₃ + 0.5], color = :gray, ls = :dash)
 		annotate!(ix₃ + 0.5, 2.1, text("lag - ½ lag", 7, :gray))
 
-		# Ploting lag solid line
+		# plotagem da linha contínua lag
 		vline!([ix₃+1], color = :red)
 		annotate!(ix₃+1, 2.1, text("lag", 7, :red))
 
-		# Ploting lag + ½ lag dashed line
+		# plotagem da linha tracejada lag + ½ lag
 		vline!([ix₃ + 1.5], color = :gray, ls = :dash)
 		annotate!(ix₃ + 1.5, 2.1, text("lag + ½ lag", 7, :gray))
 		
 	else
-		# Ploting samples
-		plot(samples₃, xlims = (0.,4.5), ylims = (0,2), title = "Au (g/t)",
-			 xlabel = "X(m)", ylabel = "Y(m)", clims = (0,1))
+		# plotagem de amostras
+		plot(samples₃, xlims = (0.,4.5), ylims = (0,2), colorbar_title="Au (g/t)",
+			 title="", xlabel = "X(m)", ylabel = "Y(m)", clims = (0,1))
 
-		# Ploting h vector
+		# plotagem do vetor h
 		plot!([(ix₃,1.),(ix₃+1,1.)], arrow = true, color = :red, lw = 2)
 
-		# Ploting lag solid line
+		# plotagem da linha contínua lag
 		vline!([ix₃+1], color = :red)
 		annotate!(ix₃+1, 2.1, text("lag", 7, :red))
 	end
-		
 end
 
 # ╔═╡ 650fc66a-3f8e-45d5-a898-5c783a8d12a1
-html"""
-
-<p align="center">
-    <b>Figura 6</b>: Exemplo de amostras colineares não equidistantes.
-</p>
-
-"""
-
-# ╔═╡ ace40206-7ce6-4a64-b1ae-bd19d295158e
 md"""
-
-#### Tolerância angular
-
-Além da tolerância linear (i.e. tolerância de passo), deve-se também definir uma **tolerância angular** que, por sua vez, é dividida em dois parâmetros:
-
-- Tolerância de azimute
-
-- Tolerância de mergulho
-
-A **tolerância angular (angtol)** é definida como metade do **incremento angular (anginc)**:
-
-```math
-angtol = \frac{anginc}{2} 
-
-```
-
-A convenção acima permite que:
-
-- Não haja overlap de amostras.
-
-- Não haja gap de amostras.
-
-
-> **Nota:** a fórmula acima é válida tanto para a tolerância de azimute quanto para a tolerância de mergulho.
-
-> **Nota:** para malhas irregulares, é necessária a definição das tolerâncias de azimute e de mergulho em um contexto 3D, mas apenas a definição da tolerância de azimute em um contexto 2D.
-
-"""
-
-# ╔═╡ 049568a8-0d02-403d-9d87-ce9a5bf5e242
-md"""
-
-A *Figura 7* ilustra um exemplo de tolerâncias angulares (i.e. azimute e mergulho) para um incremento angular de 45°.
-
-"""
-
-# ╔═╡ 728f75bd-0fc5-43c6-9551-4304925aa97b
-md"""
-
-Azimute: $(@bind dip_dir Slider(0:45:180, default=0, show_value = true))°
-
-Mergulho: $(@bind dip Slider(0:45:180, default=0, show_value = true))°
-
-"""
-
-# ╔═╡ 4c5b95f2-5ad6-4f18-9cc0-9bd96eb3bf29
-begin
-	# Ploting dip direction solid line
-	dip_dir_tol = plot([sph2cart(dip_dir+180),sph2cart(dip_dir)],
-					   color = :red, ticks = false, xlims = (-1,1),
-					   ylims = (-1,1), grid = false, lw = 3,
-					   arrow = true, axis = false, legend = false,
-					   title = "Tolerância de Azimute", size = (300,300))
-	
-	# Ploting dashed dip direction tolerance lines
-	plot!([sph2cart(dip_dir+180-22.5),sph2cart(dip_dir-22.5)], color = :gray,
-		  ls = :dash)
-	
-	plot!([sph2cart(dip_dir+180+22.5),sph2cart(dip_dir + 22.5)], color = :gray,
-		  ls = :dash)
-	
-	# Ploting N-S line
-	vline!([0], color = :black)
-	
-	# Ploting W-E line
-	hline!([0], color = :black)
-end;
-
-# ╔═╡ 7fa3052f-52c8-48b5-ab3a-8401a6d8f93a
-begin
-	# Ploting dip solid line
-	dip_tol = plot([sph2cart(dip+270),sph2cart(dip+90)], color = :red,
-				   ticks = false, xlims = (-1,1), ylims = (-1,1),
-				   grid = false, lw = 3, arrow = true, axis = false,
-				   legend = false, title = "Tolerância de Mergulho",
-				   size = (300,300))
-	
-	# Ploting dashed dip tolerance lines
-	plot!([sph2cart(dip+270-22.5),sph2cart(dip+90-22.5)], color = :gray,
-		  ls = :dash)
-	
-	plot!([sph2cart(dip+270+22.5),sph2cart(dip+90+22.5)], color = :gray,
-		  ls = :dash)
-	
-	# Ploting W-E line
-	hline!([0], color = :black)
-end;
-
-# ╔═╡ 9709372d-3d5f-4bff-8ca1-adbb4dbeda23
-# Ploting dip direction and dip
-plot(dip_dir_tol, dip_tol, layout = (1,2), size = (600,300))
-
-# ╔═╡ b5bb3401-48d5-4d22-bbed-06427862062e
-html"""
-
-<p align="center">
-    <b>Figura 7</b>: Tolerâncias angulares.
-</p>
-
+**Figura 06:** Exemplo de busca de amostras colineares irregulares. Marque a caixa para visualizar a tolerância do passo.
 """
 
 # ╔═╡ 5e555810-f34d-402c-ac0a-17a423f420bc
-
 md"""
 #### Largura da banda
 
-A **largura da banda** é um parâmetro de restrição facultativo que pode ser utilizado em conjunto com a tolerância angular.
-
-Esse parâmetro é definido pela distância entre a reta da direção de cálculo do variograma experimental e a linha de tolerância angular. A partir de uma distância igual à largura da banda a busca por amostras se paraleliza (*Figura 8*).
-
+A **largura da banda** é um parâmetro de tolerância que pode ser utilizado para limitar a busca de pares de amostras indesejados (*Deutsch, 2015*). A Figura 07 mostra a largura da banda (seta dupla preta), bem como os demais parâmetros para o cálculo do variograma experimental.
 """
 
 # ╔═╡ 6433f0dc-04f8-450e-9a94-f8cfa8cda552
-html"""
-
-<p align="center">
-    <img src="https://i.postimg.cc/7Zb0qPyc/Figure-01.png" style="height : 300px">
-</p>
-
-<p align="center">
-    <b>Figura 8</b>: Largura da banda.
-</p>
-
-"""
-
-# ╔═╡ 6f59e6db-0632-483a-89be-6c82dd188d60
 md"""
-
-### Malhas regulares x malhas irregulares
-
-Para **malhas amostrais regulares**, os parâmetros de variograma experimental a serem definidos são:
-
-- Número de direções de cálculo
-
-    - *Exemplo:* 4 direções
-
-- Direções de cálculo
-
-    - *Exemplo:* 000°, 045°, 090°, 135°
-
-- Tamanho do passo
-
-    - *Exemplo:* 25 m
-
-- Número de passos
-
-    - *Exemplo:* 5 passos (25 m, 50 m, 75 m, 100 m, 125 m)
-
-No caso de **malhas amostrais irregulares**, os parâmetros de variograma experimental a serem definidos são:
-
-- Número de direções de cálculo
-
-    - *Exemplo:* 4 direções
-
-- Direções de cálculo e tolerância angular
-
-    - *Exemplo:* 000° ± 22.5°, 045° ± 22.5°, 090° ± 22.5°, 135° ± 22.5°
-
-- Tamanho do passo e tolerância do passo
-
-    - *Exemplo:* 25 ± 12.5 m
-
-- Número de passos
-
-    - *Exemplo:* 5 passos (25 m, 50 m, 75 m, 100 m, 125 m)
-
-- Largura da banda
-
-    - *Exemplo:* 30 m
-
+![bandwidth](https://i.postimg.cc/vHmM45Qh/bandwidth.png)
+**Figura 07:** Parâmetros utilizados para o cálculo do variograma experimental. A origem do gráfico pode ser entendida como o centro de uma amostra e os "alvos" como as demais amostras. 
 """
 
 # ╔═╡ e80e5e16-59fb-4ec0-a9f0-6b8b97bc8d36
@@ -664,273 +504,113 @@ md"""
 
 A partir dos variogramas experimentais só é possível obter valores médios de variograma $γ(h)$ para distâncias iguais a múltiplos do tamanho de passo $h$ escolhido.
 
-Portanto, é necessário o ajuste de um **modelo matemático contínuo**, de modo que saberemos o valor do variograma $γ(h)$ para qualquer distância entre pares de amostras $h$.
+Portanto, é necessário o ajuste de um *modelo matemático contínuo*, de modo que saberemos o valor de $\gamma$ para qualquer distância entre pares de amostras $h$.
 
-O procedimento de se ajustar um modelo teórico contínuo ao variograma experimental é denominado **modelagem do variograma** (*Figura 9*).
+O procedimento de se ajustar um modelo teórico contínuo ao variograma experimental é denominado **modelagem do variograma**. Clique na caixa abaixo para ajustar um modelo teórico ao variograma experimental da Figura 08...
 
 """
 
 # ╔═╡ 9891913d-e735-4ec8-b09c-49b51417f18d
-# Fitting experimental variogram 
+# ajuste teórico do variograma
 varmod = fit(GaussianVariogram, γ₁);
 
 # ╔═╡ 52c19e93-8534-4b59-a164-3f12d23d5440
 md"""
 Ajuste do modelo: $(@bind fit_model CheckBox())
-
 """
 
 # ╔═╡ 7a8a49a2-007e-409a-9a45-c76f717f75f8
 begin
 	if fit_model
-		# Ploting experimental variogram
-		plot(γ₁, color = :orange, line = false)
+		# plotagem do variograma experimental
+		plot(γ₁, marker=(4,:orange), line=false, ylims=(0,1.0),
+			 xlims=(0,50), legend=false)
 	
-		# Ploting variogram model
-		plot!(varmod, ylims = (0,1.0), xlims = (0,50), label = "Ajuste Teórico",
-		  	  legend = false)
+		# plotagem do ajuste teórico (modelo)
+		plot!(varmod, ylims=(0,1.0), color=:black, xlims=(0,50),
+			  label="Ajuste Teórico", legend=false)
 
 	else
-		# Ploting experimental variogram
-		plot(γ₁, color = :orange, line = false, ylims = (0,1.0), xlims = (0,50),
-			 legend = false)
+		# plotagem do variograma experimental
+		plot(γ₁, marker=(4,:orange), line=false, ylims=(0,1.0),
+			 xlims=(0,50), legend=false)
 	end
 end	
 
 # ╔═╡ f92eedbf-097d-45f6-a550-ccc8c2f9841b
-html"""
-
-<p align="center">
-    <b>Figura 9</b>: Exemplo de ajuste de um modelo teórico a um variograma experimental.
-</p>
-
-"""
-
-# ╔═╡ ea67e941-496f-45a3-8b0f-058d573291d8
 md"""
-
-### Elementos do variograma
-
-Para se modelar o variograma, deve-se configurar quatro elementos:
-
-- Alcance
-
-- Efeito Pepita
-
-- Patamar
-
-- Tipo de Modelo
-
-"""
-
-# ╔═╡ 03a46b21-c522-4036-a710-bd6ce0a26a1b
-md"""
-
-##### Alcance (a)
-
-O **alcance (_range_)** consiste na distância máxima até onde se consegue estabelecer alguma interdependência espacial entre pares de amostras.
-
-Em outras palavras, o alcance define até qual distância $h$ existe correlação espacial entre pares de amostras. Portanto:
-
-> **Nota:** para distâncias $h$ superiores ao alcance, não há interdependência espacial entre amostras.
-
-"""
-
-# ╔═╡ 510759f5-3838-4db7-b683-e39677a2551b
-md"""
-
-##### Efeito Pepita (C₀)
-
-O **efeito pepita (_nugget effect_)** é definido como a descontinuidade próxima a origem do variograma. É o valor de $γ(h)$ quando $h$ tende a zero. Perceba que:
-
-> **Nota:** $γ(h) = C_0, \forall h → 0$
-
-> **Nota:** $γ(h) = 0, \forall h = 0$
-
-"""
-
-# ╔═╡ c75b37b1-b13a-4d3b-949c-639e4e5dc01b
-md"""
-
-##### Patamar (C + C₀)
-
-O **patamar (_sill_)** é definido como o máximo valor de $γ(h)$ que as amostras podem apresentar.
-
-Na prática, uma abordagem muito utilizada é considerar o patamar como o valor da **variância à priori** (i.e. variância amostral) da variável de interesse.
-
+**Figura 08:** Exemplo de ajuste de um modelo teórico a um variograma experimental.
 """
 
 # ╔═╡ 83593f8e-8dd2-40b1-903b-8712bb9eb048
 md"""
+### Tipos de modelo
 
-##### Tipo de modelo
+Nem todas as funções matemáticas podem ser utilizadas para ajustar variogramas experimentais. Essas funções devem ser *positivas definidas*, ou seja, quando $f(0) = 0$ e $f(x)>0, \forall x\neq0$. Essa condição deve ser satisfeita para que a a variância de krigagem seja positiva (*Sinclair & Blackwell, 2006*).
 
-Nem todas as funções matemáticas podem ser utilizadas para ajustar variogramas experimentais. Para ser utilizada, a função determinística deve ser:
-
-- Contínua
-
-- Monotônica crescente
-
-Existe um pouco mais de uma dezena de funções que podem ser utilizadas como ajustes teóricos. Dessas funções, há três que ajustam a grande maioria dos fenômenos naturais:
-
+Embora existam cerca de uma dúzia de modelos de variogramas teóricos, três deles explicam a grande maioria dos fenômenos espaciais (*Yamamoto & Landim, 2015*):
 - Modelo Gaussiano
-
 - Modelo Esférico
-
 - Modelo Exponencial
-
-O **tipo de modelo (_model_)** controla a variabilidade a pequenas distâncias, ou seja, o comportamento próximo à origem do variograma.
-
-
 """
 
 # ╔═╡ a6802bda-7b7a-4d98-bb08-bcbe8a990e01
 md"""
-
-###### Modelo Gaussiano
-
-- Apresenta comportamento próximo à origem parabólico.
-
-- Esse tipo de modelo teórico é normalmente utilizado para ajustar variogramas experimentais de fenômenos de baixa heterogeneidade.
-
-- Sua equação é descrita como:
+O **modelo gaussiano** apresenta comportamento próximo à origem parabólico e é normalmente utilizado para ajustar variogramas experimentais de fenômenos de baixa heterogeneidade. Sua equação é dada por:
 
 ``` math
-
 γ(h) = C_0 + C \left[ 1 - exp \left[- \left(\frac{h}{a} \right)^2 \right]  \right] 
-
 ```
 
-"""
-
-
-# ╔═╡ bd8328a0-9cd3-4eec-8c68-f6f15f296f4b
-md"""
-
-###### Modelo Esférico
-
-- Apresenta comportamento próximo à origem linear.
-
-- Esse tipo de modelo teórico é normalmente utilizado para ajustar variogramas experimentais de fenômenos de intermediária heterogeneidade.
-
-- É o modelo mais utilizado na indústria da mineração.
-
-- Sua equação é descrita como:
+O **modelo esférico** apresenta comportamento próximo à origem linear e é normalmente utilizado para ajustar variogramas experimentais de fenômenos de intermediária heterogeneidade. Esse é a função teórica mais comum para modelar a continuidade espacial de teores metalíferos. Sua equação é descrita como:
 
 ``` math
-γ(h) = C_0 + C \left[\frac{3h}{2a} - \frac{1}{2}\left(\frac{h}{a}\right)^3 \right], ∀ h < a)
+γ(h) = C_0 + C \left[\frac{3h}{2a} - \frac{1}{2}\left(\frac{h}{a}\right)^3 \right], ∀ h < a
 ```
 
 ``` math
 γ(h) = C_0 + C, ∀ h ≥ a
 ```
 
-"""
-
-# ╔═╡ ed5011d1-8d0a-4ace-8baa-0af219b3e3e2
-md"""
-
-###### Modelo Exponencial
-
-- Apresenta comportamento próximo à origem linear. Entretanto, a inclinação desse modelo nas proximidades da origem é maior do que a inclinação do Modelo Esférico.
-
-- Esse tipo de modelo teórico é normalmente utilizado para ajustar variogramas experimentais de fenômenos de elevada heterogeneidade.
-
-- Sua equação é descrita como:
+O **modelo exponencial** apresenta comportamento próximo à origem linear. Entretanto, a inclinação desse modelo nas proximidades da origem é maior do que a inclinação do modelo esférico. Esse tipo de modelo teórico é normalmente utilizado para ajustar variogramas experimentais de fenômenos de elevada heterogeneidade. Sua equação é definida como:
 
 ``` math
 γ(h) = C_0 + C \left[1 - exp \left[-\left(\frac{h}{a} \right) \right] \right]
 ```
 
-"""
-
-# ╔═╡ d1e9297b-04c0-47ad-91e8-77648b205d10
-md"""
-
-Termos das equações:
-
--  $γ(h)$ = valor do variograma para a distância $h$
--  $C_0$ = efeito pepita
--  $h$ = passo
--  $C$ = contribuição ao patamar
--  $a$ = alcance
-
-"""
-
-# ╔═╡ e7157b79-368d-4ce1-97d3-22110e3359da
-md"""
-
-A *Figura 10* ilustra graficamente os quatro elementos que constituem o variograma. 
-
+Selecione, na lista suspensa abaixo, o tipo de modelo de variograma que deseja visualizar (Figura 09). Tente observar a diferença do comportamento próximo à origem entre os três ajustes teóricos...
 """
 
 # ╔═╡ 6d0f5d99-f7e2-4f53-b835-c3b345613e4a
 md"""
-
-Modelo Teórico: $(@bind model Select(["Gaussiano","Esférico","Pentaesférico","Exponencial"],
-		default = "Gaussiano"))
-
-Ef. Pepita: $(@bind c₀ Slider(0.0:0.1:0.5, default=0.0, show_value=true))
-
-Patamar: $(@bind cₜ Slider(0.5:0.1:1.0, default=1.0, show_value=true))
-
-Alcance: $(@bind a Slider(5.0:10:45.0, default=25.0, show_value=true)) m
-
+Modelo Teórico: $(@bind model Select(["Gaussiano","Esférico","Exponencial"],
+				  default = "Gaussiano"))
 """
 
 # ╔═╡ 341ec3f6-c871-431f-8ffa-85f4c43ae138
-# Gaussian variogram model
+# modelo gaussiano
 if model == "Gaussiano"
-	γ₃ = GaussianVariogram(nugget = Float64(c₀),
-						   sill = Float64(cₜ),
-		 				   range = Float64(a))
+	γ₃ = GaussianVariogram(nugget=0., sill=1., range=10.)
 
-# Spherical variogram model
+# modelo esférico
 elseif model == "Esférico"
-	γ₃ = SphericalVariogram(nugget = Float64(c₀),
-						    sill = Float64(cₜ),
-						    range = Float64(a))
+	γ₃ = SphericalVariogram(nugget=0., sill=1., range=10.)
 
-# Pentaspherical variogram model
-elseif model == "Pentaesférico"
-	γ₃ = PentasphericalVariogram(nugget = Float64(c₀),
-						   		 sill = Float64(cₜ),
-						   		 range = Float64(a))
-
-# Exponential variogram model
+# modelo exponencial
 else
-	γ₃ = ExponentialVariogram(nugget = Float64(c₀),
-						      sill = Float64(cₜ),
-						      range = Float64(a))
-
+	γ₃ = ExponentialVariogram(nugget=0., sill=1., range=10.)
 end;
 
 # ╔═╡ 61b8631b-8295-4dea-a5dd-189bf578bc8c
 begin
-	# Ploting variogram model
+	# plotagem do modelo de variograma
 	plot(γ₃, color = :black, lw = 2, label = model,
-		 legend = :topleft, ylims = (0.,1.5), xlims = (0.,65.))
-	
-	# Ploting nugget effect dashed line
-	hline!([c₀], color = :red, ls = :dash, label = "Ef. Pepita")
-	annotate!(55,c₀+0.05,text("Ef. Pepita",10,:red))
-	
-	# Ploting sill dashed line
-	hline!([cₜ], color = :green, ls = :dash, label = "Patamar")
-	annotate!(55,cₜ+0.05,text("Patamar",10,:green))
-	
-	# Ploting range dashed line
-	vline!([a], color = :blue, ls = :dash, label = "Alcance")
-	annotate!(a,-0.05,text("Alcance",10,:blue))
+		 legend = :topleft, ylims = (0.,1.5), xlims = (0.,25.))
 end
 
 # ╔═╡ ab5e6c19-789b-4944-ba8e-f983a9a2652c
-html"""
-
-<p align="center">
-    <b>Figura 10</b>: Elementos do variograma.
-</p>
-
+md"""
+**Figura 09:** Tipos de modelo do variograma.
 """
 
 # ╔═╡ 8b4ee7b2-2a01-44ae-8539-27f1815fe634
@@ -938,18 +618,16 @@ md"""
 
 ## 5. Tipos de anisotropia
 
-Na geoestatística, a **anisotropia** existe quando um ou mais elementos do variograma variam com a mudança da direção. Existem três tipos (*Figura 11*):
-
+Na modelagem de variogramas, a anisotropia existe quando um ou mais elementos do variograma variam com a mudança da direção. Existem três tipos (*Yamamoto & Landim, 2015*):
 - *Anisotropia Zonal*: patamar varia de acordo com a mudança de direção.
-
 - *Anisotropia Geométrica*: alcance varia de acordo com a mudança de direção.
-
 - *Anisotropia Mista*: patamar e alcance variam de acordo com a mudança de direção.
 
-> **Nota:** embora existam três tipos de anisotropia, é comum considerar apenas a anisotropia geométrica para a modelagem do variograma.
+> ⚠️ Embora existam três tipos de anisotropia, é comum considerar apenas a anisotropia geométrica para a modelagem do variograma.
 
-> **Nota:** não existe anisotropia de efeito pepita, uma vez que esse elemento é, por definição, isotópico.
+> ⚠️ Não existe anisotropia de efeito pepita, uma vez que esse elemento é, por definição, isotópico.
 
+A partir da lista suspensa abaixo, compare os diferentes tipos de anisotropia (Figura 10)...
 """
 
 # ╔═╡ 83d6c4fe-bcd6-4d7f-93ef-2e093b1284fa
@@ -961,40 +639,36 @@ Tipo de anisotropia: $(@bind aniso Select(["Zonal","Geométrica","Mista"],
 """
 
 # ╔═╡ 187c01ca-053e-4994-a748-cf9b16683a50
-# Zonal anisotropy
+# anisotropia zonal
 if aniso == "Zonal"
 	γ_aniso₁ = SphericalVariogram(nugget = 0.1, range = 50.0, sill = 1.0)
-	γ_aniso₂ = SphericalVariogram(nugget = 0.1, range = 50.0, sill = 1.5)
+	γ_aniso₂ = SphericalVariogram(nugget = 0.1, range = 50.0, sill = 1.2)
 
-# Geometric anisotropy
+# anisotropia geométrica
 elseif aniso == "Geométrica"
 	γ_aniso₁ = SphericalVariogram(nugget = 0.1, range = 50.0, sill = 1.0)
 	γ_aniso₂ = SphericalVariogram(nugget = 0.1, range = 30.0, sill = 1.0)
 
-# Mixed anisotropy
+# anisotropia mista
 else
-	γ_aniso₁ = SphericalVariogram(nugget = 0.1, range = 50.0, sill = 1.5)
+	γ_aniso₁ = SphericalVariogram(nugget = 0.1, range = 50.0, sill = 1.2)
 	γ_aniso₂ = SphericalVariogram(nugget = 0.1, range = 30.0, sill = 1.0)
 
 end;
 
 # ╔═╡ b9634a1e-f225-4986-867f-fd36f56882df
 begin
-	# Ploting red variogram model
+	# plotagem do modelo de variograma vermelho
 	plot(γ_aniso₁, color = :red, lw = 2, legend = false,
 		 title = "Anisotropia $aniso")
 	
-	# Ploting blue variogram model
-	plot!(γ_aniso₂, color = :blue, lw = 2, xlims = (0,80), ylims = (0,2))
+	# plotagem do modelo de variograma azul
+	plot!(γ_aniso₂, color = :blue, lw = 2, xlims = (0,80), ylims = (0,1.5))
 end
 
 # ╔═╡ ee09dcab-2298-444c-ad9f-f79268c9056c
-html"""
-
-<p align="center">
-    <b>Figura 11</b>: Tipos de anisotropia.
-</p>
-
+md"""
+**Figura 10:** Tipos de anisotropia.
 """
 
 # ╔═╡ 0f28a997-4945-47fe-83b9-058726bc8041
@@ -1002,14 +676,16 @@ md"""
 
 ## 6. Estruturas imbricadas
 
-A **estrutura do variograma** é a porção da equação do ajuste teórico em que o valor de $C$ cresce com o aumento da distância $h$.
+Em muitos casos não é possível ajustar de maneira adequada um variograma experimental por meio um modelo teórico simples. Esse tipo de situação ocorre quando há mais de uma estrutura nos dados em questão (i.e. a regionalização está presente em diferentes escalas) (*Sinclair & Blackwell, 2006*). Dessa forma, podemos utilizar o imbricamento/aninhamento de estruturas, com o intuito de tornar a modelagem do variograma mais flexível. 
+
+A **estrutura do variograma** é a porção da equação do ajuste teórico em que o valor de $C$ cresce com o aumento da distância $h$:
 
 ``` math
 γ(h) = C_0 +
 \underbrace{C \left[\frac{3h}{2a} - \frac{1}{2}\left(\frac{h}{a}\right)^3 \right]}_\text{estrutura do variograma}
 ```
 
-> **Nota:** o efeito pepita $C_0$ não pertence à estrutura do variograma.
+> ⚠️ O efeito pepita $C_0$ não pertence à estrutura do variograma.
 
 O **imbricamento/aninhamento das estruturas** é definido como a soma de $n$ estruturas do variograma. A equação abaixo ilustra um imbricamento de $n$ estruturas para um modelo esférico:
 
@@ -1020,87 +696,82 @@ O **imbricamento/aninhamento das estruturas** é definido como a soma de $n$ est
 \underbrace{C_n \left[\frac{3h}{2a_n} - \frac{1}{2}\left(\frac{h}{a_n}\right)^3 \right]}_\text{n-ésima estrutura}
 ```
 
-O patamar ($C$) consiste na soma entre todas as contribuições ao patamar e o efeito pepita:
+No caso de variogramas imbricados, o patamar ($C$) consiste na soma entre todas as contribuições ao patamar e o efeito pepita:
 
 ```math
 C = C_0 + C_1 + C_2 + ... + C_n
 ```
 
-> **Nota:** normalmente, utiliza-se, no máximo, três estruturas imbricadas em um modelo de variograma.
+> ⚠️ Normalmente, utiliza-se, no máximo, três estruturas imbricadas em um modelo de variograma.
 
-O imbricamento de estruturas permite uma maior flexibilidade na modelagem do variograma. A *Figura 12* ilustra, graficamente, um exemplo de modelo de variograma construído a partir do imbricamento de duas estruturas.
+A Figura 11 mostra um exemplo de modelo de variograma imbricado...
+"""
 
+# ╔═╡ 750d0cc4-d117-48be-869a-234acfe0c6d4
+md"""
+#### 🖊️ Exercício
+
+Utilize os sliders abaixo para modelar o variograma experimental. Note o modelo de variograma é constituído por estruturas aninhadas.
 """
 
 # ╔═╡ f95ffa70-f924-404a-8cec-fc281b8588e2
 md"""
-
 Efeito pepita: $(@bind nested_cₒ Slider(0.00:0.1:4.0,
-										default=3.0, show_value=true))
+										default=0.0, show_value=true))
 
 Contrib. 1ª estrutura: $(@bind nested_c₁ Slider(0.0:0.1:10.0,
 													default=2.6, show_value=true))
 
 Contrib. 2ª estrutura: $(@bind nested_c₂ Slider(0.0:0.1:10.0,
-													default=2.7, show_value=true))
+													default=4.1, show_value=true))
 
-Alcance 1ª estrutura: $(@bind nested_r₁ Slider(10.0:1.0:156.0, default=83.0, show_value=true)) m
+Alcance 1ª estrutura: $(@bind nested_r₁ Slider(10.0:1.0:156.0, default=77.0, show_value=true)) m
 
-Alcance 2ª estrutura: $(@bind nested_r₂ Slider(10.0:1.0:156.0, default=101.0, show_value=true)) m
-
+Alcance 2ª estrutura: $(@bind nested_r₂ Slider(10.0:1.0:156.0, default=126.0, show_value=true)) m
 """
 
 # ╔═╡ 3f0465bc-444c-4026-a677-a182366790ae
 begin
-	# Nugget structure
+	# ef. pepita
 	γ_nested₀ = NuggetEffect(Float64(nested_cₒ))
 	
-	# 1ª structure
+	# 1ª estrutura
     γ_nested₁ = SphericalVariogram(sill = Float64(nested_c₁),
 								   range = Float64(nested_r₁))
 
-	# 2ª structure
+	# 2ª estrutura
     γ_nested₂ = SphericalVariogram(sill = Float64(nested_c₂),
 								   range = Float64(nested_r₂))
 
-	# Nested model
+	# modelo aninhado
     γ_nested  = γ_nested₀ + γ_nested₁ + γ_nested₂
 	
-	# Ploting experimental variogram
+	# plotagem do variograma experimental
 	plot(γ₂, color = :orange, legend = false, line = false)
 	
-	# Ploting variogram model
-	plot!(γ_nested, color = :black, lw = 2, xlims = (0,220), ylims = (0,15),
-		  title = "Variograma Imbricado")
+	# plotagem do modelo aninhado
+	plot!(γ_nested, color = :black, lw = 2, xlims = (0,220), ylims = (0,15))
 	
-	# Ploting range dashed line
+	# plotagem do alcance
 	vline!([nested_r₂], color = :gray, ls = :dash)
 end
 
 # ╔═╡ 864c9c06-e52b-4de8-bc16-d053fa3c0346
-html"""
-
-<p align="center">
-    <b>Figura 12</b>: Exemplo de modelo de variograma imbricado.
-</p>
-
+md"""
+**Figura 11:** Exemplo de modelo de variograma imbricado.
 """
 
 # ╔═╡ 538bf67b-33c6-45c3-b5bf-328922debb26
 md"""
-
 ## 7. Variograma anisotrópico
 
 Como a continuidade espacial de fenômenos naturais tende a ser anisotrópica e o objetivo da variografia é justamente descrever a continuidade espacial desses fenômenos, é plausível que o variograma seja anisotrópico.
 
-A forma mais simples e coerente para se representar anisotropia é por meios de elipses (2D) ou elipsoides (3D).
+Como dito no início do módulo, a forma mais simples e coerente para se representar anisotropia é por meios de elipses (2D) ou elipsoides (3D).
 
-Em um contexto 3D, assumindo condições de **anisotropia geométrica**, para representar a continuidade espacial de um fenômeno, basta encontrarmos os eixos principais do elipsoide, de modo que:
-
+Em um contexto 3D, assumindo condições de *anisotropia geométrica*, para representar a continuidade espacial de um fenômeno, basta encontrarmos os eixos principais do elipsoide, de modo que:
 - O efeito pepita será isotrópico.
-
 - O patamar será assumido como isotrópico.
-
 - O alcance será anisotrópico.
 
 Portanto, os eixos do elipsoide representam justamente a variação do alcance para diferentes direções.
@@ -1111,90 +782,85 @@ A equação de um **modelo esférico anisotrópico** é descrita como:
 γ(h) = C_0 + C \left[\frac{3h}{2(a_x,a_y,a_z)} - \frac{1}{2}\left(\frac{h}{(a_x,a_y,a_z)}\right)^3 \right]
 ```
 
-A *Figura 13* ilustra graficamente um exemplo de modelo de variograma anisotrópico.
-
+A Figura 12 ilustra graficamente um exemplo de modelo de variograma anisotrópico. Utilize os sliders abaixo para alterar os alcances primário (Y), secundário (X) e terciário (Z)...
 """
 
 # ╔═╡ 18282939-e7ef-4da4-aade-72e7b01886de
 md"""
-
-Alcance em Y: $(@bind range_y Slider(10.0:2.0:120.0, default=100.0, show_value=true)) m
+Alcance em Y: $(@bind range_y Slider(10.0:2.0:120.0, default=99.0, show_value=true)) m
 
 Alcance em X: $(@bind range_x Slider(10.0:2.0:120.0, default=66.0, show_value=true)) m
 
 Alcance em Z: $(@bind range_z Slider(10.0:2.0:120.0, default=26.0, show_value=true)) m
-
 """
 
 # ╔═╡ dc47965d-e732-44e4-875c-b4922ff4bd1f
 begin
-	# Primary model variogram
+	# modelo de variograma primário
 	γ_1st = SphericalVariogram(nugget = 0.1, range = Float64(range_y), sill = 5.0)
 	
-	# Secondary model variogram
+	# modelo de variograma secundário
 	γ_2nd = SphericalVariogram(nugget = 0.1, range = Float64(range_x), sill = 5.0)
 	
-	# Tertiary model variogram
+	# modelo de variograma terciário
 	γ_3rd = SphericalVariogram(nugget = 0.1, range = Float64(range_z), sill = 5.0)
 end;
 
-# ╔═╡ d6a4e6dd-7ace-4406-be57-804b4c2537e5
-md"""
-
-| Estrutura |Ef. Pepita | Alcance em X | Alcance em Y | Alcance em Z | Variância |
-|:---------:|:---------:|:------------:|:------------:|:------------:| -------|
-| 0 | 0.01 | - | - | - | - |
-| 1 | - | $(range_x) m | $(range_y) m | $(range_z) m | 5.0 |
-
-"""
-
 # ╔═╡ b2ea2e47-4fa5-4d17-8341-889069a717c7
 begin
-	# Ploting primary model variogram
-	plot(γ_1st, color = :red, lw = 2, label = "Primário",
-		 title = "Variograma Anisotrópico")
+	# plotagem do modelo de variograma primário
+	plot(γ_1st, color = :red, lw = 2, label = "Primário",)
 	
-	# Ploting secondary model variogram
+	# plotagem do modelo de variograma secundário
 	plot!(γ_2nd, color = :green, lw = 2, label = "Secundário")
 	
-	# Ploting tertiary model variogram
+	# plotagem do modelo de variograma terciário
 	plot!(γ_3rd, color = :blue, lw = 2, label = "Terciário",
 		  xlims = (0,120), ylims = (0,8))
 end
 
 # ╔═╡ 7e05a32f-44ba-45ec-8db2-6d23a966a298
-html"""
+md"""
+**Figura 13:** Exemplo de modelo de variograma anisotrópico.
+"""
 
-<p align="center">
-    <b>Figura 13</b>: Exemplo de modelo de variograma anisotrópico.
-</p>
+# ╔═╡ ad8ca8f4-fc43-4008-8d94-eae74c84010a
+md"""
+Considerando um fenômeno anisotrópico, ao final da variografia, teremos em mãos um modelo de variograma que pode ser sumarizado em uma estrutura tabular, como a tabela apresentada abaixo. No exemplo a seguir, apenas uma estrutura foi considerada. Caso tivéssemos duas estruturas, por exemplo, uma nova linha seria adicionada.
+"""
+
+# ╔═╡ d6a4e6dd-7ace-4406-be57-804b4c2537e5
+md"""
+| Estrutura |Ef. Pepita | Alcance em X | Alcance em Y | Alcance em Z | Variância |
+|:---------:|:---------:|:------------:|:------------:|:------------:|:---------:|
+|     0     |    0.01   |       -      |       -      |       -      |     -     |
+|     1     |     -     | $(range_x) m | $(range_y) m | $(range_z) m |    5.0    |
 
 """
 
 # ╔═╡ 6feb0cb4-7bff-4635-ae38-4400affe89f3
 md"""
-
 ## 8. Modelo de variograma x estimativas
 
 Sabe-se que o modelo de variograma é utilizado como entrada na estimativa por krigagem. Nesse sentido, cada um de seus parâmetros e elementos exerce uma influência no modelo de teores estimados:
 
-- A **direção** indica a orientação da continuidade espacial de teores.
+- A *direção* indica a orientação da continuidade espacial de teores;
 
-- O **alcance** controla o comprimento de continuidade espacial médio ("elipses" na imagem).
+- O *alcance* controla o comprimento de continuidade espacial médio ("elipses" na imagem);
 
-- O **patamar** define a "altura" das "elipses".
+- O *patamar* define a "altura" das "elipses";
 
-- O **efeito pepita** define uma variabilidade adicional para escalas menores.
+- O *efeito pepita* define uma variabilidade adicional para escalas menores;
 
-- O **tipo de modelo** define o comportamento próximo a origem.
+- O *modelo teórico* define o comportamento próximo a origem.
 
-O exemplo abaixo auxilia na compreensão da influência de cada um desses parâmetros nas estimativas resultantes. A *Figura 14* mostra o modelo de variograma anisotrópico utilizado na estimativa por krigagem. A *Figura 15* representa o mapa da localização das amostras.
+O exemplo abaixo auxilia na compreensão da influência de cada um desses parâmetros nas estimativas resultantes. A Figura 13 mostra o modelo de variograma anisotrópico utilizado na estimativa por krigagem. A Figura 14 representa o mapa da localização das amostras.
 
+Utilize os sliders abaixo para ajustar os variogramas experimentais azul e vermelho. Em seguida, clique na caixa para visualizar as estimativas. Faça o exercício de analisar qual é o impacto de cada parâmetro do variograma nas estimativas resultantes.
 """
 
 # ╔═╡ 8079a74c-005d-4654-8e44-d763a12aefd8
 md"""
-
 Direção de maior continuidade: $(@bind azi₂ Slider(0.0:45.0:90.0, default=0.0, show_value=true))°
 
 Modelo Teórico: $(@bind m Select(["Gaussiano","Esférico","Exponencial"],
@@ -1205,33 +871,32 @@ Efeito pepita: $(@bind Cₒ Slider(0.00:0.1:5.0, default=3.0, show_value=true))
 Alcance primário (Y): $(@bind ry Slider(10.0:1.0:156.0, default=101.0, show_value=true)) m
 
 Alcance secundário (X): $(@bind rx Slider(10.0:1.0:156.0, default=32.0, show_value=true)) m
-
 """
 
 # ╔═╡ 39e7cb17-7813-4103-880d-64803c636039
 begin
-	# Theoretical variogram model
+	# tipo do modelo
 	model_type = Dict("Gaussiano" => GaussianVariogram,
 					  "Esférico" => SphericalVariogram,
 					  "Exponencial" => ExponentialVariogram)
 	
-	# Sample variance (defining variogram sill)
-	σ² = var(wl_georef[:PB])
+	# variância amostral (definindo o patamar)
+	σ² = var(geowl[:Pb])
 	
-	# Calculating primary experimental variogram
-	γexp_pri = DirectionalVariogram(sph2cart(azi₂), wl_georef, :PB,
+	# cálculo do variograma experimental primário
+	γexp_pri = DirectionalVariogram(sph2cart(azi₂), geowl, :Pb,
                                     maxlag = 200, nlags = 5)
 	
-	# Calculating secondary experimental variogram
-	γexp_sec = DirectionalVariogram(sph2cart(azi₂+90), wl_georef, :PB,
+	# cálculo do variograma experimental secundário
+	γexp_sec = DirectionalVariogram(sph2cart(azi₂+90), geowl, :Pb,
                                     maxlag = 200, nlags = 5)
 	
-	# Fitting primary experimental variogram 
+	# modelo do variograma primário
 	γm_pri = model_type[m](nugget = Float64(Cₒ),
 						   sill = Float64(σ²),
 						   range = Float64(ry))
 	
-	# Fitting secondary experimental variogram 
+	# modelo do variograma secundário 
 	γm_sec = model_type[m](nugget = Float64(Cₒ),
 						   sill = Float64(σ²),
 						   range = Float64(rx))
@@ -1239,89 +904,72 @@ end;
 
 # ╔═╡ 308abd53-d536-4ff0-8e1d-9ac118742d93
 begin
-	# Graphic parameters
+	# parâmetros gráficos
 	col_pri = :red
 	col_sec = :blue
 	xlim    = (0,200)
 	ylim    = (0,15)
 	
-	# Ploting primary experimental variogram
+	# plotagem do variograma experimental primário
 	plot(γexp_pri, color = col_pri, label = false)
 	
-	# Ploting secondary experimental variogram
+	# plotagem do variograma experimental secundário
 	plot!(γexp_sec, color = col_sec, label = false)
 	
-	# Ploting primary variogram model
+	# plotagem do modelo primário
 	plot!(γm_pri, color = col_pri, lw = 2, legend = false)
 	
-	# Ploting secondary variogram model
+	# plotagem do modelo secundário
 	plot!(γm_sec, color = col_sec, lw = 2, xlims = xlim, ylims = ylim)
 	
-	# Ploting sill dashed line
+	# plotagem do patamar
 	hline!([σ²], color = :gray, ls = :dash)
 	
-	# Ploting primary range dashed line
+	# plotagem do alcance primário
 	vline!([ry], color = col_pri, ls = :dash)
 	
-	# Ploting secondary range dashed line
+	# plotagem do alcance secundário
 	vline!([rx], color = col_sec, ls = :dash)
 end
 
 # ╔═╡ a0b3b930-5f2a-47a1-bc81-c70c2ff595e6
-html"""
-
-<p align="center">
-    <b>Figura 14</b>: Modelo de variograma anisotrópico utilizado na estimativa.
-</p>
-
-"""
-
-# ╔═╡ ee0d2529-a6bc-4ee3-bd74-27a38a585c14
 md"""
-
-Quando a checkbox `Filtrar apenas high grades` é marcada, apenas os high grades de Pb (%) são apresentados. Esses valores correspondem a todos os teores de Pb maiores que o P90. Isso facilita a visualização espacial das amostras.
-
-Além disso, ao ativar a checkbox `Visualizar estimativas`, é possível visualizar as estimativas realizadas a partir do modelo de variograma configurado (*Figura 13*). As estimativas serão mostradas na *Figura 15*.
-
+**Figura 13:** Modelo de variograma anisotrópico utilizado na estimativa.
 """
 
 # ╔═╡ fb99bba7-e81b-4653-a7dc-3558f6fc7e2c
 md"""
-
-Filtrar apenas high grades: $(@bind filter_hg CheckBox())
-
 Visualizar estimativas: $(@bind show_model CheckBox())
-
 """
 
 # ╔═╡ cd5c821d-247e-4d18-93cf-065197b79f1b
 begin
 	if show_model
-		# Defining anisotropy ellipsoid
+		# elipsoide de anisotropia
 		ellip = Ellipsoid([ry,rx],[azi₂], convention = GSLIB)
 
-		# Anisotropic variogram model
+		# modelo de variograma
 		γ = model_type[m](nugget = Float64(Cₒ),
 						  sill = Float64(σ²),
 						  distance = metric(ellip))
 
-		# Estimation domain
+		# domínio de estimativa
 		dom = CartesianGrid((243,283),(8.,8.),(1.,1.))
 
-		# Defining estimation problem
+		# definição do problema de estimativa
 		problem = EstimationProblem(wl_georef, dom, :PB)
 
-		# Defining solver
+		# definição do estimador (OK)
 		OK = Kriging(:PB => (variogram = γ,
 						     neighborhood = ellip,
 						     minneighbors = 8,
 							 maxneighbors = 16)
 				    )
 
-		# Solving estimation problem
+		# solução da estimativa
 		sol = solve(problem, OK)
 		
-		# Manipulating estimates
+		# manipulação das estimativas
 		estimates = sol |> @map({PB = _.PB, geometry = _.geometry}) |> GeoData
 	end
 end;
@@ -1329,58 +977,54 @@ end;
 # ╔═╡ c90bdb75-1918-4d57-93b1-6cda3e8fbb0c
 begin
 	if show_model
-		# Ploting estimates		
+		# plotagem das estimativas		
 		plot(estimates, color=:coolwarm, xlabel="X", ylabel="Y",
 			 xlims=(5,255), ylims=(5,295),clims = (0,12),
 			 marker=(:square,1.2), markerstrokewidth=0,
 			 size=(500,500))
 		
-		# Ploting samples
-		plot!(wl_georef, color=:coolwarm, marker=(:square,2),
+		# plotagem de amostras
+		plot!(geowl, color=:coolwarm, marker=(:square,2),
 			  markerstrokecolor=:black, markerstrokewidth=0.3,
 		      title="Pb (%)")
 		
 	else
-		
-		if filter_hg
-			# Filtering high grades
-			wl_filt = wl_georef |> @filter(_.PB > quantile(wl.PB, 0.9)) |> GeoData
-			
-			# Ploting high grades
-			plot(wl_filt, color=:coolwarm, marker=(:square,2),
-				 markerstrokecolor=:black, markerstrokewidth=0.3,
-				 xlims=(5,255), ylims=(5,295),clims = (0,12),
-				 size=(500,500),title="Pb (%)", xlabel="X", ylabel="Y")
-
-		else
-			# Ploting samples
-			plot(wl_georef, color=:coolwarm, marker=(:square,2),
-				 markerstrokecolor=:black, markerstrokewidth=0.3,
-				 xlims=(5,255), ylims=(5,295),clims = (0,12),
-				 size=(500,500),title="Pb (%)", xlabel="X", ylabel="Y")
-		end
+		# plotagem de amostras
+		plot(geowl, color=:coolwarm, marker=(:square,2),
+			 markerstrokecolor=:black, markerstrokewidth=0.3,
+			 xlims=(5,255), ylims=(5,295),clims = (0,12),
+			 size=(500,500),title="Pb (%)", xlabel="X", ylabel="Y")
 		
 	end
 end
 
 # ╔═╡ 2f1d77a0-e5cd-4d77-8031-cff161f67a45
-html"""
-
-<p align="center">
-    <b>Figura 15</b>: Mapa de localização das amostras de Pb (%). Ative a primeira checkbox para visualizar apenas os high grades ou a segunda para visualizar as estimativas.
-</p>
-
+md"""
+**Figura 14:** Mapa de localização das amostras de Pb (%). Ative a caixa para visualizar as estimativas.
 """
 
 # ╔═╡ d5de8d26-7e90-4615-bd3b-cdfd002f98b2
 md"""
 ## Referências
+*Camana, F.; Deutsch, C.V. [The nugget effect](https://geostatisticslessons.com/lessons/nuggeteffect). In: Geostatistics Lessons, 2019.*
+
+*Deutsch, J. L. [Experimental variogram tolerance parameters](https://geostatisticslessons.com/lessons/variogramparameters). In: Geostatistics Lessons, 2015.*
+
+*Hoffimann, J.; Zadrozny, B. [Efficient variography with partition variograms](https://www.researchgate.net/publication/333973794_Efficient_Variography_with_Partition_Variograms). Computers & Geosciences, 131, 2019. 52-59.*
+
+*Isaaks, E. H.; Srivastava, M. R. [Applied geostatistics](https://www.google.com.br/books/edition/Applied_Geostatistics/gUXQzQEACAAJ?hl=pt-BR). New York: Oxford University Press, 1989.*
+
+*Morgan, C. [Theoretical and practical aspects of variography](https://wiredspace.wits.ac.za/handle/10539/11193). Tese de Doutorado. University of Witwatersrand, 2011*
 
 *Rossi, M. E.; Deutsch, C. V. [Mineral resource estimation](https://www.google.com.br/books/edition/Mineral_Resource_Estimation/gzK_BAAAQBAJ?hl=pt-BR&gbpv=0). New York: Springer Science & Business Media, 2013.*
+
+*Samson, M.; Deutsch, C.V. [The sill of the variogram](https://geostatisticslessons.com/lessons/sillofvariogram). In: Geostatistics Lessons, 2021.*
 
 *Sinclair, A. J.; Blackwell, G. H. [Applied mineral inventory estimation](https://www.google.com.br/books/edition/Applied_Mineral_Inventory_Estimation/oo7rCrFQJksC?hl=pt-BR&gbpv=0). New York: Cambridge University Press, 2006.*
 
 *Sinclair, A. J.; Vallée, M. [Reviewing continuity: an essential element of quality control for deposit and reserve estimation](https://www.google.com.br/books/edition/Applied_Mineral_Inventory_Estimation/oo7rCrFQJksC?hl=pt-BR&gbpv=0). Exploration and Mining Geology, 3(2), 1994. 95-108.*
+
+*Yamamoto, J. K.; Landim, P. M. B. [Geoestatística: conceitos e aplicações](https://www.google.com.br/books/edition/Geoestat%C3%ADstica/QUsrBwAAQBAJ?hl=pt-BR&gbpv=0). São Paulo: Oficina de textos, 2015.*
 """
 
 # ╔═╡ 838f3147-299c-4e12-a4b0-a9f29d19f2d7
@@ -2933,8 +2577,14 @@ version = "0.9.1+5"
 # ╟─363b1ca8-1cb4-465d-89b3-a15570d5dc7f
 # ╟─e1502221-f2ee-4f76-b442-f83dbf454743
 # ╟─faee9091-89aa-46ff-9a90-42eb71dcdd6a
+# ╟─12770ca7-be19-4b11-88b5-0b65a05cefd6
+# ╠═57bf7106-7316-43f7-8578-f59f01f04b79
 # ╟─51107168-29ca-40b1-a658-9361199be3b1
-# ╟─d4775d05-4943-4493-897e-4340f01475be
+# ╟─ea67e941-496f-45a3-8b0f-058d573291d8
+# ╟─03a46b21-c522-4036-a710-bd6ce0a26a1b
+# ╟─3a03cb21-0dd0-488d-9950-92ee2ed8d697
+# ╟─8519999f-2062-41b7-a8ae-4e190b2df860
+# ╟─59c0673a-e117-4669-8156-6d3a8eb861e8
 # ╟─0c00aee8-9db5-4fca-b92d-e19aa4fe5c1b
 # ╟─4b12eecc-0645-4f46-b3be-8b8a095af599
 # ╟─b23b047e-1c02-40c5-ba88-825da85ba75c
@@ -2943,54 +2593,33 @@ version = "0.9.1+5"
 # ╟─5e623ea7-03f9-46a9-ba54-6d48d1a64057
 # ╟─4b136ca1-f46f-43dc-9a1d-0659f1ef5e61
 # ╟─c782a92c-cc4d-44bc-8521-2f70ad222bd5
-# ╟─bdf7046f-f955-446c-8437-f889be9e22c5
+# ╟─81dc06f6-79a0-4022-9219-c0ae97a20ab6
+# ╠═d4775d05-4943-4493-897e-4340f01475be
+# ╟─73cded81-c93e-4609-80ae-ca1dfcb79ec7
 # ╟─43bc79ba-bb97-48bd-a8e4-c478bdc3a60b
 # ╟─3f39dcf2-055e-4aa8-8caa-09223175a5fa
 # ╟─facdf937-4056-4699-b505-d9cada0c8ce3
-# ╟─1704bcbf-004c-4e30-a09a-6325f116b53c
 # ╟─5cb62b37-fe28-4816-b7ed-f5f40df255dc
 # ╟─f4e189ac-5d12-4de5-80e1-516103e5950f
 # ╟─c3135efd-e69c-4270-8b45-b3f9f2dd586c
 # ╟─8923e1c1-914d-47b5-a4b4-5f0c53c4e810
-# ╟─4d6946ec-3d4b-40bd-9ba6-40fb68c80142
-# ╟─d0455ea3-9ab0-4545-bb06-ae8809d99290
-# ╟─472e42d3-00ba-49f9-93ae-438f6cccae08
-# ╟─1bdc6f70-b3b3-4f9d-aacd-3038fbe3dfa8
 # ╟─3d25e2bc-9a6d-4712-92ed-de31dbdea3f2
 # ╟─874544a1-07af-4509-a34d-68d77558aaae
 # ╟─2965ea0b-9b5e-4460-a735-e555733b2d83
 # ╟─9d60b923-72e7-42c8-8ef3-d4a590e3f600
 # ╟─7c00b7a2-5c09-46f5-ba8d-03786fd606b8
-# ╟─f1f163f7-eabc-4808-82e4-98ecfeddc730
-# ╟─8bd1b52b-b6a8-489e-ae74-be2931eef4ee
 # ╟─841ffdd2-16b4-4c19-8f03-70942a4ebb2e
 # ╟─f738e56e-7725-4d52-a700-960ce372f025
 # ╟─650fc66a-3f8e-45d5-a898-5c783a8d12a1
-# ╟─ace40206-7ce6-4a64-b1ae-bd19d295158e
-# ╟─4c5b95f2-5ad6-4f18-9cc0-9bd96eb3bf29
-# ╟─049568a8-0d02-403d-9d87-ce9a5bf5e242
-# ╟─7fa3052f-52c8-48b5-ab3a-8401a6d8f93a
-# ╟─728f75bd-0fc5-43c6-9551-4304925aa97b
-# ╟─9709372d-3d5f-4bff-8ca1-adbb4dbeda23
-# ╟─b5bb3401-48d5-4d22-bbed-06427862062e
 # ╟─5e555810-f34d-402c-ac0a-17a423f420bc
 # ╟─6433f0dc-04f8-450e-9a94-f8cfa8cda552
-# ╟─6f59e6db-0632-483a-89be-6c82dd188d60
 # ╟─e80e5e16-59fb-4ec0-a9f0-6b8b97bc8d36
 # ╟─9891913d-e735-4ec8-b09c-49b51417f18d
 # ╟─52c19e93-8534-4b59-a164-3f12d23d5440
 # ╟─7a8a49a2-007e-409a-9a45-c76f717f75f8
 # ╟─f92eedbf-097d-45f6-a550-ccc8c2f9841b
-# ╟─ea67e941-496f-45a3-8b0f-058d573291d8
-# ╟─03a46b21-c522-4036-a710-bd6ce0a26a1b
-# ╟─510759f5-3838-4db7-b683-e39677a2551b
-# ╟─c75b37b1-b13a-4d3b-949c-639e4e5dc01b
 # ╟─83593f8e-8dd2-40b1-903b-8712bb9eb048
 # ╟─a6802bda-7b7a-4d98-bb08-bcbe8a990e01
-# ╟─bd8328a0-9cd3-4eec-8c68-f6f15f296f4b
-# ╟─ed5011d1-8d0a-4ace-8baa-0af219b3e3e2
-# ╟─d1e9297b-04c0-47ad-91e8-77648b205d10
-# ╟─e7157b79-368d-4ce1-97d3-22110e3359da
 # ╟─341ec3f6-c871-431f-8ffa-85f4c43ae138
 # ╟─6d0f5d99-f7e2-4f53-b835-c3b345613e4a
 # ╟─61b8631b-8295-4dea-a5dd-189bf578bc8c
@@ -3001,21 +2630,22 @@ version = "0.9.1+5"
 # ╟─b9634a1e-f225-4986-867f-fd36f56882df
 # ╟─ee09dcab-2298-444c-ad9f-f79268c9056c
 # ╟─0f28a997-4945-47fe-83b9-058726bc8041
+# ╟─750d0cc4-d117-48be-869a-234acfe0c6d4
 # ╟─f95ffa70-f924-404a-8cec-fc281b8588e2
 # ╟─3f0465bc-444c-4026-a677-a182366790ae
 # ╟─864c9c06-e52b-4de8-bc16-d053fa3c0346
 # ╟─538bf67b-33c6-45c3-b5bf-328922debb26
 # ╟─dc47965d-e732-44e4-875c-b4922ff4bd1f
 # ╟─18282939-e7ef-4da4-aade-72e7b01886de
-# ╟─d6a4e6dd-7ace-4406-be57-804b4c2537e5
 # ╟─b2ea2e47-4fa5-4d17-8341-889069a717c7
 # ╟─7e05a32f-44ba-45ec-8db2-6d23a966a298
+# ╟─ad8ca8f4-fc43-4008-8d94-eae74c84010a
+# ╟─d6a4e6dd-7ace-4406-be57-804b4c2537e5
 # ╟─6feb0cb4-7bff-4635-ae38-4400affe89f3
 # ╟─39e7cb17-7813-4103-880d-64803c636039
 # ╟─8079a74c-005d-4654-8e44-d763a12aefd8
 # ╟─308abd53-d536-4ff0-8e1d-9ac118742d93
 # ╟─a0b3b930-5f2a-47a1-bc81-c70c2ff595e6
-# ╟─ee0d2529-a6bc-4ee3-bd74-27a38a585c14
 # ╟─cd5c821d-247e-4d18-93cf-065197b79f1b
 # ╟─fb99bba7-e81b-4653-a7dc-3558f6fc7e2c
 # ╟─c90bdb75-1918-4d57-93b1-6cda3e8fbb0c

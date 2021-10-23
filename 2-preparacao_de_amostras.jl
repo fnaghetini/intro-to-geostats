@@ -125,7 +125,7 @@ Os exemplos a seguir, extraídos de *Sinclair & Blackwell (2006)*, evidenciam a 
 md"""
 ## 2. Geração de furos
 
-Neste módulo, iremos trabalhar com o [Marvin](), um conjunto de dados de um depósito de Cu-Au Pórfiro fictício, mas que apresenta uma série de caracteríticas típicas de depósitos sulfetados (*Whittle et al., 2007*).
+Neste módulo, iremos trabalhar com o [Marvin](https://github.com/fnaghetini/intro-to-geostats/tree/main/data/Marvin), um conjunto de dados de um depósito de Cu-Au Pórfiro fictício, mas que apresenta uma série de caracteríticas típicas de depósitos sulfetados (*Whittle et al., 2007*).
 
 > ⚠️ Para fins de simplificação, apenas os teores de `Au` foram mantidos.
 

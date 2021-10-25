@@ -29,22 +29,27 @@ end;
 
 # ╔═╡ 14ac7b6e-9538-40a0-93d5-0379fa009872
 html"""
-<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp🚀&nbsp<b>Projeto Final</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
+<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp🏆&nbsp<b>Projeto Final</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
 """
 
 # ╔═╡ 6b7e7c5d-7a86-4ea4-a47e-fb4148030c1a
 PlutoUI.TableOfContents(aside=true, title="Sumário",
 						indent=true, depth=2)
 
+# ╔═╡ 3afd7a32-3696-4cea-b00c-b52bfdb003ba
+md"""
+![ufmg-logo](https://logodownload.org/wp-content/uploads/2015/02/ufmg-logo-2.png)
+"""
+
 # ╔═╡ c544614a-3e5c-4d22-9340-592aabf84871
 md"""
-# 🚀 Projeto Final
+# 🏆 Projeto Final
 
 Este último módulo visa demonstrar, na prática, um fluxo de trabalho completo de estimativa de recursos realizado com o pacote [GeoStats.jl](https://github.com/JuliaEarth/GeoStats.jl). Para isso, utilizaremos todo o conhecimento adquirido nos cinco módulos anteriores. Abordaremos desde a etapa de importação dos dados brutos (tabelas Collar, Survey e Assay) até a geração de um modelo de teores 3D.
 
 > ⚠️ Nos dois últimos módulos trabalhamos com uma base de dados 2D (i.e. Walker Lake). Neste módulo, no entanto, trabalharemos com um banco de dados 3D e, por isso, adaptaremos alguns conceitos.
 
-O produto final deste módulo é um modelo de blocos estimado (i.e. modelo de teores) por diferentes métodos: Inverso da Potência da Distância (IPD), Krigagem Simples (KS) e Krigagem Ordinária (KO).
+O produto final deste módulo é um modelo de blocos estimado (i.e. modelo de teores) por diferentes métodos: Inverso do Quadrado da Distância (IQD), Krigagem Simples (KS) e Krigagem Ordinária (KO).
 """
 
 # ╔═╡ 3353d0be-4280-4ffd-824b-745bb6b64f41
@@ -54,7 +59,7 @@ md"""
 >- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
 >- Algumas células encontram-se ocultadas (e.g. células que geram os plots). Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
 >- A explicação das células que geram os plots está fora do escopo deste notebook. Entretanto, a sintaxe é bem intuitiva e pode ser facilmente compreendida!
->- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
+>- Você pode ainda clicar no ícone `...`, no canto superior direito de uma célula, para excluí-la do notebook.
 >- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."` (e.g. esta célula). Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
 >- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
 >- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
@@ -123,6 +128,11 @@ md"""
 - Após a geração dos furos, não há inconsistências em nenhuma das tabelas importadas.
 """
 
+# ╔═╡ ec102b27-79e2-4a91-99d6-dff061752855
+md"""
+> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 2](https://github.com/fnaghetini/intro-to-geostats/blob/main/2-preparacao_de_amostras.jl).
+"""
+
 # ╔═╡ bedcf585-53ef-4cf6-9dc2-d3fc9cff7755
 md"""
 ## 3. Limpeza dos dados
@@ -161,6 +171,11 @@ md"""
 - Após a aplicação da função `dropmissing!`, os 307 valores falantes de `CU` e `LITH` foram removidos com sucesso da tabela de furos `dh`.
 """
 
+# ╔═╡ ee6c8dfa-d8be-4b5a-bfe0-9e1b3f394e9d
+md"""
+> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl).
+"""
+
 # ╔═╡ f4bd13d4-70d3-4167-84ff-9d3c7200e143
 md"""
 ## 4. Compositagem
@@ -184,10 +199,10 @@ begin
 	                    title  = "Amostras Brutas")
 
     # plotagem da média
-    vline!([X̅_dh], label="X̅ = $(X̅_dh)m")
+    vline!([X̅_dh], label="X̅ = $(X̅_dh) m")
 
     # plotagem da mediana
-    vline!([md_dh], label="md = $(md_dh)m")
+    vline!([md_dh], label="md = $(md_dh) m")
 end
 
 # ╔═╡ f40bca06-6a3e-4807-9857-ff17d21893bc
@@ -242,10 +257,10 @@ begin
 		                title  = "Compostas Ótimas")
 
     # plotagem da média
-    vline!([X̅_cp], label="X̅ = $(X̅_cp)m")
+    vline!([X̅_cp], label="X̅ = $(X̅_cp) m")
 
     # plotagem da mediana
-    vline!([md_cp], label="md = $(md_cp)m")
+    vline!([md_cp], label="md = $(md_cp) m")
 end
 
 # ╔═╡ 280db32e-cebf-4d51-bfcb-54d456f2194b
@@ -287,6 +302,11 @@ md"""
 - Houve um aumento na dispersão do comprimento das amostras após a compositagem. Poderíamos testar outras configurações de compositagem, mas seguiremos com essas compostas.
 """
 
+# ╔═╡ fb67daea-0b8b-47da-b06c-8256566f9ba0
+md"""
+> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 2](https://github.com/fnaghetini/intro-to-geostats/blob/main/2-preparacao_de_amostras.jl).
+"""
+
 # ╔═╡ f2be5f11-1923-4658-93cf-800ce57c32d3
 md"""
 ## 5. Análise exploratória
@@ -297,11 +317,11 @@ Primeiramente, vamos calcular sumário estatístico da variável `CU` e, em segu
 """
 
 # ╔═╡ ecec08be-b9da-4913-9f5a-3a77631fa96e
-function sumario(teor::String)
+function sumario(teor::String, id::String)
 	q10 = quantile(cp[!,teor], 0.1)
 	q90 = quantile(cp[!,teor], 0.9)
 	
-	df = DataFrame(teor = teor,
+	df = DataFrame(teor = id,
                    X̄    = mean(cp[!,teor]),
 				   md   = median(cp[!,teor]),
 				   min  = minimum(cp[!,teor]),
@@ -317,7 +337,7 @@ function sumario(teor::String)
 end;
 
 # ╔═╡ d00f02fc-3c14-4911-a36b-209c747f96cb
-sumario_cu = sumario("CU")
+sumario_cu = sumario("CU", "Cu (amostral)")
 
 # ╔═╡ b95a6def-f3e6-4835-b15f-2a48577006f4
 begin
@@ -447,6 +467,11 @@ md"""
 - As amostras apresentam-se ligeiramente agrupadas na porção sudeste do depósito.
 """
 
+# ╔═╡ c6c41764-509c-4f40-b063-a5f85dcc16db
+md"""
+> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl).
+"""
+
 # ╔═╡ 3c2eb77b-60e9-4aeb-9d19-ba22293741f9
 md"""
 ## 6. Desagrupamento
@@ -473,7 +498,7 @@ begin
 	Cu_clus = sumario_cu[:,[:teor,:X̄,:S²,:q10,:md,:q90]]
 	
 	# Sumário estatístico do Cu declusterizado
-	Cu_decl = DataFrame(teor = "Cu (declusterizado)",
+	Cu_decl = DataFrame(teor = "Cu (desagrupado)",
 						X̄    = mean(samples, :CU, s),
 						S²   = var(samples, :CU, s),
 						q10  = quantile(samples, :CU, 0.1, s),
@@ -496,6 +521,11 @@ md"""
 - Utilizaremos essas estatísticas desagrupadas mais tarde, durante a validação das estimativas.
 """
 
+# ╔═╡ 6ec16d83-d8fb-45d0-a7f8-d75f712b4c91
+md"""
+> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl).
+"""
+
 # ╔═╡ b02263dc-280a-40b4-be1e-9c3b6873e153
 md"""
 
@@ -512,16 +542,15 @@ Durante o [módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/
     - Dip de maior continuidade, fixando-se o azimute;
     - Segunda rotação do variograma (eixo X);
     - Alcance da direção (azimute + dip) de maior continuidade (Y).
-4. **Variograma secundário:**
+4. **Variogramas secundário e terciário:**
     - Terceira rotação do variograma (eixo Y);
-    - Alcance da direção de continuidade intermediária (X).
-5. **Variograma terciário:**
+    - Alcance da direção de continuidade intermediária (X);
     - Alcance da direção de menor continuidade (Z).
 """
 
 # ╔═╡ 6d520cfe-aa7b-4083-b2bf-b34f840c0a75
 md"""
-### Variograma down hole
+### 1. Variograma down hole
 
 Primeiramente, iremos calcular o **variograma experimental down hole**, com o intuito de se obter o *efeito pepita* e o valor de *contribuição por estrutura*.
 
@@ -675,7 +704,7 @@ end
 
 # ╔═╡ 09d95ff8-3ba7-4031-946b-8ba768dae5d5
 md"""
-### Variograma azimute
+### 2. Variograma azimute
 
 O próximo passo é o cálculo do **variograma experimental do azimute de maior continuidade**. Nesta etapa, obteremos a *primeira rotação* do variograma.
 
@@ -733,11 +762,11 @@ md"""
 
 # ╔═╡ 99baafe5-6249-4eda-845f-d7f6219d5726
 # Cores dos variograms principais
-colorpri, colorsec, colorter = cgrad(:Purples)[[9,7,5]];
+colorpri, colorsec, colorter = :red, :green, :blue;
 
 # ╔═╡ 294ac892-8952-49bc-a063-3d290c375ea5
 md"""
-### Variograma primário
+### 3. Variograma primário
 
 Agora, calcularemos o **variograma experimental primário**, ou seja, aquele que representa a *direção (azimute/mergulho) de maior continuidade*.
 
@@ -830,7 +859,7 @@ md"""
 # ╔═╡ 6c048b83-d12c-4ce8-9e9a-b89bf3ef7638
 md"""
 
-### Variogramas secundário e terciário
+### 4. Variogramas secundário e terciário
 
 Por definição, os três eixos principais do variograma são ortogonais entre si. Agora que encontramos a *direção de maior continuidade do variograma (eixo primário)*, sabemos que os outros dois eixos (secundário e terciário) pertencem a um plano cuja normal é o próprio eixo primário!
 
@@ -999,7 +1028,7 @@ Agora que temos as três direções principais do modelo de variograma, podemos 
 
 | Estrutura | Modelo | Alcance em Y | Alcance em X | Alcance em Z | Contribuição | Efeito Pepita |
 |:---:|:--------:|:--------:|:--------:|:--------:|:---:|:---:|
-|  0  |    EPP   |    -     |    -     |    -     |  -  | $cₒ |
+|  0  |     -    |    -     |    -     |    -     |  -  | $cₒ |
 |  1  | Esférico |  $rpri₁  |  $rsec₁  |  $rter₁  | $c₁ |  -  |
 |  2  | Esférico |  $rpri₂  |  $rsec₂  |  $rter₂  | $c₂ |  -  |
 
@@ -1007,15 +1036,15 @@ Agora que temos as três direções principais do modelo de variograma, podemos 
 
 # ╔═╡ c9ac9fb4-5d03-43c9-833e-733e48565946
 begin
-    plot(γpri, color = colorpri, lw = 2, label = "primário",
-		 legend = :bottomright, title = "")
+    plot(γpri, color=colorpri, lw=2, label="primário",
+		 legend=:bottomright, title="")
 
-    plot!(γsec, color = colorsec, lw = 2, label = "secundário")
+    plot!(γsec, color=colorsec, lw=2, label="secundário")
 
-    plot!(γter, 0, range(γpri)+10, color = colorter, lw = 2, label = "terciário",
-		  ylims = (0, σ²+0.05))
+    plot!(γter, 0, range(γpri)+10, color=colorter, lw=2, label="terciário",
+		  ylims=(0, σ²+0.05))
 	
-	hline!([σ²], color = :gray, label="σ²")
+	hline!([σ²], color=:gray, label="σ²")
 end
 
 # ╔═╡ 5134e2cb-8c98-4e5e-9f13-722b8f828dc7
@@ -1043,15 +1072,15 @@ O elipsoide de anisotropia nada mais é do que uma representação do modelo de 
 # ╔═╡ 38d15817-f3f2-496b-9d83-7dc55f4276dc
 begin
 	# elipsoides de anisotropia para cada estrutura
-	ellipsoid₁ = Ellipsoid([rpri₁, rsec₁, rter₁], [azi, -dip, -θ], convention = GSLIB)
-    ellipsoid₂ = Ellipsoid([rpri₂, rsec₂, rter₂], [azi, -dip, -θ], convention = GSLIB)
+	ellipsoid₁ = Ellipsoid([rpri₁, rsec₁, rter₁], [azi, -dip, -θ], convention=GSLIB)
+    ellipsoid₂ = Ellipsoid([rpri₂, rsec₂, rter₂], [azi, -dip, -θ], convention=GSLIB)
 
 	# estruturas do variograma final
-	γₒ = NuggetEffect(nugget = Float64(cₒ))
-
-    γ₁ = SphericalVariogram(sill = Float64(c₁), distance = metric(ellipsoid₁))
-
-    γ₂ = SphericalVariogram(sill = Float64(c₂), distance = metric(ellipsoid₂))
+	γₒ = NuggetEffect(nugget=Float64(cₒ))
+	
+    γ₁ = SphericalVariogram(sill=Float64(c₁), distance=metric(ellipsoid₁))
+	
+    γ₂ = SphericalVariogram(sill=Float64(c₂), distance=metric(ellipsoid₂))
 
 	# aninhamento das estruturas e obtenção do modelo de variograma final
     γ = γₒ + γ₁ + γ₂
@@ -1059,76 +1088,74 @@ end;
 
 # ╔═╡ b2156251-26ae-4b1d-8757-ffdf3a02a2f8
 md"""
->🏆 Finalmente encontramos o modelo de variograma final $\gamma$ que será utilizado como entrada durante a estimação por Krigagem.
+>🏆 Finalmente encontramos o modelo de variograma final $\gamma$, que será utilizado como entrada durante a estimação por Krigagem.
+"""
+
+# ╔═╡ 51f8bc33-a24f-4ce4-a81b-cd22fb8312ec
+md"""
+> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/4-variografia.jl).
 """
 
 # ╔═╡ 9baefd13-4c16-404f-ba34-5982497e8da6
 md"""
 ## 8. Estimação
 
-Grande parte das estimativas realizadas na indústria são baseadas em estimadores lineares:
+Nesta seção, seguiremos o fluxo de trabalho do [GeoStats.jl](https://juliaearth.github.io/GeoStats.jl/stable/index.html#Quick-example), anteriormente apresentado no [módulo 5]():
 
-```math
-\hat{z}(x_o) = \sum_{i=1}^{n} w_i \cdot z(x_i) = w_1 \cdot z(x_1) + w_2 \cdot z(x_2) + \cdots + w_n \cdot z(x_n)
-```
-
-Neste módulo, estimaremos os teores de Cu a partir dos seguintes estimadores lineares:
-
-No método **Inverso da Distância** os pesos da combinação linear são calculados como o inverso da distância às amostras. Opcionalmente, as distâncias podem ser elevadas a uma potência, por exemplo o quadrado da distância.
-
-Na **Krigagem Simples (SK)**, a média populacional é assumida como conhecida e constante em todo o domínio de estimativa. Devemos portanto definir esse parâmetro como entrada desse estimador que, no nosso contexto, será a média declusterizada. Diferentemente da Krigagem Ordinária, não há condição de fechamento para os pesos atribuídos às amostras da vizinhança e, nesse sentido, uma parte do peso é atribuída à média especificada.
-
-Por outro lado, a **Krigagem Ordinária (OK)** não assume o conhecimento da média populacional. Nesse caso há condição de fechamento, em que o somatório dos pesos atribuídos às amostras da vizinhança deve resultar na unidade.
-
-Seguiremos os seguintes passos no **GeoStats.jl**:
-
-- Criação do modelo de blocos
-- Definição do problema de estimação
-- Definição do solver geoestatístico
-- Solução do problema de estimação
-
+- **Etapa 1:** Criação do domínio de estimativas;
+- **Etapa 2:** Definição do problema de estimação;
+- **Etapa 3:** Definição do estimador;
+- **Etapa 4:** Solução do problema de estimação.
 """
 
 # ╔═╡ a7a59395-59ec-442a-b4b6-7db55d150d53
 md"""
 
-##### Criação do modelo de blocos
+### Etapa 1: Criação do domínio de estimativas
 
-Nesta primeira etapa, definimos o **modelo de blocos**, ou seja, o domínio onde realizaremos as estimativas de teores de Cu. Devemos definir três parâmetros:
+Nesta primeira etapa, delimitaremos o domínio de estimativas. No contexto de estimativa de recursos minerais, esse domínio é chamado de **modelo de blocos**.
 
-- Ponto de origem do modelo de blocos
-- Ponto de término do modelo de blocos
-- Número de blocos nas direções X, Y e Z
+> ⚠️ O modelo de blocos é o modelo geológico 3D discretizado em unidades volumétricas menores (i.e. blocos). Em outras palavras, trata-se do modelo geológico constituído por "tijolos".
 
+Para definir o modelo de blocos, devemos configurar três parâmetros:
+
+- Ponto de origem do modelo de blocos;
+- Ponto de término do modelo de blocos;
+- Número de blocos nas direções X, Y e Z.
+
+Faremos algumas manipulações e, em seguida, utilizaremos a função `CartesianGrid` para criar o modelo de blocos, cujas dimensões dos blocos serão `20 m x 20 m x 10 m` (Figura 16)...
 """
 
 # ╔═╡ f7cee6a3-5ac2-44ff-9d5e-58ede7327c46
 begin
-
-	# Caixa delimitadora das amostras
+	# caixa delimitadora das amostras
     bbox = boundingbox(samples)
 	
-	# Lados da caixa delimitadora
+	# lados da caixa delimitadora
 	extent = maximum(bbox) - minimum(bbox)
 	
-	# Tamanho dos blocos em cada direção (metros)
+	# tamanho dos blocos em cada direção (metros)
 	blocksizes = (20., 20., 10.)
 	
-	# Número de blocos em cada direção
+	# número de blocos em cada direção
 	nblocks = ceil.(Int, extent ./ blocksizes)
 
-	# Modelo de blocos para realização de estimativas
-    grid = CartesianGrid(minimum(bbox), maximum(bbox), dims = Tuple(nblocks))
-
+	# modelo de blocos
+    grid = CartesianGrid(minimum(bbox), maximum(bbox), dims=Tuple(nblocks))
 end
+
+# ╔═╡ a73cc834-c600-4278-bc77-49b85dc90256
+md"""
+**Figura 16:** Modelo de blocos.
+"""
 
 # ╔═╡ 12d79d77-358c-4098-993a-d5be538929a2
 md"""
+Utilize os sliders abaixo para rotacionar o modelo de blocos...
 
 Rotação em Z: $(@bind ψ₁ Slider(0:5:90, default=45, show_value=true))°
 
 Rotação em X: $(@bind ψ₂ Slider(0:5:90, default=45, show_value=true))°
-
 """
 
 # ╔═╡ 6f7663ed-c672-4d29-8b06-415dcdc8fbff
@@ -1137,14 +1164,15 @@ plot(grid, camera = (ψ₁,ψ₂), xlabel = "X", ylabel = "Y", zlabel = "Z")
 # ╔═╡ a8adf478-620d-4744-aae5-99d0891fe6b0
 md"""
 
-##### Definição do problema de estimação
+### Etapa 2: Definição do problema de estimação
 
-Para definirmos o problema de estimação, devemos passar como parâmetros:
+Para definirmos o problema de estimação, devemos definir os seguintes parâmetros:
 
-- Furos georreferenciados
-- Modelo de blocos
-- Variável de interesse
+- Furos georreferenciados;
+- Modelo de blocos;
+- Variável de interesse.
 
+Neste exemplo, passaremos os furos georreferenciados `samples`, o modelo de blocos `grid` e a variável de interesse `:CU` como parâmetros da função `EstimationProblem`...
 """
 
 # ╔═╡ affacc76-18e5-49b2-8e7f-77499d2503b9
@@ -1153,14 +1181,19 @@ problem = EstimationProblem(samples, grid, :CU)
 # ╔═╡ 31cd3d10-a1e8-4ad8-958f-51de08d0fa54
 md"""
 
-##### Definição do solver geoestatístico
+### Etapa 3: Definição do estimador
 
-Um **solver** nada mais é do que o estimador que utilizaremos para realizar a estimativa. No nosso contexto, criaremos três solvers:
+Nesta etapa, devemos selecionar o estimador (solver) e configurar os parâmetros de vizinhança. Neste exemplo, utilizaremos três estimadores:
 
-- Inverso da distância (IDW)
-- Krigagem Simples (SK)
-- Krigagem Ordinária (OK)
+- Inverso do Quadrado da Distância (IQD);
+- Krigagem Simples (KS);
+- Krigagem Ordinária (KO).
 
+No caso dos estimadores KS e OK, utilizaremos o modelo de variograma `γ` e um volume de busca igual ao elipsoide de anisotropia `ellipsoid₂` definido anteriormente.
+
+A média estacionária, um parâmetro que deve ser informado no caso da KS, será definida como o valor da média declusterizada de Cu `μ`.
+
+Utilize os sliders abaixo para configurar o número mínimo `minneighbors` e máximo `maxneighbors` de amostras que serão utilizadas para se estimar cada bloco...
 """
 
 # ╔═╡ 9c61271d-4afe-4f7c-a521-8f799b6981ed
@@ -1174,23 +1207,22 @@ Número máximo de amostras: $(@bind nmax Slider(6:1:20, default=8, show_value=t
 
 # ╔═╡ 2a76c2b9-953e-4e4b-a98e-8e992943f60c
 begin
-	
-	# Média desclusterizada
+	# média desclusterizada
     μ = mean(samples, :CU)
 	
-	# Inverso do quadrado da distância
-	idw = IDW(:CU => (power = 2, neighbors = nmax))
+	# IQD
+	IQD = IDW(:CU => (power=2, neighbors=nmax))
 
-	# Krigagem simples
-    SK = Kriging(
-		:CU => (variogram = γ, mean = μ, neighborhood = ellipsoid₂,
-			    minneighbors = nmin, maxneighbors = nmax)
+	# KS
+    KS = Kriging(
+		:CU => (variogram=γ, mean=μ, neighborhood=ellipsoid₂,
+			    minneighbors=nmin, maxneighbors=nmax)
 	)
 
-	# Krigagem ordinária
-    OK = Kriging(
-		:CU => (variogram = γ, neighborhood = ellipsoid₂,
-			    minneighbors = nmin, maxneighbors = nmax)
+	# KO
+    KO = Kriging(
+		:CU => (variogram=γ, neighborhood=ellipsoid₂,
+			    minneighbors=nmin, maxneighbors=nmax)
 	)
 
 end;
@@ -1198,51 +1230,57 @@ end;
 # ╔═╡ 9b3fe534-78fa-48db-a101-e2a43f2478d6
 md"""
 
-##### Solução do problema de estimação
+### Etapa 4: Solução do problema de estimação
 
-Para gerar o modelo de teores de Cu, resolvemos o problema definido com qualquer um dos solvers. Como o notebook que estamos trabalhando reage a qualquer alteração dos parâmetros, nós adicionamos um checkbox para apenas executar os solvers sob demanda.
+Para gerar o modelo de estimativas de Cu, resolvemos o problema definido com os três estimadores para, posteriormente, compará-los. Clique na caixa abaixo para executar as estimativas...
 
-Marque o checkbox $(@bind run CheckBox()) para executar os solvers.
-
+Executar estimativas: $(@bind run CheckBox())
 """
 
 # ╔═╡ e9b7e9b7-146f-4763-ad79-c93e111b25b4
 if run
-	sol_idw = solve(problem, idw)
+	sol_iqd = solve(problem, IQD)
 end
 
 # ╔═╡ 78117ae8-d77c-4508-9793-3e7e9dfbb913
 if run
-	sol_SK = solve(problem, SK)
+	sol_ks = solve(problem, KS)
 end
 
 # ╔═╡ 5e86ee34-60fe-43e4-851c-2f08072f836e
 if run
-	sol_OK = solve(problem, OK)
+	sol_ko = solve(problem, KO)
 end
 
 # ╔═╡ 50650d2f-350b-446d-8c4b-6aa19e18c148
 md"""
-Marque o checkbox $(@bind viz CheckBox()) para visualizar o modelo de teores.
+Agora que os teores de Cu foram estimados, clique na caixa abaixo para visualizar o modelo de teores (Figura 17). Em seguida, selecione, na lista suspensa abaixo, a solução que deseja visualizar...
 
-**Alerta:** A visualização pode demorar a aparecer por conta da biblioteca Plots.jl utilizada neste notebook. Aconselhamos a biblioteca [Makie.jl](https://github.com/JuliaPlots/Makie.jl) para visualizações 3D.
+Visualizar estimativas: $(@bind viz CheckBox())
 """
 
 # ╔═╡ bce98bc9-c676-4a2e-bdac-10a74a9cdeae
 if run && viz
 md"""
-Solução: $(@bind selection Select(["IDW", "SK", "OK"], default = "OK"))
+Solução: $(@bind selection Select(["IQD", "KS", "KO"], default="KO"))
 """
+end
+
+# ╔═╡ 3bc456e5-9030-41e5-a48c-179da59547c9
+if run && viz
+	md"""
+	**Figura 17:** Visualização das estimativas por $selection.
+	"""
 end
 
 # ╔═╡ 97b41da9-979a-4785-9ee4-19f43d912c49
 if run && viz	
-	if selection == "IDW"
-		sol = sol_idw
-	elseif selection == "SK"
-		sol = sol_SK
-	elseif selection == "OK"
-		sol = sol_OK
+	if selection == "IQD"
+		sol = sol_iqd
+	elseif selection == "KS"
+		sol = sol_ks
+	elseif selection == "KO"
+		sol = sol_ko
 	end
 end;
 
@@ -1254,7 +1292,6 @@ if run && viz
 	xM, yM, zM = cmax
 	
 	md"""
-
 	Rotação em Z: $(@bind ϕ₁ Slider(0:5:90, default=45, show_value=true))°
 
 	Rotação em X: $(@bind ϕ₂ Slider(0:5:90, default=45, show_value=true))°
@@ -1283,162 +1320,149 @@ end
 md"""
 ## 9. Validação das estimativas
 
-Uma etapa crucial do fluxograma de estimativa de recursos é a **validação da estimativa**. Dentre as diversas formas existentes, realizaremos as seguintes validações:
+Nesta etapa, iremos comparar as estimativas geradas pelos três estimadores por meio de duas abordagens de validação:
 
-- Validação global da estimativa
-
-- Q-Q Plot entre teores amostrais e teores estimados
-
+- Validação global das estimativas;
+- Q-Q plot entre teores amostrais e teores estimados.
 """
 
-# ╔═╡ 64a8cd06-6020-434a-a1e2-115e17c51d29
+# ╔═╡ fb8dc6e2-8708-41c5-b4ca-0f04b7a2bde5
 md"""
+Na **validação global das estimativas**, nos atentaremos para a comparação entre os seguintes sumários estatísticos:
 
-##### Validação global da estimativa
+- Cu (amostral);
+- Cu (desagrupado);
+- Cu (estimado por IQD);
+- Cu (estimado por KS);
+- Cu (estimado por KO).
 
-Nesta validação, nos atentaremos para a comparação entre os seguintes sumários estatísticos das seguintes variáveis:
+> ⚠️ Como a Krigagem leva em consideração a redundância amostral, é mais conveniente compararmos a média Krigada com a a média declusterizada.
 
-- Cu amostral
-- Cu declusterizado
-- Cu estimado por IDW
-- Cu estimado por SK
-- Cu estimado por OK
-
-É importante ressaltar dois pontos acerca dos estimadores da família da Krigagem:
-
-- Como a Krigagem leva em consideração a redundância amostral, é mais conveniente compararmos a média Krigada com a a média declusterizada
-
-- Em geral estimativas por Krigagem tendem a não honrar a real variabilidade do depósito. Em outras palavras, o histograma dos teores estimados por Krigagem tende a ser mais suavizado do que o histograma dos teores amostrais
-
+Compare os cinco sumários estatísticos gerados abaixo...
 """
 
 # ╔═╡ 92b731f3-5eae-406e-a593-4e6d49f476d9
 if run
-	sol_SK_filt = sol_SK |> @filter(!isnan(_.CU)) |> DataFrame
-	sol_OK_filt = sol_OK |> @filter(!isnan(_.CU)) |> DataFrame
+	sol_ks_filt = sol_ks |> @filter(!isnan(_.CU)) |> DataFrame
+	sol_ko_filt = sol_ko |> @filter(!isnan(_.CU)) |> DataFrame
 end;
 
 # ╔═╡ c6b0f335-19cb-4fbe-a47b-2ba3fd664832
 if run
 	
-	stats_idw = DataFrame(Variable = "Cu (Inverso da distância)",
-                         X̄   = mean(sol_idw[:CU]),
-                         S²  = var(sol_idw[:CU]),
-                         P10 = quantile(sol_idw[:CU], 0.1),
-                         P50 = quantile(sol_idw[:CU], 0.5),
-                         P90 = quantile(sol_idw[:CU], 0.9))
+	stats_iqd = DataFrame(Variable = "Cu (IQD)",
+                         X̄   = mean(sol_iqd[:CU]),
+                         S²  = var(sol_iqd[:CU]),
+                         q10 = quantile(sol_iqd[:CU], 0.1),
+                         md  = quantile(sol_iqd[:CU], 0.5),
+                         q90 = quantile(sol_iqd[:CU], 0.9))
 	
-	stats_SK = DataFrame(Variable = "Cu (Krigagem simples)",
-                         X̄   = mean(sol_SK_filt[!,:CU]),
-                         S²  = var(sol_SK_filt[!,:CU]),
-                         P10 = quantile(sol_SK_filt[!,:CU], 0.1),
-                         P50 = quantile(sol_SK_filt[!,:CU], 0.5),
-                         P90 = quantile(sol_SK_filt[!,:CU], 0.9))
+	stats_ks = DataFrame(Variable = "Cu (KS)",
+                         X̄   = mean(sol_ks_filt[!,:CU]),
+                         S²  = var(sol_ks_filt[!,:CU]),
+                         q10 = quantile(sol_ks_filt[!,:CU], 0.1),
+                         md  = quantile(sol_ks_filt[!,:CU], 0.5),
+                         q90 = quantile(sol_ks_filt[!,:CU], 0.9))
 
 	
-    stats_OK = DataFrame(Variable = "Cu (Krigagem ordinária)",
-                         X̄   = mean(sol_OK_filt[!,:CU]),
-                         S²  = var(sol_OK_filt[!,:CU]),
-                         P10 = quantile(sol_OK_filt[!,:CU], 0.1),
-                         P50 = quantile(sol_OK_filt[!,:CU], 0.5),
-                         P90 = quantile(sol_OK_filt[!,:CU], 0.9))
+    stats_ko = DataFrame(Variable = "Cu (KO)",
+                         X̄   = mean(sol_ko_filt[!,:CU]),
+                         S²  = var(sol_ko_filt[!,:CU]),
+                         q10 = quantile(sol_ko_filt[!,:CU], 0.1),
+                         md  = quantile(sol_ko_filt[!,:CU], 0.5),
+                         q90 = quantile(sol_ko_filt[!,:CU], 0.9))
 
     [Cu_clus
 	 Cu_decl
-	 stats_idw
-	 stats_SK
-	 stats_OK]
+	 stats_iqd
+	 stats_ks
+	 stats_ko]
 
 end
 
 # ╔═╡ ed97c749-30b7-4c72-b790-fef5a8332548
 if run
-md"""
-A partir da comparação entre as estatísticas acima, nota-se que:
+	md"""
+	##### Observações
 
-- As médias estimadas são muito próximas da média declusterizada
-
-- OK apresentou estimativas menos suavizadas do que as estimativas de SK.
-
-
-"""
+	- As médias estimadas são muito próximas da média declusterizada;
+	- KO apresentou estimativas menos suavizadas do que aquelas geradas pela KS;
+	- Os estimadores da família da Krigagem tendem a gerar estimativas que não honram a real variabilidade do depósito. Em outras palavras, o histograma dos teores estimados por Krigagem tende a ser mais suavizado do que o histograma dos teores amostrais.
+	"""
 end
 
 # ╔═╡ 263c1837-7474-462b-bd97-ee805baec458
 md"""
+Já o **Q-Q plot entre os teores amostrais e os teores estimados** pode ser utilizado para realizar uma comparação entre as distribuições de Cu amostral e Cu estimado. Podemos analisar visualmente o grau de suavização dos diferentes estimadores.
 
-##### Q-Q plot
-
-O Q-Q plot entre os teores amostrais (reais) e os teores estimados pode ser utilizado para realizar uma comparação entre as distribuições de Cu amostral e Cu estimado. Podemos analisar visualmente o grau de suavização dos diferentes solvers.
-
-Quanto mais distantes forem os pontos do plot da função identidade (X=Y), mais suaves são as estimativas em relação a distribuicão amostral.
-
+Compare os Q-Q plots gerados abaixo (Figura 18)...
 """
 
 # ╔═╡ 193dde9b-1f4a-4313-a3a6-ba3c89600bcb
 if run
 
-	qq_idw = qqplot(
-				   samples[:CU], sol_idw[:CU],
-		           color = :red, legend = :false,
-                   xlabel = "Cu amostral (%)",
-		           ylabel = "Cu estimado (%)",
-                   title="IDW"
+	qq_iqd = qqplot(
+				   samples[:CU], sol_iqd[:CU],
+		           color=:red, legend=:false,
+                   xlabel="Cu amostral (%)",
+		           ylabel="Cu estimado (%)",
+                   title="IQD"
                    )
 	
-    qq_SK = qqplot(
-				   samples[:CU], sol_SK_filt[!,:CU],
-                   color = :red, legend = :false,
-		           xlabel = "Cu amostral (%)",
-                   title = "SK"
+    qq_ks = qqplot(
+				   samples[:CU], sol_ks_filt[!,:CU],
+                   color=:red, legend=:false,
+		           xlabel="Cu amostral (%)",
+                   title="KS"
                    )
  
-    qq_OK = qqplot(
-				   samples[:CU], sol_OK_filt[!,:CU],
-		           color = :green,
-                   xlabel = "Cu amostral (%)",
-                   title = "OK"
+    qq_ko = qqplot(
+				   samples[:CU], sol_ko_filt[!,:CU],
+		           color=:green,
+                   xlabel="Cu amostral (%)",
+                   title="KO"
 				  )
 
-    plot(qq_idw, qq_SK, qq_OK, layout = (1,3), size = (700,500))
+    plot(qq_iqd, qq_ks, qq_ko, layout=(1,3), size=(700,500))
 
+end
+
+# ╔═╡ 6926d1bb-359d-46a5-abf5-e1700d0edcf0
+if run
+	md"""
+	**Figura 18:** Q-Q plots entre os teores amostrais e estimados de Cu (%).
+	"""
 end
 
 # ╔═╡ 2181506b-76f5-4a57-adba-e90679b2b21b
 md"""
 
-#### Resumo
+##### Observações
 
-- A Krigagem ordinária é superior a Krigagem simples como ilustrado no Q-Q plot.
-
-- Especificamente neste depósito, os resultados do IDW e OK são bastante parecidos. De certa forma, isso é esperado dada a baixa erraticidade dos dados.
-
-- Métodos de Krigagem são conhecidos por suavizar **inadequadamente** a distribuição de teores.
-
-- Amanhã aprenderemos uma alternativa a Krigagem no módulo **simulação Gaussiana**.
+- KO é superior a KS conforme ilustrado no Q-Q plot;
+- Especificamente neste depósito, os resultados do IQD e OK são bastante parecidos. De certa forma, isso é esperado dada a baixa erraticidade dos dados;
+- Métodos de Krigagem são conhecidos por suavizar inadequadamente a distribuição de teores.
 """
 
 # ╔═╡ 5ad612f4-76e9-4867-b4c8-4c35540a5f47
 md"""
 ## 10. Exportação das estimativas
 
-É possível exportar o modelo de teores para diferentes formatos como CSV e GSLIB caso seja necessário continuar o trabalho em outro software.
+Nesta última seção, iremos exportar as estimativas geradas pelo método da Krigagem Ordinária em dois formatos distintos:
 
-Marque o checkbox $(@bind store CheckBox()) para salvar o modelo de teores.
+- GSLIB;
+- CSV.
 
-Exportação no formato GSLIB:
+Marque a caixa abaixo para executar a exportação das estimativas em ambos os formatos...
 
+Salvar estimativas: $(@bind store CheckBox())
 """
 
 # ╔═╡ b96c4bd5-54ba-4394-b963-5c5ddc06cf3b
+# GSLIB
 if run && store
-	save("output/grademodel.gslib", sol_OK)
+	save("output/grademodel.gslib", sol_ko)
 end;
-
-# ╔═╡ 83b9ba41-4ada-496a-bf0f-32b37fde1027
-md"""
-Exportação no formato CSV:
-"""
 
 # ╔═╡ 79bc4b7d-72de-4c9e-94f5-3b5ba6bbff1d
 function csvtable(solution, variable)
@@ -1456,12 +1480,13 @@ function csvtable(solution, variable)
 	
 	var  = solution[variable*"-variance"]
 	
-	DataFrame(MEAN = mean, VARIANCE = var, X = X, Y = Y, Z = Z)
+	DataFrame(MEAN=mean, VARIANCE=var, X=X, Y=Y, Z=Z)
 end;
 
 # ╔═╡ 245c7304-1cc0-408a-97ec-867ac0cc81b0
+# CSV
 if run && store
-	csvtable(sol_OK, "CU") |> CSV.write("output/grademodel.csv")
+	csvtable(sol_ko, "CU") |> CSV.write("output/grademodel.csv")
 end;
 
 # ╔═╡ 1164ba05-0835-4713-b11c-92b37085b744
@@ -3043,6 +3068,7 @@ version = "0.9.1+5"
 # ╟─980f4910-96f3-11eb-0d4f-b71ad9888d73
 # ╟─14ac7b6e-9538-40a0-93d5-0379fa009872
 # ╟─6b7e7c5d-7a86-4ea4-a47e-fb4148030c1a
+# ╟─3afd7a32-3696-4cea-b00c-b52bfdb003ba
 # ╟─c544614a-3e5c-4d22-9340-592aabf84871
 # ╟─3353d0be-4280-4ffd-824b-745bb6b64f41
 # ╟─8e2b3339-a65d-4e1b-a9fb-69b6cd4631ea
@@ -3054,12 +3080,14 @@ version = "0.9.1+5"
 # ╟─bb8336ba-f347-418c-8883-47d86350bc94
 # ╠═412cfe3d-f9f1-49a5-9f40-5ab97946df6d
 # ╟─d343401d-61dc-4a45-ab9b-beaff2534886
+# ╟─ec102b27-79e2-4a91-99d6-dff061752855
 # ╟─bedcf585-53ef-4cf6-9dc2-d3fc9cff7755
 # ╠═15fd1c4d-fbf2-4389-bc1c-eabbbd26817b
 # ╟─39ae0ea7-9659-4c7b-b161-fd9c3495f4e3
 # ╟─f9545a95-57c0-4de6-9ab7-3ac3728b3d27
 # ╠═4d5f2467-c7d5-4a82-9968-97f193090bd6
 # ╟─2af7dfc5-a26a-4ad3-a046-31d1dfa107f1
+# ╟─ee6c8dfa-d8be-4b5a-bfe0-9e1b3f394e9d
 # ╟─f4bd13d4-70d3-4167-84ff-9d3c7200e143
 # ╟─41790d87-ce85-461f-a16d-04821a3624bb
 # ╟─f40bca06-6a3e-4807-9857-ff17d21893bc
@@ -3074,6 +3102,7 @@ version = "0.9.1+5"
 # ╠═676bea93-69a9-4f2c-bb3e-759a9d28b12e
 # ╠═59dfbb66-f188-49f1-87ba-4f7020c4c031
 # ╟─7a021fbd-83ac-4a36-bb8c-98519e6f8acb
+# ╟─fb67daea-0b8b-47da-b06c-8256566f9ba0
 # ╟─f2be5f11-1923-4658-93cf-800ce57c32d3
 # ╟─ecec08be-b9da-4913-9f5a-3a77631fa96e
 # ╟─d00f02fc-3c14-4911-a36b-209c747f96cb
@@ -3085,16 +3114,18 @@ version = "0.9.1+5"
 # ╟─eac8e835-83bc-4f9c-b25b-3aaddcf69611
 # ╟─8bb2f630-8234-4f7f-a05c-8206993bdd45
 # ╟─862dd0cf-69ae-48e7-92fb-ff433f62e67c
-# ╠═ea0968ca-a997-40c6-a085-34b3aa89807e
+# ╟─ea0968ca-a997-40c6-a085-34b3aa89807e
 # ╟─52c28a55-3a4a-4df3-841a-ab8fc748bf55
 # ╟─3ae99e49-6996-4b4a-b930-f6073994f25c
 # ╟─ccbcf57e-d00b-43df-8555-eee8bf4f9e6f
+# ╟─c6c41764-509c-4f40-b063-a5f85dcc16db
 # ╟─3c2eb77b-60e9-4aeb-9d19-ba22293741f9
 # ╠═63b75ae2-8dca-40e3-afe0-68c6a639f54e
 # ╟─5699c563-d6cb-4bc2-8063-e1be00722a41
 # ╟─16cb8eaa-773e-4a42-ae8d-00bebddedc59
 # ╟─af160a03-10ea-404e-87a3-e6417058449f
 # ╟─161cc157-9667-48b5-8832-586c4bb0c476
+# ╟─6ec16d83-d8fb-45d0-a7f8-d75f712b4c91
 # ╟─e49b7b48-77d8-4abf-a5df-70e9c65e3667
 # ╟─b02263dc-280a-40b4-be1e-9c3b6873e153
 # ╟─6d520cfe-aa7b-4083-b2bf-b34f840c0a75
@@ -3142,10 +3173,12 @@ version = "0.9.1+5"
 # ╟─d700e40b-dd7f-4630-a29f-f27773000597
 # ╠═38d15817-f3f2-496b-9d83-7dc55f4276dc
 # ╟─b2156251-26ae-4b1d-8757-ffdf3a02a2f8
+# ╟─51f8bc33-a24f-4ce4-a81b-cd22fb8312ec
 # ╟─9baefd13-4c16-404f-ba34-5982497e8da6
 # ╟─a7a59395-59ec-442a-b4b6-7db55d150d53
 # ╠═f7cee6a3-5ac2-44ff-9d5e-58ede7327c46
 # ╟─6f7663ed-c672-4d29-8b06-415dcdc8fbff
+# ╟─a73cc834-c600-4278-bc77-49b85dc90256
 # ╟─12d79d77-358c-4098-993a-d5be538929a2
 # ╟─a8adf478-620d-4744-aae5-99d0891fe6b0
 # ╠═affacc76-18e5-49b2-8e7f-77499d2503b9
@@ -3159,19 +3192,20 @@ version = "0.9.1+5"
 # ╟─50650d2f-350b-446d-8c4b-6aa19e18c148
 # ╟─bce98bc9-c676-4a2e-bdac-10a74a9cdeae
 # ╟─b2197d9c-0342-4efe-8c9e-ecf45a07fcf3
+# ╟─3bc456e5-9030-41e5-a48c-179da59547c9
 # ╟─97b41da9-979a-4785-9ee4-19f43d912c49
 # ╟─63d5db73-1073-4b8d-bfab-93577579571f
 # ╟─4f05c05d-c92a-460d-b3e0-d392111ef57a
-# ╟─64a8cd06-6020-434a-a1e2-115e17c51d29
+# ╟─fb8dc6e2-8708-41c5-b4ca-0f04b7a2bde5
 # ╟─92b731f3-5eae-406e-a593-4e6d49f476d9
 # ╟─c6b0f335-19cb-4fbe-a47b-2ba3fd664832
 # ╟─ed97c749-30b7-4c72-b790-fef5a8332548
 # ╟─263c1837-7474-462b-bd97-ee805baec458
 # ╟─193dde9b-1f4a-4313-a3a6-ba3c89600bcb
+# ╟─6926d1bb-359d-46a5-abf5-e1700d0edcf0
 # ╟─2181506b-76f5-4a57-adba-e90679b2b21b
 # ╟─5ad612f4-76e9-4867-b4c8-4c35540a5f47
 # ╠═b96c4bd5-54ba-4394-b963-5c5ddc06cf3b
-# ╟─83b9ba41-4ada-496a-bf0f-32b37fde1027
 # ╠═245c7304-1cc0-408a-97ec-867ac0cc81b0
 # ╟─79bc4b7d-72de-4c9e-94f5-3b5ba6bbff1d
 # ╟─1164ba05-0835-4713-b11c-92b37085b744

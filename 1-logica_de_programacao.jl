@@ -54,7 +54,7 @@ md"""
 >- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
 >- Algumas células encontram-se ocultadas (e.g. células que geram os plots). Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
 >- A explicação das células que geram os plots está fora do escopo deste notebook. Entretanto, a sintaxe é bem intuitiva e pode ser facilmente compreendida!
->- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
+>- Você pode ainda clicar no ícone `...`, no canto superior direito de uma célula, para excluí-la do notebook.
 >- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."` (e.g. esta célula). Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
 >- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
 >- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
@@ -90,9 +90,7 @@ frase = "Olá, mundo! 🌎"
 
 # ╔═╡ 55a2c622-0f9f-45db-b534-55873c0759d4
 md"""
-
-> ⚠️ As cadeias de caracteres (**strings**) devem ser encapsuladas por áspas duplas.
-
+> ⚠️ As cadeias de caracteres (**strings**) devem ser encapsuladas por áspas duplas. Emojis também são considerados cadeias de caracteres! Clique [aqui](https://getemoji.com/) para copiar emojis e colar nas células deste notebook.
 """
 
 # ╔═╡ 449c91c3-7f03-4ffd-95e7-02cdb58323fd
@@ -466,9 +464,9 @@ Abaixo, são listados alguns recursos complementares a este notebook:
 
 > [Documentação da Linguagem Julia](https://docs.julialang.org/en/v1/)
 
-> [Canal do YouTube - Julia Language](https://www.youtube.com/c/TheJuliaLanguage)
+> [YouTube - Julia Language](https://www.youtube.com/c/TheJuliaLanguage)
 
-> [Minicurso de Geoestatística CBMina 2021](https://github.com/juliohm/CBMina2021)
+> [YouTube - Programação Dinâmica](https://www.youtube.com/playlist?list=PL5TJqBvpXQv4TO4Y_JZExBCBzNXDLYUCj)
 """
 
 # ╔═╡ ce463e41-8cb2-46cb-9656-1503997a883e

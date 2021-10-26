@@ -59,7 +59,7 @@ md"""
 >- Caso deseje executar alguma célula do notebook, clique no ícone ▶️, localizado no canto inferior direito da célula.
 >- Algumas células encontram-se ocultadas (e.g. células que geram os plots). Você pode clicar no ícone 👁️, localizado no canto superior esquerdo da célula, para ocultá-la ou exibí-la.
 >- A explicação das células que geram os plots está fora do escopo deste notebook. Entretanto, a sintaxe é bem intuitiva e pode ser facilmente compreendida!
->- Você pode ainda clicar no ícone `...`, no canto superior direito, para excluir uma célula do notebook.
+>- Você pode ainda clicar no ícone `...`, no canto superior direito de uma célula, para excluí-la do notebook.
 >- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."` (e.g. esta célula). Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
 >- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
 >- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
@@ -792,9 +792,9 @@ md"""
 
 Os **mapas de localização** indicam a posição de cada amostra no espaço geográfico e normalmente é colorido pelos valores da variável de interesse. A Figura 10 mostra um exemplo de mapa de localização.
 
-Quando o objetivo final é a estimativa de recursos, uma prática comum é visualizar a posição das amostras _**highgrade**_ no espaço geográfico. Caso não se tenha muitas informações, é usual adotar a  convenção em que $highgrades > q(0.90)$.
+Quando o objetivo final é a estimativa de recursos, uma prática comum é visualizar a posição das amostras **highgrade** no espaço geográfico. Caso não se tenha muitas informações, é usual adotar a  convenção em que $highgrades > q(0.90)$.
 
-Na lista suspensa abaixo, selecione a variável de interesse e, opcionalmente, marque a caixa para filtrar apenas as amostras _highgrade_...
+Na lista suspensa abaixo, selecione a variável de interesse e, opcionalmente, marque a caixa para filtrar apenas as amostras highgrade...
 """
 
 # ╔═╡ fc62d1b2-3bf6-4c42-bda2-840673f24e25
@@ -834,11 +834,62 @@ md"""
 - As amostras highgrade de `Co` e `Cr` possivelmente apresentam uma maior continuidade espacial na direção NE-SW.
 """
 
+# ╔═╡ dd91c3a4-6c9c-479c-a7a4-26f46185025e
+md"""
+## 7. Desagrupamento
+
+É muito comum, na mineração, que regiões "mais ricas" de um depósito sejam mais amostradas do que suas porções "mais pobres". Essa situação se justifica pelo fato de a sondagem ser um procedimento de elevado custo e, nesse sentido, é mais coerente que amostremos mais as regiões mais promissoras do depósito.
+
+A Teoria da Amostragem deixa claro que a amostragem de um fenômeno (*e.g.* mineralização de Cu) deve ser representativa. Em outras palavras:
+
+> *Uma amostragem é representativa, quando qualquer parte do todo (população/depósito) tem iguais chances de ser amostrada. Se alguma parte for favorecida/desfavorecida na amostragem, a amostra não é representativa*.
+
+Nesse sentido, como frequentemente há um agrupamento amostral preferencial nas porções ricas dos depósitos, podemos dizer que a amostragem de depósitos minerais não é representativa. Dessa maneira, como temos uma amostragem sistematicamente não representativa, teremos uma estimativa sistematicamente não fiel à realidade do depósito.
+"""
+
+# ╔═╡ 612bcc28-c174-43be-834c-8b1f74632631
+md"""
+Uma forma de mitigar esse viés amostral intrínseco à indústria da mineração é a utilização de técnicas de **desagrupamento** (ou declusterização). Essas técnicas atribuem um peso a cada amostra baseado na sua proximidade com as amostras circunvizinhas. Nesse sentido, dados situados em regiões de maior densidade amostral (i.e. muitas amostras próximas) recebem pesos baixos, enquanto dados localizados em porções de baixa densidade amostral ganham pesos maiores. A premissa é que dados mais próximos são mais redundantes e podem enviesar enviesar as estatísticas (*Deutsch, 2015*).
+
+Podemos utilizar os pesos de desagrupamento para recalcular as estatísticas dos teores. Esses pesos são calculados em função de um tamanho de um bloco especificado. 
+
+Utilize o slider abaixo para alterar o tamanho do bloco de desagrupamento. Analise o efeito desse parâmetro nas estatísticas desagrupadas da variável `Cu`.
+"""
+
+# ╔═╡ dd2a6a37-ae4a-46b7-a137-74958e3ef296
+md"""
+Tamanho de bloco: $(@bind tam_bloco Slider(0.1:0.05:2.0, default=0.25, show_value=true))
+"""
+
+# ╔═╡ b5ac40b8-e5d9-4dd2-90cf-827360ce9c25
+function sumdesagrup(teor::Symbol, id=nothing)
+	
+	sum = DataFrame(teor = id,
+                    X̄    = mean(geodados, teor, tam_bloco),
+				    md   = quantile(geodados, teor, 0.5, tam_bloco),
+                    S²   = var(geodados, teor, tam_bloco))
+				
+	return sum
+end;
+
+# ╔═╡ 2125de8e-7844-4741-9301-aa84b58f7900
+[sumario("Cu")[!,[1,2,3,6]]
+ sumdesagrup(:Cu, "Cu (desagrupado)")]
+
+# ╔═╡ 6f329001-e19c-4685-977d-802a860fe74e
+md"""
+Normalmente, o tamanho do bloco de desagrupamento é escolhido em função das dimensões da malha. Nesse sentido, o valor default do slider foi definido como o espaçamento médio da malha (i.e. $\approx 0,25$).
+
+> ⚠️ Voltaremos a mencionar as técnicas de desagrupamento no [módulo 5](). As estatísticas desagrupadas são utilizadas na validação das estimativas.
+"""
+
 # ╔═╡ 47cf20cd-62f6-43c2-b531-31eab994aa15
 md"""
 ## Referências
 
 *Bussab, W. O.; Morettin, P. A. [Estatística básica](https://www.google.com.br/books/edition/ESTAT%C3%8DSTICA_B%C3%81SICA/vDhnDwAAQBAJ?hl=pt-BR&gbpv=0). 9ª ed. São Paulo: Saraiva, 2017.*
+
+*Deutsch, C. V. [Cell declustering parameter selection](https://geostatisticslessons.com/lessons/celldeclustering). In: Geostatistics Lessons, 2015.*
 
 *Goovaerts, P. [Geostatistics for natural resources evaluation](https://www.google.com.br/books/edition/Geostatistics_for_Natural_Resources_Eval/CW-7tHAaVR0C?hl=pt-BR&gbpv=0). New York: Oxford University Press, 1997.*
 
@@ -862,6 +913,8 @@ Abaixo, são listados alguns recursos complementares a este notebook:
 > [Videoaula Estatística Univariada - University of Texas](https://www.youtube.com/watch?v=wAcbA2cIqec&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ)
 
 > [Videoaula Estatística Bivariada - LPM/UFRGS](https://www.youtube.com/watch?v=U0sqVJY_mzA)
+
+> [Videoaula Desagrupamento - LPM/UFRGS](https://www.youtube.com/watch?v=lCCOwPM51dc)
 """
 
 # ╔═╡ 0e813b9b-6bb4-4377-b297-f3789f09f42c
@@ -2531,6 +2584,12 @@ version = "0.9.1+5"
 # ╟─314aaeb2-9550-4662-b84e-357b659c3635
 # ╟─70069594-eb84-42ae-9f52-c5c8fa0aae0b
 # ╟─7a412bca-ee60-46dc-953f-9fda81d234c2
+# ╟─dd91c3a4-6c9c-479c-a7a4-26f46185025e
+# ╟─612bcc28-c174-43be-834c-8b1f74632631
+# ╟─dd2a6a37-ae4a-46b7-a137-74958e3ef296
+# ╟─b5ac40b8-e5d9-4dd2-90cf-827360ce9c25
+# ╟─2125de8e-7844-4741-9301-aa84b58f7900
+# ╟─6f329001-e19c-4685-977d-802a860fe74e
 # ╟─47cf20cd-62f6-43c2-b531-31eab994aa15
 # ╟─5f177c03-cb3d-4268-8c33-3aa7610e337b
 # ╟─0e813b9b-6bb4-4377-b297-f3789f09f42c

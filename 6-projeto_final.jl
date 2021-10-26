@@ -1269,9 +1269,6 @@ Solução: $(@bind selection Select(["IQD", "KS", "KO"], default="KO"))
 """
 end
 
-# ╔═╡ ee41b8da-a488-478d-a424-ad46470652ae
-@bind veg Radio(["potato", "carrot"])
-
 # ╔═╡ 3bc456e5-9030-41e5-a48c-179da59547c9
 if run && viz
 	md"""
@@ -1663,7 +1660,6 @@ Os seguintes pacotes foram utilizados neste notebook:
 # ╟─50650d2f-350b-446d-8c4b-6aa19e18c148
 # ╟─bce98bc9-c676-4a2e-bdac-10a74a9cdeae
 # ╟─b2197d9c-0342-4efe-8c9e-ecf45a07fcf3
-# ╠═ee41b8da-a488-478d-a424-ad46470652ae
 # ╟─3bc456e5-9030-41e5-a48c-179da59547c9
 # ╟─97b41da9-979a-4785-9ee4-19f43d912c49
 # ╟─63d5db73-1073-4b8d-bfab-93577579571f

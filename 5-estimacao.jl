@@ -18,7 +18,7 @@ end;
 
 # ╔═╡ 3e70ffa1-2a50-4dc4-a529-e4361ac6ad5f
 html"""
-<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp📊&nbsp<b>Estimação</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
+<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp🎯&nbsp<b>Estimação</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
 """
 
 # ╔═╡ 9f8d2a06-275e-4689-8a69-b1f4dec807b3
@@ -32,7 +32,7 @@ md"""
 
 # ╔═╡ 84ad4d5f-b3c3-4c21-89f2-d15396e83d05
 md"""
-# 📊 Estimação
+# 🎯 Estimação
 
 Você com certeza já ouviu falar sobre **modelagem geológica 3D**. Durante esse procedimento, o geólogo utiliza os dados disponíveis (e.g. furos de sondagem, mapa geológico) e faz algumas inferências para gerar um modelo tridimensional da subsuperfície. Após a geração desse modelo (contínuo), ele normalmente é discretizado em pequenos "tijolos" denominados blocos. Por essa razão, o modelo geológico discretizado é chamado de **modelo de blocos**.
 
@@ -95,7 +95,67 @@ em que $\{z(x_1), z(x_2), ..., z(x_n)\}$ são os valores das $n$ amostras que se
 Os métodos caracterizados por essa equação são denominados **estimadores lineares ponderados** e se diferenciam entre si de acordo com a forma que os pesos $w_i$ são atribuídos a cada amostra.
 """
 
-# ╔═╡ 0d1397b7-9f87-4562-b90f-833c5e9466f2
+# ╔═╡ 9b31cfec-400a-4068-84b8-8170b3c8ab58
+md"""
+### Inverso da Potência da Distância (IPD)
+
+"""
+
+# ╔═╡ 2c9c38c6-7047-4548-ae9c-c6207d1f7158
+
+
+# ╔═╡ 956f6c67-93f1-41bf-b921-e893111bbebe
+md"""
+### Krigagem Simples (KS)
+
+"""
+
+# ╔═╡ 69d50ed7-d85e-4eb0-a7a7-73aaf1a8d0d9
+
+
+# ╔═╡ eab5920c-fd1f-4e03-a6f3-90e3ce731b6e
+md"""
+### Krigagem Ordinária (KO)
+
+"""
+
+# ╔═╡ 604c2a49-ebe8-42b7-83d3-72595c74f7b3
+
+
+# ╔═╡ 5a9f4bbf-202f-4191-b59d-f2bed05347ae
+md"""
+## 2. Criação do domínio de estimativas
+
+"""
+
+# ╔═╡ 669d757d-dc19-43e1-b96f-8c1aa31f7579
+
+
+# ╔═╡ 2531eee8-72c5-4056-879c-b1b65273d51a
+md"""
+## 3. Definição do problema de estimação
+
+"""
+
+# ╔═╡ 36033c09-267c-48df-b6cd-ce2ee2a5eac6
+
+
+# ╔═╡ 8aaca25b-8ebc-418c-ad48-344a31ba8ed9
+md"""
+## 4. Definição do estimador
+
+"""
+
+# ╔═╡ c86d68b0-468b-45fe-b1a7-1521a5ca8cc7
+
+
+# ╔═╡ 14ba26ab-db0d-4993-9b98-56309ff23389
+md"""
+## 5. Solução do problema de estimação
+
+"""
+
+# ╔═╡ 8a27e470-a566-4377-b2ae-a3e5ad9969da
 
 
 # ╔═╡ b1b823ac-f9cf-4e5b-a622-4274f3785567
@@ -1621,7 +1681,20 @@ version = "0.9.1+5"
 # ╟─035ef186-a067-44c0-b9a0-bdac6f4d770b
 # ╟─564423c2-6a3e-4919-a6fc-32f7d1664f86
 # ╟─a069cc27-d08e-47b4-9f75-24dab178b333
-# ╠═0d1397b7-9f87-4562-b90f-833c5e9466f2
+# ╟─9b31cfec-400a-4068-84b8-8170b3c8ab58
+# ╠═2c9c38c6-7047-4548-ae9c-c6207d1f7158
+# ╟─956f6c67-93f1-41bf-b921-e893111bbebe
+# ╠═69d50ed7-d85e-4eb0-a7a7-73aaf1a8d0d9
+# ╟─eab5920c-fd1f-4e03-a6f3-90e3ce731b6e
+# ╠═604c2a49-ebe8-42b7-83d3-72595c74f7b3
+# ╟─5a9f4bbf-202f-4191-b59d-f2bed05347ae
+# ╠═669d757d-dc19-43e1-b96f-8c1aa31f7579
+# ╟─2531eee8-72c5-4056-879c-b1b65273d51a
+# ╠═36033c09-267c-48df-b6cd-ce2ee2a5eac6
+# ╟─8aaca25b-8ebc-418c-ad48-344a31ba8ed9
+# ╠═c86d68b0-468b-45fe-b1a7-1521a5ca8cc7
+# ╟─14ba26ab-db0d-4993-9b98-56309ff23389
+# ╠═8a27e470-a566-4377-b2ae-a3e5ad9969da
 # ╟─b1b823ac-f9cf-4e5b-a622-4274f3785567
 # ╟─9cd2e572-23fc-4f7a-9b91-a5d3d13a9b48
 # ╟─c8ced4cd-a74f-48bc-8cca-fb3971930390

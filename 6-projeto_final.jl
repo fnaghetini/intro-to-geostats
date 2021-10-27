@@ -71,7 +71,7 @@ md"""
 md"""
 ## 1. Base de dados
 
-Neste módulo, utilizaremos uma base de dados desenvolvida pelo autor, denominada [Junipero](). Ela consiste em conjunto de furos realizados durante uma campanha de sondagem em um depósito fictício de Cu Pórfiro. Portanto, estaremos interessados na estimativa da commodity Cu (%).
+Neste módulo, utilizaremos uma base de dados desenvolvida pelo autor, denominada [Junipero](https://github.com/fnaghetini/intro-to-geostats/tree/main/data/Junipero). Ela consiste em conjunto de furos realizados durante uma campanha de sondagem em um depósito fictício de Cu Pórfiro. Portanto, estaremos interessados na estimativa da commodity Cu (%).
 
 A Figura 01 mostra os campos presentes nas quatro tabelas do banco de dados.
 """
@@ -517,7 +517,7 @@ end
 md"""
 ##### Observações
 
-- A média declusterizada representa $(round(Xᵣ, digits=2))% da média original. Ou seja, há uma diferença de $(round((100-Xᵣ), digits=2))% de Cu entre a média original e a média declusterizada;
+- A média desagrupada representa $(round(Xᵣ, digits=2))% da média original. Ou seja, há uma diferença de $(round((100-Xᵣ), digits=2))% de Cu entre a média original e a média desagrupada;
 - Utilizaremos essas estatísticas desagrupadas mais tarde, durante a validação das estimativas.
 """
 
@@ -737,7 +737,7 @@ begin
 
     Random.seed!(1234)
 	
-	coloraziₐ = :green
+	coloraziₐ = :orange
 	coloraziᵦ = :purple
 
     gaziₐ = DirectionalVariogram(sph2cart(azi, 0), samples, :CU,
@@ -757,7 +757,7 @@ end
 
 # ╔═╡ 9389a6f4-8710-44c3-8a56-804017b6239b
 md"""
-✔️ Agora sabemos que a *primeira rotação do variograma é igual a $(azi)*. Utilizaremos essa informação mais a frente para a criação do elipsoide de anisotropia.
+✔️ Agora sabemos que a *primeira rotação do variograma é igual a $(azi)*º. Utilizaremos essa informação mais a frente para a criação do elipsoide de anisotropia.
 """
 
 # ╔═╡ 99baafe5-6249-4eda-845f-d7f6219d5726
@@ -853,7 +853,7 @@ end
 
 # ╔═╡ 55373bb0-6953-4c6f-b1dd-2dacac90b6cc
 md"""
-✔️ Agora sabemos que a *segunda rotação do variograma é igual a $dip °*. Além disso, também encontramos os *alcances do eixo primário* do variograma.
+✔️ Agora sabemos que a *segunda rotação do variograma é igual a $(dip)°*. Além disso, também encontramos os *alcances do eixo primário* do variograma.
 """
 
 # ╔═╡ 6c048b83-d12c-4ce8-9e9a-b89bf3ef7638
@@ -1024,7 +1024,7 @@ md"""
 md"""
 ### Modelo de variograma final
 
-Agora que temos as três direções principais do modelo de variograma, podemos sumarizar as informações obtidas nos passos anteriores na tabela abaixo. A Figura 15 é a representação gráfica da informação contida nessa tabela.
+Agora que temos as três direções principais do modelo de variograma, podemos sumarizar as informações obtidas nos passos anteriores na tabela abaixo. A Figura 15 é a representação gráfica das informações contidas nessa tabela.
 
 | Estrutura | Modelo | Alcance em Y | Alcance em X | Alcance em Z | Contribuição | Efeito Pepita |
 |:---:|:--------:|:--------:|:--------:|:--------:|:---:|:---:|
@@ -1088,7 +1088,7 @@ end;
 
 # ╔═╡ b2156251-26ae-4b1d-8757-ffdf3a02a2f8
 md"""
->🏆 Finalmente encontramos o modelo de variograma final $\gamma$, que será utilizado como entrada durante a estimação por Krigagem.
+🏆 Finalmente encontramos o modelo de variograma final `γ`, que será utilizado como entrada na estimação por Krigagem.
 """
 
 # ╔═╡ 51f8bc33-a24f-4ce4-a81b-cd22fb8312ec
@@ -1100,22 +1100,17 @@ md"""
 md"""
 ## 8. Estimação
 
-Nesta seção, seguiremos o fluxo de trabalho do [GeoStats.jl](https://juliaearth.github.io/GeoStats.jl/stable/index.html#Quick-example), anteriormente apresentado no [módulo 5]():
-
-- **Etapa 1:** Criação do domínio de estimativas;
-- **Etapa 2:** Definição do problema de estimação;
-- **Etapa 3:** Definição do estimador;
-- **Etapa 4:** Solução do problema de estimação.
+Nesta seção, seguiremos o fluxo de trabalho do [GeoStats.jl](https://juliaearth.github.io/GeoStats.jl/stable/index.html#Quick-example), anteriormente apresentado no [módulo 5]().
 """
 
 # ╔═╡ a7a59395-59ec-442a-b4b6-7db55d150d53
 md"""
 
-### Etapa 1: Criação do domínio de estimativas
+### Criação do modelo de blocos
 
 Nesta primeira etapa, delimitaremos o domínio de estimativas que, no nosso caso, podemos chamar de modelo de blocos.
 
-Para definir o modelo de blocos, devemos configurar três parâmetros:
+Para definir o modelo de blocos, iremos configurar três parâmetros:
 
 - Ponto de origem do modelo de blocos;
 - Ponto de término do modelo de blocos;
@@ -1132,7 +1127,7 @@ begin
 	# lados da caixa delimitadora
 	extent = maximum(bbox) - minimum(bbox)
 	
-	# tamanho dos blocos em cada direção (metros)
+	# dimensões dos blocos
 	blocksizes = (20., 20., 10.)
 	
 	# número de blocos em cada direção
@@ -1162,26 +1157,34 @@ plot(grid, camera = (ψ₁,ψ₂), xlabel = "X", ylabel = "Y", zlabel = "Z")
 # ╔═╡ a8adf478-620d-4744-aae5-99d0891fe6b0
 md"""
 
-### Etapa 2: Definição do problema de estimação
+### Definição do problema de estimação
 
 Para definirmos o problema de estimação, devemos definir os seguintes parâmetros:
 
-- Furos georreferenciados;
-- Modelo de blocos;
+- Amostras georreferenciadas;
+- Domínio de estimativas;
 - Variável de interesse.
 
-Neste exemplo, passaremos os furos georreferenciados `samples`, o modelo de blocos `grid` e a variável de interesse `:CU` como parâmetros da função `EstimationProblem`...
+Neste exemplo, passaremos os furos georreferenciados `samples` e a variável de interesse `:CU` como parâmetros da função `EstimationProblem`. Além disso, também passaremos, como domínio de estimativas, os `centroides` do modelo de blocos gerado anteriomente. Para isso, utilizaremos a função `centroid`...
+
+> ⚠️ *Centroide* é um termo genérico para se referir ao centro de um poliedro que, no nosso caso, representa cada um dos blocos.
 """
 
 # ╔═╡ affacc76-18e5-49b2-8e7f-77499d2503b9
-problem = EstimationProblem(samples, grid, :CU)
+begin
+	# centroides dos blocos
+	centroides = Collection(centroid.(grid))
+	
+	# problema de estimação
+	problem = EstimationProblem(samples, centroides, :CU)
+end
 
 # ╔═╡ 31cd3d10-a1e8-4ad8-958f-51de08d0fa54
 md"""
 
-### Etapa 3: Definição do estimador
+### Definição do estimador
 
-Nesta etapa, devemos selecionar o estimador (solver) e configurar os parâmetros de vizinhança. Neste exemplo, utilizaremos três estimadores:
+Nesta etapa, devemos selecionar o estimador (i.e. solver) e configurar os parâmetros de vizinhança. Neste exemplo, utilizaremos três estimadores:
 
 - Inverso do Quadrado da Distância (IQD);
 - Krigagem Simples (KS);
@@ -1228,7 +1231,7 @@ end;
 # ╔═╡ 9b3fe534-78fa-48db-a101-e2a43f2478d6
 md"""
 
-### Etapa 4: Solução do problema de estimação
+### Solução do problema de estimação
 
 Para gerar o modelo de estimativas de Cu, resolvemos o problema definido com os três estimadores para, posteriormente, compará-los. Clique na caixa abaixo para executar as estimativas...
 
@@ -1267,7 +1270,9 @@ end
 # ╔═╡ 3bc456e5-9030-41e5-a48c-179da59547c9
 if run && viz
 	md"""
-	**Figura 17:** Visualização das estimativas por $selection.
+	**Figura 17:** Visualização das estimativas de Cu por $selection.
+	
+	Utilize os sliders abaixo para rotacionar e fatiar o modelo de estimativas gerado...
 	"""
 end
 
@@ -1311,7 +1316,7 @@ if run && viz
 	@df scatter(:X, :Y, :Z, marker_z = :CU, color = :jet, marker = (:square, 4),
 	            xlabel = "X", ylabel = "Y", zlabel = "Z",
 		        xlims = (xm, xM), ylims = (ym, yM), zlims = (zm, zM),
-	            label = "Modelo de teores de Cu (%)", camera = (ϕ₁, ϕ₂))
+	            label = "Cu (%) - $(selection)", camera = (ϕ₁, ϕ₂))
 end
 
 # ╔═╡ 4f05c05d-c92a-460d-b3e0-d392111ef57a
@@ -1334,9 +1339,11 @@ Na **validação global das estimativas**, nos atentaremos para a comparação e
 - Cu (estimado por KS);
 - Cu (estimado por KO).
 
-> ⚠️ Como a Krigagem leva em consideração a redundância amostral, é mais conveniente compararmos a média Krigada com a a média declusterizada.
+> ⚠️ Como a Krigagem leva em consideração a redundância amostral, é mais conveniente compararmos a média Krigada com a a média desagrupada.
 
 Compare os cinco sumários estatísticos gerados abaixo...
+
+> ⚠️ Para visualizar os sumários estatísticos, a caixa *Executar estimativas* deve estar marcada. 
 """
 
 # ╔═╡ 92b731f3-5eae-406e-a593-4e6d49f476d9
@@ -1388,7 +1395,7 @@ if run
 	- IQD gerou estimativas menos suavizadas do que KO;
 	- KO gerou estimativas menos suavizadas do que KS e IQD.
 	
-	> ⚠️ Os estimadores da família da Krigagem tendem a gerar estimativas que não honram a real variabilidade do depósito (i.e. mais suavizadas). Uma alternativa seria a utilização de técnicas de **Simulação Geoestatística**. Para ter uma breve introdução a esse tópico, confira este [notebook](https://github.com/juliohm/CBMina2021/blob/main/notebook2.jl). 
+	> ⚠️ Os estimadores da família da Krigagem tendem a gerar estimativas que não honram a real variabilidade do depósito (i.e. mais suavizadas). Uma alternativa seria a utilização de técnicas de **Simulação Geoestatística**. Para ter uma breve introdução a esse tópico, confira este [notebook](https://github.com/juliohm/CBMina2021/blob/main/notebook2.jl) e esta [videoaula](https://www.youtube.com/watch?v=3cLqK3lR56Y&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ) do Prof. Michael Pyrcz. 
 	"""
 end
 
@@ -1397,6 +1404,8 @@ md"""
 Já o **Q-Q plot entre os teores amostrais e os teores estimados** pode ser utilizado para realizar uma comparação entre as distribuições de Cu amostral e Cu estimado. Podemos analisar visualmente o grau de suavização dos diferentes estimadores.
 
 Compare os Q-Q plots gerados abaixo (Figura 18)...
+
+> ⚠️ Para visualizar os Q-Q plots, a caixa *Executar estimativas* deve estar marcada. 
 """
 
 # ╔═╡ 193dde9b-1f4a-4313-a3a6-ba3c89600bcb
@@ -1436,13 +1445,14 @@ if run
 end
 
 # ╔═╡ 2181506b-76f5-4a57-adba-e90679b2b21b
-md"""
+if run
+	md"""
+	##### Observações
 
-##### Observações
-
-- A KO mostra uma menor suavização em relação aos demais métodos;
-- Métodos de Krigagem são conhecidos por suavizar inadequadamente a distribuição de teores.
-"""
+	- A KO mostra uma menor suavização em relação aos demais métodos;
+	- Métodos de Krigagem são conhecidos por suavizar inadequadamente a distribuição de teores.
+	"""
+end
 
 # ╔═╡ 5ad612f4-76e9-4867-b4c8-4c35540a5f47
 md"""
@@ -1454,6 +1464,8 @@ Nesta última seção, iremos exportar as estimativas geradas pelo método da Kr
 - CSV.
 
 Marque a caixa abaixo para executar a exportação das estimativas em ambos os formatos...
+
+> ⚠️ Para exportar as estimativas, a caixa *Executar estimativas* deve estar marcada.
 
 Salvar estimativas: $(@bind store CheckBox())
 """

@@ -1113,9 +1113,7 @@ md"""
 
 ### Etapa 1: Criação do domínio de estimativas
 
-Nesta primeira etapa, delimitaremos o domínio de estimativas. No contexto de estimativa de recursos minerais, esse domínio é chamado de **modelo de blocos**.
-
-> ⚠️ O modelo de blocos é o modelo geológico 3D discretizado em unidades volumétricas menores (i.e. blocos). Em outras palavras, trata-se do modelo geológico constituído por "tijolos".
+Nesta primeira etapa, delimitaremos o domínio de estimativas que, no nosso caso, podemos chamar de modelo de blocos.
 
 Para definir o modelo de blocos, devemos configurar três parâmetros:
 
@@ -1828,9 +1826,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Distributions]]
 deps = ["ChainRulesCore", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns"]
-git-tree-sha1 = "15dad92b6a36400c988de3fc9490a372599f5b4c"
+git-tree-sha1 = "3fcfb6b34ea303642aee8f85234a0dcd0dc5ce73"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.21"
+version = "0.25.22"
 
 [[DocStringExtensions]]
 deps = ["LibGit2"]
@@ -2833,9 +2831,9 @@ version = "2.4.6"
 
 [[Variography]]
 deps = ["Distances", "GeoStatsBase", "InteractiveUtils", "LinearAlgebra", "Meshes", "NearestNeighbors", "Optim", "Parameters", "Printf", "Random", "RecipesBase", "Setfield", "SpecialFunctions", "Transducers"]
-git-tree-sha1 = "97817eb256ae53195bbe85e3e2fbc9b61b709186"
+git-tree-sha1 = "4909032736b2e197d6cd16fa434fabae09419562"
 uuid = "04a0146e-e6df-5636-8d7f-62fa9eb0b20c"
-version = "0.12.22"
+version = "0.12.24"
 
 [[Wayland_jll]]
 deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg", "XML2_jll"]

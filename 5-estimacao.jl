@@ -82,7 +82,7 @@ Nesta primeira seção, teremos uma breve introdução a três dos principais m�
 md"""
 ### Estimadores lineares ponderados
 
-Os três métodos listados acima compartilham a mesma equação para calcular estimativas $\hat{z}(x_o)$: :
+Os três métodos listados acima compartilham a mesma equação para calcular estimativas $\hat{z}(x_o)$:
 
 ```math
 \hat{z}(x_o) = \sum_{i=1}^{n} w_i \cdot z(x_i) = w_1 \cdot z(x_1) + w_2 \cdot z(x_2) + \cdots + w_n \cdot z(x_n)
@@ -99,10 +99,44 @@ Os métodos caracterizados por essa equação são denominados **estimadores lin
 md"""
 ### Inverso da Potência da Distância (IPD)
 
+Uma abordagem intuitiva para atribuir pesos é pensar que amostras mais distantes do ponto a ser estimado devem receber pesos menores, enquanto amostras próximas devem receber pesos maiores.
+
+>⚠️ De acordo com a 1ª Lei da Geografia, proposta por Tobler na década de 1970: *"tudo está relacionado a tudo, mas coisas mais próximas são mais parecidas (relacionadas) entre si do que coisas mais distantes"*.
+
+Nesse sentido, no método **Inverso da Potência da Distância (IPD)**, o peso $w_i$ de uma amostra $z(x_i)$ é inversamente proporcional a sua distância Euclidiana $d_i$ até o ponto que está sendo estimado $\hat{z}(x_o)$ (*Isaaks & Srivastava, 1989*). É comum escolhermos uma potência $p$ arbitrária associada à distância:
+
+```math
+\hat{z}(x_o) = \frac{\sum_{i=1}^{n}\frac{1}{d_i^p}z(x_i)} {\sum_{i=1}^{n}\frac{1}{d_i^p}}
+```
+
+em que $w_i = \frac{1}{d_i^p}$. O denominador da equação acima é uma **condição de fechamento** que garante que a soma dos $n$ pesos sempre totalize em 1.
+
+>⚠️ Na Mineração, é muito comum adotar-se $p=2$. Nesse caso específico, o método pode ser chamado de **Inverso do Quadrado da Distância (IQD)**.
+
+A Figura 01 mostra um gráfico de distância por peso para diferentes potências $p$:
 """
 
-# ╔═╡ 2c9c38c6-7047-4548-ae9c-c6207d1f7158
+# ╔═╡ 951ca515-39a9-4e95-a53c-6fd7977a4cbb
+begin
+	ds = collect(1:100)
+	ws = [@. 1/(ds^p) for p in 1:6]
+	
+	labels = ["p=$p" for p in 1:6]
+	
+	plot(ws, label=hcat(labels...), xlabel="Distância", ylabel="Peso", lw=1.5)
+end
 
+# ╔═╡ 28acc648-ac4a-4d1c-86ce-5bb329c6a141
+md"""
+**Figura 01:** Relação entre distância e peso para diferentes potências $p$.
+"""
+
+# ╔═╡ 25ddae7c-a276-417e-92c8-9fc2076db219
+md"""
+##### Observações
+
+- Com o aumento da potência $p$, mais rapidamente os pesos diminuem em função do aumento da distância entre as amostras e o ponto a ser estimado.
+"""
 
 # ╔═╡ 956f6c67-93f1-41bf-b921-e893111bbebe
 md"""
@@ -1682,7 +1716,9 @@ version = "0.9.1+5"
 # ╟─564423c2-6a3e-4919-a6fc-32f7d1664f86
 # ╟─a069cc27-d08e-47b4-9f75-24dab178b333
 # ╟─9b31cfec-400a-4068-84b8-8170b3c8ab58
-# ╠═2c9c38c6-7047-4548-ae9c-c6207d1f7158
+# ╟─951ca515-39a9-4e95-a53c-6fd7977a4cbb
+# ╟─28acc648-ac4a-4d1c-86ce-5bb329c6a141
+# ╟─25ddae7c-a276-417e-92c8-9fc2076db219
 # ╟─956f6c67-93f1-41bf-b921-e893111bbebe
 # ╠═69d50ed7-d85e-4eb0-a7a7-73aaf1a8d0d9
 # ╟─eab5920c-fd1f-4e03-a6f3-90e3ce731b6e

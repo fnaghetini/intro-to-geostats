@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.4
+# v0.17.0
 
 using Markdown
 using InteractiveUtils
@@ -9,8 +9,8 @@ begin
 	# carregando pacotes necessários
 	using GeoStats, Statistics
 	using CSV, DataFrames, Query
-    using PlutoUI
-    using Plots
+    using PlutoUI, Distributions
+    using Plots, Random
 	
 	# configurações de visualização
 	gr(format=:png)
@@ -71,7 +71,7 @@ md"""
 md"""
 ## 1. Conceitos básicos
 
-Nesta primeira seção, teremos uma breve introdução a três dos principais métodos utilizados na *estimação* de recursos minerais:
+Nesta primeira seção, teremos uma breve introdução a três dos principais *estimadores lineares ponderados* utilizados na *estimação* de recursos minerais:
 
 - Inverso da Potência da Distância;
 - Krigagem Simples;
@@ -118,11 +118,14 @@ A Figura 01 mostra um gráfico de distância por peso para diferentes potências
 
 # ╔═╡ 951ca515-39a9-4e95-a53c-6fd7977a4cbb
 begin
+	# geração dos dados
 	ds = collect(1:100)
-	ws = [@. 1/(ds^p) for p in 1:6]
-	
-	labels = ["p=$p" for p in 1:6]
-	
+	ws = [@. 1/(ds^p) for p in 1:5]
+
+	# labels de cada gráfico
+	labels = ["p=$p" for p in 1:5]
+
+	# plotagem
 	plot(ws, label=hcat(labels...), xlabel="Distância", ylabel="Peso", lw=1.5)
 end
 
@@ -138,32 +141,174 @@ md"""
 - Com o aumento da potência $p$, mais rapidamente os pesos diminuem em função do aumento da distância entre as amostras e o ponto a ser estimado.
 """
 
-# ╔═╡ 956f6c67-93f1-41bf-b921-e893111bbebe
+# ╔═╡ 69c94901-8d49-4fcc-97f4-bf857b04e627
 md"""
-### Krigagem Simples (KS)
+### Krigagem
 
+**Krigagem** é um termo genérico aplicado a uma família de métodos de estimação que buscam *minimizar o erro (ou resíduo) da estimação*, normalmente pela estratégia de Mínimos Quadrados (*Sinclair & Blackwell, 2006*). Alguns exemplos são: Krigagem Simples (KS), Krigagem Ordinária (KO), Krigagem Universal (KU) e Krigagem com Deriva Externa (KDE). Neste módulo, abordaremos apenas os dois primeiros.
+
+>⚠️ Um **resíduo** (ou erro) consiste na diferença entre o valor estimado e o valor real $r = \hat{z}(x) - z(x)$ para um determinado ponto pertencente ao domínio de estimação.
+
+Os métodos de Krigagem estão associados ao acrônimo **B.L.U.E.** (*Best Linear Unbiased Estimator*). Eles são estimadores **lineares**, pois suas estimativas são combinações lineares ponderadas das amostras disponíveis. Além disso, são **não enviesados**, já que a média dos resíduos é idealmente igual a zero. Por fim, esses métodos são **"melhores"**, pois objetivam minimizar a variância dos resíduos $\sigma_r^2$, que pode ser escrita como (*Isaaks & Srivastava, 1989*):
+
+```math
+\sigma_r^2 = \frac{1}{n} \sum_{i=1}^{n} [\hat{z}(x_i) - z(x_i)]^2 = E[\hat{z}(x_i) - z(x_i)]^2
+```
+
+A minimização de $\sigma_r^2$ é justamente o diferencial dos estimadores da família da Krigagem, já que o método IPD também é linear e não enviesado (*Isaaks & Srivastava, 1989*). A Figura 02 mostra um exemplo de duas distribuições de resíduos hipotéticas...
 """
 
-# ╔═╡ 69d50ed7-d85e-4eb0-a7a7-73aaf1a8d0d9
+# ╔═╡ 78866735-d01e-4c9d-abec-3ed54b8ed612
+begin
+	# semente aleatória
+	Random.seed!(1234)
 
+	# N(μ=0, σ²=1)
+	𝒩₁ = Normal()
+	# N(μ=0, σ²=3)
+	𝒩₂ = Normal(0,3)
+
+	# geração de Z₁~ N(μ=0, σ²=1)
+	Z₁ = rand(𝒩₁, 2500)
+	# geração de Z₂ ~ N(μ=0, σ²=3)
+	Z₂ = rand(𝒩₂, 2500)
+
+	# histogramas
+	histogram(Z₂, bins=:scott, label="σ² = 3", alpha=0.7)
+	histogram!(Z₁, bins=:scott, alpha=0.7, label="σ² = 1",
+			   xlabel="Resíduos", ylabel="Freq. Absoluta")
+end
+
+# ╔═╡ d5d0ef84-7c79-4d5e-af5c-52090b1dd233
+md"""
+**Figura 02:** Distribuições de resíduos hipotéticas.
+"""
+
+# ╔═╡ fa6d5e16-ad13-4e68-8ee8-d846db277917
+md"""
+##### Observações
+
+- Ambas as distribuições de resíduos são *não enviesadas*, já que apresentam média igual a zero;
+- A distribuição azul apresenta uma maior dispersão de resíduos $\sigma_r^2$ do que a distribuição laranja;
+- O diferencial dos métodos de Krigagem é justamente minimizar essa dispersão dos resíduos $\sigma_r^2$, ou seja, o erro da estimação.
+"""
+
+# ╔═╡ 956f6c67-93f1-41bf-b921-e893111bbebe
+md"""
+#### Krigagem Simples (KS)
+
+Para se utilizar a **Krigagem Simples (KS)**, um estimador da família da Krigagem, deve-se ter conhecimento, à priori, da média real do depósito $\mu$. Esse seria o "maravilhoso caso em que conhecemos a média" (*Chilès & Delfiner, 2012*).
+
+Na SK, ao minimizar a variância da estimação $\sigma_r^2$, obtemos as seguintes equações (*Sinclair & Blackwell, 2006*):
+
+```math
+\begin{bmatrix}
+	\gamma(x_1,x_1) & \gamma(x_1,x_2) & \cdots & \gamma(x_1,x_n) \\
+	\gamma(x_2,x_1) & \gamma(x_2,x_2) & \cdots & \gamma(x_2,x_n) \\
+	    \vdots      &     \vdots      & \ddots &      \vdots     \\
+	\gamma(x_n,x_1) & \gamma(x_n,x_2) & \cdots & \gamma(x_n,x_n) \\
+\end{bmatrix}
+
+\begin{bmatrix}
+	  w_1  \\
+	  w_2  \\
+	\vdots \\
+	  w_n  \\
+\end{bmatrix}
+
+=
+
+\begin{bmatrix}
+	\gamma(x_1,x_0) \\
+	\gamma(x_2,x_0) \\
+	    \vdots      \\
+	\gamma(x_n,x_0) \\
+\end{bmatrix}
+```
+em que $\gamma(x_1, x_j)$ representa o valor do variograma entre os pares das $n$ amostras utilizadas na estimação, $w_i$ representa os pesos que serão atribuídos às amostras e $\gamma(x_i, x_0)$ é o valor do variograma entre uma amostra e o ponto a ser estimado. O passo seguinte é realizar uma simples manipulação algébrica para isolar o vetor de pesos que, por sua vez, é a informação que desejamos obter.
+
+Especificamente na KS, a soma dos pesos $w_i$ não totaliza em 1 e, o peso restante é atribuído ao valor da média do depósito. Chamaremos esse peso atribuído a média de $w_\mu$:
+
+```math
+w_\mu = 1 - \sum_{i=1}^{n}w_i
+```
+
+>⚠️ A demonstração de como obter o sistema linear acima foge do escopo deste material. Para mais detalhes, consulte *Isaaks & Srivastava (1989)*.
+
+Como raramente temos acesso à média do depósito, a KS não é um método tão utilizado como a Krigagem Simples, que veremos a seguir (*Sinclair & Blackwell, 2006*).
+"""
 
 # ╔═╡ eab5920c-fd1f-4e03-a6f3-90e3ce731b6e
 md"""
-### Krigagem Ordinária (KO)
+#### Krigagem Ordinária (KO)
 
+Ao contrário da KS, na **Krigagem Ordinária (KO)**, a média do depósito não precisa ser conhecida. Nesse método, a minimização de $\sigma_r^2$ é realizada com uma restrição de que a soma dos pesos $w_i$ deve totalizar em 1 (*Sinclair & Blackwell, 2006*).
+
+Essa restrição é introduzida no processo de minimização a partir da criação de uma variável artificial, o *Parâmetro de Lagrange* $\lambda$. Portanto, uma equação adicional (equivalente a zero) é introduzida no sistema linear da KO (*Sinclair & Blackwell, 2006*):
+
+```math
+\begin{bmatrix}
+	\gamma(x_1,x_1) & \gamma(x_1,x_2) & \cdots & \gamma(x_1,x_n) &    1   \\
+	\gamma(x_2,x_1) & \gamma(x_2,x_2) & \cdots & \gamma(x_2,x_n) &    1   \\
+	    \vdots      &     \vdots      & \ddots &      \vdots     & \vdots \\
+	\gamma(x_n,x_1) & \gamma(x_n,x_2) & \cdots & \gamma(x_n,x_n) &    1   \\
+	       1        &         1       & \cdots &        1        &    0   \\
+\end{bmatrix}
+
+\begin{bmatrix}
+	  w_1   \\
+	  w_2   \\
+	\vdots  \\
+	  w_n   \\
+	\lambda \\
+\end{bmatrix}
+
+=
+
+\begin{bmatrix}
+	\gamma(x_1,x_0) \\
+	\gamma(x_2,x_0) \\
+	    \vdots      \\
+	\gamma(x_n,x_0) \\
+	       1        \\
+\end{bmatrix}
+```
+
+>⚠️ Note que o sistema linear da KO é muito similar àquele da KS. A única diferença é que adicionamos uma equação extra para garantir a condição de fechamento.
+
+Como a soma dos pesos $w_i$ totaliza em 1, não é necessário atribuir um peso $w_\mu$ à média real e, consequentemente, não precisamos ter conhecimento desse parâmetro. Isso corrobora o fato de a KO ser o estimador mais utilizado na indústria.
 """
-
-# ╔═╡ 604c2a49-ebe8-42b7-83d3-72595c74f7b3
-
 
 # ╔═╡ 5a9f4bbf-202f-4191-b59d-f2bed05347ae
 md"""
 ## 2. Criação do domínio de estimativas
 
+Assim como no módulo anterior, também utilizaremos a famosa base de dados [Walker Lake](https://github.com/fnaghetini/intro-to-geostats/blob/main/data/Walker_Lake.csv). Primeiramente, vamos importar e georreferenciar esses dados. Novamente, apenas a variável `Pb` (em %) será considerada...
 """
 
 # ╔═╡ 669d757d-dc19-43e1-b96f-8c1aa31f7579
+begin
+	# variáveis de interesse
+	VARS = [:X,:Y,:Pb]
+	# diretório dos dados
+	DIR = "data/Walker_Lake.csv"
+	
+	# importação dos dados
+	walkerlake = CSV.File(DIR, type = Float64) |> DataFrame
+	
+	# seleção das variáveis de interesse e remoção dos valores faltantes
+	f1(dados) = select(dados, VARS)
+	f2(dados) = dropmissing(dados)
+	wl = walkerlake |> f1 |> f2 |> DataFrame
+	
+	# georreferenciamento dos dados
+	geowl = georef(wl, (:X,:Y))
+end
 
+# ╔═╡ 207ca8d7-08df-47dd-943b-7f7846684e3b
+md"""
+Agora, podemos criar o nosso **domínio de estimação**, ou seja, um grid 2D onde calcularemos as estimativas. Para isso, utilizaremos a função `CartesianGrid` do pacote [GeoStats.jl](https://github.com/JuliaEarth/GeoStats.jl).
+"""
 
 # ╔═╡ 2531eee8-72c5-4056-879c-b1b65273d51a
 md"""
@@ -192,9 +337,20 @@ md"""
 # ╔═╡ 8a27e470-a566-4377-b2ae-a3e5ad9969da
 
 
+# ╔═╡ a2e173e6-fe66-44e6-b371-3ae194d7b0f9
+md"""
+## 6. Validação das estimativas
+
+"""
+
+# ╔═╡ e49569b3-0231-4b8e-98d9-21c68c4b1160
+
+
 # ╔═╡ b1b823ac-f9cf-4e5b-a622-4274f3785567
 md"""
 ## Referências
+
+*Chilès, J. P.; Delfiner, P. [Geostatistics: modeling spatial uncertainty](https://www.google.com.br/books/edition/Geostatistics/CUC55ZYqe84C?hl=pt-BR&gbpv=0). New Jersey: John Wiley & Sons, 2012.*
 
 *Isaaks, E. H.; Srivastava, M. R. [Applied geostatistics](https://www.google.com.br/books/edition/Applied_Geostatistics/gUXQzQEACAAJ?hl=pt-BR). New York: Oxford University Press, 1989.*
 
@@ -235,15 +391,18 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 GeoStats = "dcc97b0b-8ce5-5539-9008-bb190f959ef6"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
 CSV = "~0.9.9"
 DataFrames = "~1.2.2"
+Distributions = "~0.25.23"
 GeoStats = "~0.27.0"
 Plots = "~1.23.1"
 PlutoUI = "~0.7.16"
@@ -507,9 +666,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Distributions]]
 deps = ["ChainRulesCore", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns"]
-git-tree-sha1 = "3fcfb6b34ea303642aee8f85234a0dcd0dc5ce73"
+git-tree-sha1 = "d249ebaa67716b39f91cf6052daf073634013c0f"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.22"
+version = "0.25.23"
 
 [[DocStringExtensions]]
 deps = ["LibGit2"]
@@ -1719,18 +1878,23 @@ version = "0.9.1+5"
 # ╟─951ca515-39a9-4e95-a53c-6fd7977a4cbb
 # ╟─28acc648-ac4a-4d1c-86ce-5bb329c6a141
 # ╟─25ddae7c-a276-417e-92c8-9fc2076db219
+# ╟─69c94901-8d49-4fcc-97f4-bf857b04e627
+# ╟─78866735-d01e-4c9d-abec-3ed54b8ed612
+# ╟─d5d0ef84-7c79-4d5e-af5c-52090b1dd233
+# ╟─fa6d5e16-ad13-4e68-8ee8-d846db277917
 # ╟─956f6c67-93f1-41bf-b921-e893111bbebe
-# ╠═69d50ed7-d85e-4eb0-a7a7-73aaf1a8d0d9
 # ╟─eab5920c-fd1f-4e03-a6f3-90e3ce731b6e
-# ╠═604c2a49-ebe8-42b7-83d3-72595c74f7b3
 # ╟─5a9f4bbf-202f-4191-b59d-f2bed05347ae
 # ╠═669d757d-dc19-43e1-b96f-8c1aa31f7579
+# ╟─207ca8d7-08df-47dd-943b-7f7846684e3b
 # ╟─2531eee8-72c5-4056-879c-b1b65273d51a
 # ╠═36033c09-267c-48df-b6cd-ce2ee2a5eac6
 # ╟─8aaca25b-8ebc-418c-ad48-344a31ba8ed9
 # ╠═c86d68b0-468b-45fe-b1a7-1521a5ca8cc7
 # ╟─14ba26ab-db0d-4993-9b98-56309ff23389
 # ╠═8a27e470-a566-4377-b2ae-a3e5ad9969da
+# ╟─a2e173e6-fe66-44e6-b371-3ae194d7b0f9
+# ╠═e49569b3-0231-4b8e-98d9-21c68c4b1160
 # ╟─b1b823ac-f9cf-4e5b-a622-4274f3785567
 # ╟─9cd2e572-23fc-4f7a-9b91-a5d3d13a9b48
 # ╟─c8ced4cd-a74f-48bc-8cca-fb3971930390

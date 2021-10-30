@@ -73,7 +73,7 @@ julia> Pkg.update("Pluto")
 
 8. Após a conclusão do download, descompacte o arquivo e mova a pasta resultante **intro-to-geostats-main** para algum diretório a sua escolha;
 
-9. Novamente, abra o Julia REPL e execute os comandos a seguir para abrir o ambiente Pluto. Uma janela abrirá no seu navegador;
+9. Novamente, abra o Julia REPL e execute os comandos a seguir para abrir o ambiente Pluto. Uma janela será aberta no seu navegador;
 
 ```julia
 julia> using Pluto

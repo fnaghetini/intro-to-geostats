@@ -17,6 +17,8 @@ Este material busca fornecer uma introdução interativa e interessante sobre fe
   <img alt="Pluto.jl" src="https://raw.githubusercontent.com/fonsp/Pluto.jl/dd0ead4caa2d29a3a2cfa1196d31e3114782d363/frontend/img/logo_white_contour.svg" height="80">
 </p>
 
+<hr>
+
 ## Estrutura
 
 Este material é dividido em seis módulos:
@@ -36,6 +38,8 @@ Este material é dividido em seis módulos:
 No módulo de **Lógica de Programação**, teremos uma breve introdução a alguns conceitos relacionados à lógica de programação (e.g. funções, estruturas condicionais, laços de repetição) e aos recursos interativos do [PlutoUI.jl](https://github.com/JuliaPluto/PlutoUI.jl). No módulo **Preparação de Amostras**, aprenderemos como gerar furos de sondagem a partir das tabelas de Collar, Survey e Assay e a compositar amostras. Já no módulo seguinte, **Análise Exploratória**, abordaremos técnicas de descrição univariada, bivariada e espacial, além de métodos de desagrupamento de amostras. No módulo **Variografia**, teremos nosso primeiro contato com uma das principais ferramentas geoestatísticas, o variograma. No módulo **Estimação**, aprenderemos sobre os principais métodos de estimação utilizados na Avaliação de Recursos Minerais: _Inverso da Potência da Distância (IPD)_, _Krigagem Simples (KS)_ e _Krigagem Ordinária (KO)_. Por fim, no módulo **Projeto Final**, colocaremos em prática todos os conceitos aprendidos nos módulos anteriores e executaremos um projeto de Avaliação de Recursos desde a geração dos furos de sondagem até a validação das estimativas obtidas.
 
 **Nota:** os dados utilizados ao longo dos módulos encontram-se na pasta [data](https://github.com/fnaghetini/intro-to-geostats).
+
+<hr>
 
 ## Instruções
 
@@ -92,6 +96,8 @@ julia> Pluto.run()
 
 **Nota:** você não precisará executar todos esses passos quando quiser abrir um dos módulos. Se você já tiver seguido este passo-a-passo completo em algum momento, para abrir um dos módulos, basta seguir os **passos 9 e 10**.
 
+<hr>
+
 ## Referências
 
 *Abzalov, M. [Applied mining geology](https://www.google.com.br/books/edition/Applied_Mining_Geology/Oy3RDAAAQBAJ?hl=pt-BR&gbpv=0). Switzerland: Springer International Publishing, 2016*
@@ -112,6 +118,8 @@ julia> Pluto.run()
 
 *Yamamoto, J. K.; Landim, P. M. B. [Geoestatística: conceitos e aplicações](https://www.google.com.br/books/edition/Geoestat%C3%ADstica/QUsrBwAAQBAJ?hl=pt-BR&gbpv=0). São Paulo: Oficina de textos, 2015.*
 
+<hr>
+
 ## Recursos recomendados
 
 > [Introdução à Geoestatística - LPM/UFRGS](https://www.youtube.com/watch?v=G_phXlFDINw&list=PL0EYHNpWwMVkKgf_SiPWN37OblHCUIOen)
@@ -121,6 +129,8 @@ julia> Pluto.run()
 > [GeoStats.jl Tutorials](https://github.com/JuliaEarth/GeoStatsTutorials)
 
 > [Minicurso GeoStats.jl - CBMina 2021](https://github.com/juliohm/CBMina2021)
+
+<hr>
 
 ## Licença
 

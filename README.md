@@ -118,6 +118,10 @@ julia> Pluto.run()
 
 > [Data Analytics and Geostatistics - University of Texas](https://www.youtube.com/watch?v=pxckixOlguA&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ)
 
+> [GeoStats.jl Tutorials](https://github.com/JuliaEarth/GeoStatsTutorials)
+
+> [Minicurso GeoStats.jl - CBMina 2021](https://github.com/juliohm/CBMina2021)
+
 ## Licença
 
 Este repositório encontra-se sob a licença MIT:

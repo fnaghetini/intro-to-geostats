@@ -92,6 +92,32 @@ julia> Pluto.run()
 
 **Nota:** você não precisará executar todos esses passos quando quiser abrir um dos módulos. Se você já tiver seguido este passo-a-passo completo em algum momento, para abrir um dos módulos, basta seguir os **passos 9 e 10**.
 
+## Referências
+
+*Abzalov, M. [Applied mining geology](https://www.google.com.br/books/edition/Applied_Mining_Geology/Oy3RDAAAQBAJ?hl=pt-BR&gbpv=0). Switzerland: Springer International Publishing, 2016*
+
+*Bussab, W. O.; Morettin, P. A. [Estatística básica](https://www.google.com.br/books/edition/ESTAT%C3%8DSTICA_B%C3%81SICA/vDhnDwAAQBAJ?hl=pt-BR&gbpv=0). 9ª ed. São Paulo: Saraiva, 2017.*
+
+*Chilès, J. P.; Delfiner, P. [Geostatistics: modeling spatial uncertainty](https://www.google.com.br/books/edition/Geostatistics/CUC55ZYqe84C?hl=pt-BR&gbpv=0). New Jersey: John Wiley & Sons, 2012.*
+
+*Isaaks, E. H.; Srivastava, M. R. [Applied geostatistics](https://www.google.com.br/books/edition/Applied_Geostatistics/gUXQzQEACAAJ?hl=pt-BR). New York: Oxford University Press, 1989.*
+
+*Magalhães, M. N.; De Lima, A. C. P. [Noções de probabilidade e estatística](https://www.google.com.br/books/edition/No%C3%A7%C3%B5es_de_Probabilidade_e_Estat%C3%ADstica/-BAuPwAACAAJ?hl=pt-BR). 7ª ed. São Paulo: Editora da Universidade de São Paulo, 2015.*
+
+*Rossi, M. E.; Deutsch, C. V. [Mineral resource estimation](https://www.google.com.br/books/edition/Mineral_Resource_Estimation/gzK_BAAAQBAJ?hl=pt-BR&gbpv=0). New York: Springer Science & Business Media, 2013.*
+
+*Sinclair, A. J.; Blackwell, G. H. [Applied mineral inventory estimation](https://www.google.com.br/books/edition/Applied_Mineral_Inventory_Estimation/oo7rCrFQJksC?hl=pt-BR&gbpv=0). New York: Cambridge University Press, 2006.*
+
+*Yamamoto, J. K. [Avaliação e classificação de reservas minerais](https://www.google.com.br/books/edition/Avalia%C3%A7%C3%A3o_e_classifica%C3%A7%C3%A3o_de_reserva/AkmsTIzmblQC?hl=pt-BR&gbpv=0). São Paulo: Editora da Universidade de São Paulo, 2001*.
+
+*Yamamoto, J. K.; Landim, P. M. B. [Geoestatística: conceitos e aplicações](https://www.google.com.br/books/edition/Geoestat%C3%ADstica/QUsrBwAAQBAJ?hl=pt-BR&gbpv=0). São Paulo: Oficina de textos, 2015.*
+
+## Recursos recomendados
+
+> [Introdução à Geoestatística - LPM/UFRGS](https://www.youtube.com/watch?v=G_phXlFDINw&list=PL0EYHNpWwMVkKgf_SiPWN37OblHCUIOen)
+
+> [Data Analytics and Geostatistics - University of Texas](https://www.youtube.com/watch?v=pxckixOlguA&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ)
+
 ## Licença
 
 Este repositório encontra-se sob a licença MIT:

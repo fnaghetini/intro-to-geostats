@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.1
+# v0.17.0
 
 using Markdown
 using InteractiveUtils
@@ -412,7 +412,7 @@ Com seus conhecimentos geológicos, tente identificar qual rocha é exibida na F
 md"""
 ![rocha](http://lh3.googleusercontent.com/-4dxg2gAuqgk/VeqttO0BqSI/AAAAAAAAKq0/j_G5leYIfIg/s720/01465%252520IMG_20150809_104742%252520mylonite.jpg)
 
-**Figura 01:** Identifique a rocha acima. Extraído de [sandatlas.org](https://www.sandatlas.org/mylonite/).
+_**Figura 01:** Identifique a rocha acima. Extraído de [sandatlas.org](https://www.sandatlas.org/mylonite/)._
 """
 
 # ╔═╡ 98a32d2d-7173-406d-92cf-dfa847d47c49
@@ -440,7 +440,7 @@ Na lista suspensa seguir, selecione a opção que corresponda à correta subclas
 md"""
 ![silicato](https://geology.com/minerals/photos/titanite-crystal.jpg)
 
-**Figura 02:** Identifique a subclasse do silicato acima. Extraído de: [geology.com](https://geology.com/minerals/titanite.shtml).
+_**Figura 02:** Identifique a subclasse do silicato acima. Extraído de: [geology.com](https://geology.com/minerals/titanite.shtml)._
 """
 
 # ╔═╡ 87832d6c-525d-4060-a1e8-d06a611b5dfe

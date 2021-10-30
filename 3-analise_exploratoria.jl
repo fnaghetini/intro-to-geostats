@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.1
+# v0.17.0
 
 using Markdown
 using InteractiveUtils
@@ -92,7 +92,7 @@ Assim como em várias áreas, não temos informações sobre toda a população 
 md"""
 ![Figura_01](https://i.postimg.cc/dVwQj93Q/Figura-01.png)
 
-**Figura 01:** A população é representada pelo depósito, enquanto a amostra é representada pelos furos de sondagem disponíveis. Figura elaborada pelo autor.
+_**Figura 01:** A população é representada pelo depósito, enquanto a amostra é representada pelos furos de sondagem disponíveis. Figura elaborada pelo autor._
 """
 
 # ╔═╡ b517b327-27e9-4e7c-a721-3ff8c991ff08
@@ -122,7 +122,7 @@ A Figura 02 mostra um esquema com os tipos de variáveis existentes.
 md"""
 ![Figura_02](https://i.postimg.cc/MGvTF2fZ/Figura-02.jpg)
 
-**Figura 02:** Tipos de variáveis. Modificado de *Bussab & Morettin (2017)*.
+_**Figura 02:** Tipos de variáveis. Modificado de *Bussab & Morettin (2017)*._
 """
 
 # ╔═╡ 966a59b1-f8b8-4612-ab4d-ff7ec2a569d9
@@ -486,7 +486,7 @@ begin
 end
 
 # ╔═╡ f18ea3c8-fbc0-4c8c-a8f6-e2d083809a38
-md"**Figura 03:** Histograma da variável $teor1."
+md"_**Figura 03:** Histograma da variável $teor1._"
 
 # ╔═╡ 155f6b0f-5156-4f42-93c2-6f867415ef37
 md"""
@@ -504,7 +504,7 @@ O **boxplot**, assim como o histograma, é um gráfico univariado que visa repre
 
 ![Figura 04](https://i.postimg.cc/HnRG8289/Figura-03.png)
 
-**Figura 04:** Exemplo de boxplot e seus elementos. Figura elaborada pelo autor.
+_**Figura 04:** Exemplo de boxplot e seus elementos. Figura elaborada pelo autor._
 
 Selecione, na lista suspensa abaixo, uma variável de teor para que seu boxplot correspondente seja exibido (Figura 05).
 
@@ -531,7 +531,7 @@ begin
 end
 
 # ╔═╡ ef54af89-22e2-4149-9fb4-9fc0b48b76c8
-md"**Figura 05:** Boxplot da variável $teor2."
+md"_**Figura 05:** Boxplot da variável $teor2._"
 
 # ╔═╡ c42132cd-b4e6-4561-a71b-13b276793f13
 md"""
@@ -583,7 +583,9 @@ begin
 end
 
 # ╔═╡ 49d89445-4ca2-4aab-b0a4-a632ddbb640b
-md"**Figura 06:** Gráfico de barras da variável $var_nom."
+md"""
+_**Figura 06:** Gráfico de barras da variável_ $var_nom.
+"""
 
 # ╔═╡ 98c18d0a-95fe-4949-9507-240bb90a02b9
 md"""
@@ -651,7 +653,7 @@ begin
 end
 
 # ╔═╡ ce8762e6-c0d7-4683-8ffe-5ac844b406d4
-md"**Figura 07:** Mapa de calor dos coeficientes de Pearson."
+md"_**Figura 07:** Mapa de calor dos coeficientes de Pearson._"
 
 # ╔═╡ d2956461-9a8f-4123-9243-523f623e1f21
 md"""
@@ -690,7 +692,9 @@ begin
 end
 
 # ╔═╡ 0f9da683-d792-4965-9988-9c80e4e6148f
-md"**Figura 08:** Diagrama de dispersão entre as variáveis $var₁ e $var₂."
+md"""
+_**Figura 08:** Diagrama de dispersão entre as variáveis $var₁ e $var₂._
+"""
 
 # ╔═╡ e34c26f3-4aee-48bc-b164-2347f957a7d7
 md"""
@@ -746,7 +750,7 @@ end
 
 # ╔═╡ 067878a2-1d5d-4b4b-9857-5a473849007b
 md"""
-**Figura 09:** Q-Q plot entre os teores de $Z (ppm) nas rochas do $lito₁ e $lito₂.
+_**Figura 09:** Q-Q plot entre os teores de $Z (ppm) nas rochas do $lito₁ e $lito₂._
 """
 
 # ╔═╡ b1f8414f-e004-4cae-8d69-a56b57b5ea11
@@ -811,20 +815,20 @@ begin
 		hg = filter(Zᵤ => x -> x > q90, dados) |> DataFrame
 		
 		scatter(hg[!,:X], hg[!,:Y], marker_z=hg[!,Zᵤ],
-				color=:coolwarm, legend=:topright, marker=(:square,2.5),
+				marker=(:jet,3), legend=:topright,
 				xlabel="X", ylabel="Y", label="$Zᵤ (ppm)",
 				xlims=(0,6), ylims=(0,6), markerstrokewidth=0.3)
 	
 	else
 		scatter(dados[!,:X], dados[!,:Y], marker_z=dados[!,Zᵤ],
-				color=:coolwarm, legend=:topright, marker=(:square,2.5),
+				marker=(:jet,3), legend=:topright,
 				xlabel="X", ylabel="Y", label="$Zᵤ (ppm)",
 				xlims=(0,6), ylims=(0,6), markerstrokewidth=0.3)
 	end
 end
 
 # ╔═╡ 70069594-eb84-42ae-9f52-c5c8fa0aae0b
-md"**Figura 10:** Mapa de localização das amostras de $Zᵤ."
+md"_**Figura 10:** Mapa de localização das amostras de $Zᵤ._"
 
 # ╔═╡ 7a412bca-ee60-46dc-953f-9fda81d234c2
 md"""
@@ -1354,9 +1358,9 @@ uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 
 [[GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pkg", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll"]
-git-tree-sha1 = "dba1e8614e98949abfa60480b13653813d8f0157"
+git-tree-sha1 = "0c603255764a1fa0b61752d2bec14cfbd18f7fe8"
 uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
-version = "3.3.5+0"
+version = "3.3.5+1"
 
 [[GR]]
 deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Printf", "Random", "Serialization", "Sockets", "Test", "UUIDs"]

@@ -4,6 +4,15 @@
 using Markdown
 using InteractiveUtils
 
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    quote
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
+        el
+    end
+end
+
 # ╔═╡ f9fb89e0-36a8-11ec-3fa3-d716ca093060
 begin
 	# carregando pacotes necessários
@@ -131,7 +140,7 @@ end
 
 # ╔═╡ 28acc648-ac4a-4d1c-86ce-5bb329c6a141
 md"""
-**Figura 01:** Relação entre distância e peso para diferentes potências $p$.
+_**Figura 01:** Relação entre distância e peso para diferentes potências $p$._
 """
 
 # ╔═╡ 25ddae7c-a276-417e-92c8-9fc2076db219
@@ -176,12 +185,12 @@ begin
 	# histogramas
 	histogram(Z₂, bins=:scott, label="σ² = 3", alpha=0.7)
 	histogram!(Z₁, bins=:scott, alpha=0.7, label="σ² = 1",
-			   xlabel="Resíduos", ylabel="Freq. Absoluta")
+			   xlabel="Resíduo", ylabel="Freq. Absoluta")
 end
 
 # ╔═╡ d5d0ef84-7c79-4d5e-af5c-52090b1dd233
 md"""
-**Figura 02:** Distribuições de resíduos hipotéticas.
+_**Figura 02:** Distribuições de resíduos hipotéticas._
 """
 
 # ╔═╡ fa6d5e16-ad13-4e68-8ee8-d846db277917
@@ -307,35 +316,248 @@ end
 
 # ╔═╡ 207ca8d7-08df-47dd-943b-7f7846684e3b
 md"""
-Agora, podemos criar o nosso **domínio de estimação**, ou seja, um grid 2D onde calcularemos as estimativas. Para isso, utilizaremos a função `CartesianGrid` do pacote [GeoStats.jl](https://github.com/JuliaEarth/GeoStats.jl).
+Agora, podemos criar o nosso **domínio de estimação**, ou seja, um grid 2D onde calcularemos as estimativas. Para definirmos esse domínio, precisamos informar três parâmetros à função `CartesianGrid`:
+
+- Coordenada do ponto de origem do domínio (vértice inferior esquerdo);
+- Coordenada do ponto de término do domínio (vértice superior direito);
+- Número de células em cada direção (i.e. X e Y).
+
+Definiremos a "caixa delimitadora" do grid a partir da criação de um retângulo aderente à malha amostral, utilizando a função `boundingbox`. Dessa forma, podemos encontrar as coordenadas de origem e de término do domínio, obtendo as coordenadas mínima e máxima do retângulo, respectivamente.
+
+Ao invés de informarmos o número de células em cada direção, é mais conveniente informarmos as dimensões que cada uma das células deve ter, ou seja, o *tamanho da célula*. Para isso, basta fazermos algumas manipulações, como veremos a seguir.
+
+>⚠️ Aqui o termo *célula* foi adotado simplesmente por se tratar de um problema 2D. Em contextos 3D, o termo *bloco* é mais comum, como veremos no próximo módulo.
+
+O tamanho da célula (ou bloco) é um parâmetro crucial, principalmente quando o objetivo é realizar uma *Krigagem de blocos*. Como neste módulo realizaremos uma *Krigagem de pontos*, ou seja, estimaremos o centroide de cada célula, não iremos discutir sobre esse parâmetro com tanto rigor. Definiremos o tamanho das células como ¼ do espaçamento médio entre amostras vizinhas que, no nosso caso, é de `5 m x 5 m`.
+
+>⚠️ Caso queira investigar as diferenças entre Krigagem de pontos e Krigagem de blocos, consulte *Isaaks & Srivastava (1989)*.
+"""
+
+# ╔═╡ b14c6b92-81cc-482f-9746-d9a011cff5cd
+begin
+	# caixa delimitadora das amostras
+    bbox = boundingbox(geowl)
+	
+	# lados da caixa delimitadora
+	extent = maximum(bbox) - minimum(bbox)
+	
+	# Tamanho dos blocos em cada direção
+	blocksizes = (5., 5.)
+	
+	# Número de blocos em cada direção
+	nblocks = ceil.(Int, extent ./ blocksizes)
+
+	# Modelo de blocos para realização de estimativas
+    grid = CartesianGrid(minimum(bbox), maximum(bbox), dims = Tuple(nblocks))
+end
+
+# ╔═╡ 9055d652-1c6c-4d73-9302-d58a35ffb975
+md"""
+A Figura 03 ilustra a distribuição espacial das amostras de Pb (%) sobre o grid de estimação definido acima. O nosso objetivo, neste módulo, é estimar valores de `Pb` para cada centroide das células.
+"""
+
+# ╔═╡ 37462572-3c3d-46e1-8e2d-266e86470b6a
+begin
+	# plotagem do domínio de estimação
+	plot(grid, lw=0.5, color=:gray70)
+
+	# plotagem das amostras
+	plot!(geowl, marker=(:jet,:circle,3), markerstrokewidth=0.3,
+		  title="Pb (%)", xlims=(0,280), ylims=(0, 300), size=(500,500))
+end
+
+# ╔═╡ 4469f1a2-6054-4ba0-b402-03892d3a90e4
+md"""
+_**Figura 03:** Amostras de Pb (%) plotadas sobre o domínio de estimação._
 """
 
 # ╔═╡ 2531eee8-72c5-4056-879c-b1b65273d51a
 md"""
 ## 3. Definição do problema de estimação
 
+O passo seguinte é definir o **problema de estimação**. Para isso, basta informarmos três parâmetros à função `EstimationProblem`:
+
+- Amostras georreferenciadas;
+- Domínio de estimação;
+- Variável que será estimado.
+
+No nosso caso, conforme mencionado anteriormente, estamos interessados em estimar os centroides das células e, para isso, utilizaremos a função `centroid`.
+
+> ⚠️ *Centroide* é um termo genérico para se referir ao ponto central de uma célula.
 """
 
 # ╔═╡ 36033c09-267c-48df-b6cd-ce2ee2a5eac6
+begin
+	# centroides das células
+	centroides = Collection(centroid.(grid))
 
+	# definição do problema de estimação
+	problema = EstimationProblem(geowl, centroides, :Pb)
+end
+
+# ╔═╡ 3a034b2e-97a2-4a4f-bc60-c6634082254a
+md"""
+##### Observações
+
+- Note que a saída da célula acima fornece um resumo do nosso problema de estimação:
+    - `data`: amostras (469 amostras);
+    - `domain`: domínio de estimação (725 centroides de células);
+    - `variables`: variável a ser estimada (Pb).
+"""
+
+# ╔═╡ 22b5fc9a-9d08-4e36-a500-329e5036081f
+function sph2cart(azi)
+	θ = deg2rad(azi)
+	sin(θ), cos(θ)
+end;
 
 # ╔═╡ 8aaca25b-8ebc-418c-ad48-344a31ba8ed9
 md"""
 ## 4. Definição do estimador
 
+Além de escolhermos qual estimador utilizaremos e obtermos o modelo de variograma (apenas no caso da Krigagem), devemos definir os chamados **parâmetros de vizinhança** ou, simplesmente, *vizinhança*. A vizinhança restringe o número de amostras que serão utilizadas na estimação de um ponto.
+
+Segundo *Chilès & Delfiner (2012)*, a teoria sempre foi construída considerando todas as $n$ amostras disponíveis para calcular cada uma das estimativas. Entretanto, na prática, $n$ pode ser suficientemente grande a ponto do cálculo das estimativas não ser computacionalmente viável. Nesse sentido, uma prática comum é definir um **número mínimo e máximo de amostras** que serão utilizadas para estimar um determinado ponto. Essas informações são exemplos de parâmetros de vizinhança e são representados pelos argumentos `minneighbors` e `maxneighbors`, respectivamente.
+
+Outro parâmetro importante é a **área de busca**, que, normalmente, é representada por uma elipse. Durante a estimação, o centroide da elipse coincide com a posição do ponto a ser estimado. Dessa forma, apenas as amostras que se situarem no interior da área de busca poderão ser utilizadas na estimativa. A elipse (ou elipsoide) de busca é representado pelo parâmetro `neighborhood`.
+
+> ⚠️ As dimensões de uma elipse são definidas por dois eixos principais ortogonais entre si, enquanto sua orientação é definida por uma rotação em relação ao Norte (i.e. azimute). É comum utilizar a elipse de anisotropia (obtida durante a variografia) como elipse de busca, uma vez que ela nos indica até qual distância duas amostras apresentam interdependência espacial.
 """
 
-# ╔═╡ c86d68b0-468b-45fe-b1a7-1521a5ca8cc7
+# ╔═╡ 07175b65-bf21-49c4-9bfa-be5cf000f2ba
+begin
+	# variância amostral (definindo o patamar)
+	σ² = var(geowl[:Pb])
 
+	# elipsoide de anisotropia
+	elp = Ellipsoid([100.0,35.0],[0], convention = GSLIB)
+
+	# modelo de variograma
+	γ = SphericalVariogram(nugget = 3.0,
+					  	   sill = Float64(σ²),
+					       distance = metric(elp))
+end;
+
+# ╔═╡ 045cdf16-d264-4b5d-990b-c1bd2acb5613
+md"""
+Considerere uma estimação em que os números mínimo e máximo de amostras são iguais a 5 e 2, respectivamente. A elipse de busca apresenta uma rotação de 45°, ou seja, seu maior eixo está alinhado ao azimute 045°. A Figura 04 mostra três situações distintas que podem ocorrer durante a estimação do centroide de um bloco. As amostras em vermelho são externas à área de busca e não podem ser utilizadas na estimação, enquanto as amostras verdes, por se situarem dentro da elipse de busca, podem.
+
+- No **cenário A**, como existem 4 amostras no interior da elipse e o máximo permitido é de 5 amostras, todas elas serão utilizadas na estimação do centroide;
+
+- No **cenário B**, as 2 amostras internas à área de busca serão utilizadas na estimação;
+
+- No **cenário C**, como apenas 1 amostra está inserida dentro da elipse de busca e o mínimo de amostras é igual a 2, o centroide do bloco *não* será estimado.
+
+![Figura_04](https://i.postimg.cc/HLgMG7Sr/elipses.jpg)
+
+_**Figura 04:** Estimação do centroide de um bloco. (A) As quatro amostras internas à elipse de busca são utilizadas na estimação. (B) As duas amostras internas à elipse de busca são utilizadas na estimação. (C) Como não há amostras suficientes, o centroide não é estimado. Figura elaborada pelo autor._
+"""
+
+# ╔═╡ 79c812cf-849a-4eea-93d2-b08a3844d5a7
+md"""
+No nosso exemplo, iremos definir três estimadores distintos: IQD, KS e KO. Os números máximo e mínimo de amostras serão 4 e 8, respectivamente.
+
+No caso dos estimadores SK e KO, utilizaremos o modelo de variograma `γ` e uma elipse de busca `elp` igual à elipse de anisotropia. A média , que deve ser informada no caso da KS, será definida como o valor da média desagrupada de Pb `μₚ`.
+
+"""
+
+# ╔═╡ b2cb5618-72ba-43a3-9b04-cb2a8821bfa9
+begin
+	# média desclusterizada
+    μₚ = mean(geowl, :Pb)
+	
+	# IQD
+	IQD = IDW(:Pb => (power=2, neighbors=8))
+
+	# KS
+    KS = Kriging(
+		:Pb => (variogram=γ, mean=μₚ, neighborhood=elp,
+			    minneighbors=4, maxneighbors=8)
+	)
+
+	# KO
+    KO = Kriging(
+		:Pb => (variogram=γ, neighborhood=elp,
+			    minneighbors=4, maxneighbors=8)
+	)
+end;
 
 # ╔═╡ 14ba26ab-db0d-4993-9b98-56309ff23389
 md"""
 ## 5. Solução do problema de estimação
 
+Para gerar as de estimativas de Pb (%), resolvemos o problema definido com os três estimadores. Para isso, devemos passar o problema de estimação e o estimador como parâmetros da função `solve`. Clique na caixa abaixo para executar as estimativas...
+
+Executar estimativas: $(@bind run CheckBox())
 """
 
-# ╔═╡ 8a27e470-a566-4377-b2ae-a3e5ad9969da
+# ╔═╡ d5977fdd-c9bc-4589-ae0e-f6cac6973fbb
+if run
+	sol_iqd = solve(problema, IQD)
+end
 
+# ╔═╡ e570281a-39e3-438f-9c4a-395f321f12d4
+if run
+	sol_ks = solve(problema, KS)
+end
+
+# ╔═╡ 4af2bbf9-fc03-49d0-a19f-f34356c897f7
+if run
+	sol_ko = solve(problema, KO)
+end
+
+# ╔═╡ 73b54c21-7b69-429b-a088-fba3d0c09459
+md"""
+Agora que os teores de Pb foram estimados, clique na caixa abaixo para visualizar o resultado (Figura 05). Em seguida, utilize a lista suspensa abaixo para selecionar a solução que deseja visualizar...
+
+Visualizar estimativas: $(@bind viz CheckBox())
+"""
+
+# ╔═╡ 5f90093b-4b1e-4e0d-b84c-4232bd3c1b1a
+if run && viz
+	md"""
+	Solução: $(@bind solucao Select(["IQD", "KS", "KO"], default="KO"))
+	"""
+end
+
+# ╔═╡ a49e5f8d-09cf-4baf-b7b4-d43858df8089
+if run && viz	
+	if solucao == "IQD"
+		sol = sol_iqd
+	elseif solucao == "KS"
+		sol = sol_ks
+	elseif solucao == "KO"
+		sol = sol_ko
+	end
+end;
+
+# ╔═╡ 60db4fd5-f06c-4821-a7ed-2f63033653ff
+if run && viz
+	ẑ = sol |> @map({Pb = _.Pb, geometry = _.geometry}) |> GeoData
+end;
+
+# ╔═╡ 2e9b95c5-a687-4881-b69e-6567ade520cb
+begin
+	if run && viz
+		# plotagem das estimativas		
+		plot(ẑ, color=:jet, xlabel="X", ylabel="Y",
+			 xlims=(0,280), ylims=(0, 300),clims = (0,12),
+			 marker=(:square,10), markerstrokewidth=0.,
+			 title="Pb (%)", size=(500,500))
+
+		# plotagem de amostras
+		plot!(geowl, color=:jet, marker=(:circle,3),
+			  markerstrokecolor=:black, markerstrokewidth=0.5,
+		      title="Pb (%)")
+	end
+end
+
+# ╔═╡ 981efb6c-b1ea-4577-9c40-f3f374a23ba1
+if run && viz
+	md"""
+	_**Figura 05:** Visualização das estimativas de Pb por $solucao._
+	"""
+end
 
 # ╔═╡ a2e173e6-fe66-44e6-b371-3ae194d7b0f9
 md"""
@@ -1887,12 +2109,29 @@ version = "0.9.1+5"
 # ╟─5a9f4bbf-202f-4191-b59d-f2bed05347ae
 # ╠═669d757d-dc19-43e1-b96f-8c1aa31f7579
 # ╟─207ca8d7-08df-47dd-943b-7f7846684e3b
+# ╠═b14c6b92-81cc-482f-9746-d9a011cff5cd
+# ╟─9055d652-1c6c-4d73-9302-d58a35ffb975
+# ╟─37462572-3c3d-46e1-8e2d-266e86470b6a
+# ╟─4469f1a2-6054-4ba0-b402-03892d3a90e4
 # ╟─2531eee8-72c5-4056-879c-b1b65273d51a
 # ╠═36033c09-267c-48df-b6cd-ce2ee2a5eac6
+# ╟─3a034b2e-97a2-4a4f-bc60-c6634082254a
+# ╟─22b5fc9a-9d08-4e36-a500-329e5036081f
 # ╟─8aaca25b-8ebc-418c-ad48-344a31ba8ed9
-# ╠═c86d68b0-468b-45fe-b1a7-1521a5ca8cc7
+# ╟─07175b65-bf21-49c4-9bfa-be5cf000f2ba
+# ╟─045cdf16-d264-4b5d-990b-c1bd2acb5613
+# ╟─79c812cf-849a-4eea-93d2-b08a3844d5a7
+# ╠═b2cb5618-72ba-43a3-9b04-cb2a8821bfa9
 # ╟─14ba26ab-db0d-4993-9b98-56309ff23389
-# ╠═8a27e470-a566-4377-b2ae-a3e5ad9969da
+# ╠═d5977fdd-c9bc-4589-ae0e-f6cac6973fbb
+# ╠═e570281a-39e3-438f-9c4a-395f321f12d4
+# ╠═4af2bbf9-fc03-49d0-a19f-f34356c897f7
+# ╟─73b54c21-7b69-429b-a088-fba3d0c09459
+# ╟─5f90093b-4b1e-4e0d-b84c-4232bd3c1b1a
+# ╟─a49e5f8d-09cf-4baf-b7b4-d43858df8089
+# ╟─60db4fd5-f06c-4821-a7ed-2f63033653ff
+# ╟─2e9b95c5-a687-4881-b69e-6567ade520cb
+# ╟─981efb6c-b1ea-4577-9c40-f3f374a23ba1
 # ╟─a2e173e6-fe66-44e6-b371-3ae194d7b0f9
 # ╠═e49569b3-0231-4b8e-98d9-21c68c4b1160
 # ╟─b1b823ac-f9cf-4e5b-a622-4274f3785567

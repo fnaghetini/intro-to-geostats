@@ -80,7 +80,7 @@ A Figura 01 mostra os campos presentes nas quatro tabelas do banco de dados.
 md"""
 ![tabelas_raw](https://i.postimg.cc/52Qz4t7Z/tables.jpg)
 
-**Figura 01:** Tabelas Collar, Survey, Assay e Litho e seus respectivos campos.
+_**Figura 01:** Tabelas Collar, Survey, Assay e Litho e seus respectivos campos._
 """
 
 # ╔═╡ ff01a7d7-d491-4d49-b470-a2af6783c82b
@@ -207,7 +207,7 @@ end
 
 # ╔═╡ f40bca06-6a3e-4807-9857-ff17d21893bc
 md"""
-**Figura 02:** Distribuição do comprimento das amostras brutas.
+_**Figura 02:** Distribuição do comprimento das amostras brutas._
 """
 
 # ╔═╡ 7ea21049-5edd-4979-9782-8a20d4bb287b
@@ -265,7 +265,7 @@ end
 
 # ╔═╡ 280db32e-cebf-4d51-bfcb-54d456f2194b
 md"""
-**Figura 03:** Distribuição do comprimento das compostas ótimas.
+_**Figura 03:** Distribuição do comprimento das compostas ótimas._
 """
 
 # ╔═╡ 893d7d19-878b-4990-80b1-ef030b716048
@@ -363,7 +363,7 @@ end
 
 # ╔═╡ 81a5831f-75ef-478b-aba5-70d19306798e
 md"""
-**Figura 04:** Distribuição dos teores compostos de Cu (%).
+_**Figura 04:** Distribuição dos teores compostos de Cu (%)._
 """
 
 # ╔═╡ 0808061f-4856-4b82-8560-46a59e669ac4
@@ -386,7 +386,7 @@ Nesse sentido, podemos utilizar o pacote [Plots.jl](https://github.com/JuliaPlot
 
 # ╔═╡ eac8e835-83bc-4f9c-b25b-3aaddcf69611
 md"""
-**Figura 05:** Distribuição espacial dos teores de Cu (%).
+_**Figura 05:** Distribuição espacial dos teores de Cu (%)._
 """
 
 # ╔═╡ 8bb2f630-8234-4f7f-a05c-8206993bdd45
@@ -422,7 +422,7 @@ Utilize os sliders acima para analisar esses teores por ângulos diferentes...
 
 # ╔═╡ 52c28a55-3a4a-4df3-841a-ab8fc748bf55
 md"""
-**Figura 06:** Distribuição espacial dos highgrades e lowgrades de Cu (%).
+_**Figura 06:** Distribuição espacial dos highgrades e lowgrades de Cu (%)._
 """
 
 # ╔═╡ 3ae99e49-6996-4b4a-b930-f6073994f25c
@@ -614,7 +614,7 @@ Agora que sabemos a orientação média dos furos ($(round(μazi,digits=2))°/ $
 
 # ╔═╡ 8348abd3-27f6-4161-bd04-c4be6a644888
 md"""
-**Figura 07:** Variograma experimental downhole.
+_**Figura 07:** Variograma experimental downhole._
 """
 
 # ╔═╡ 1465f010-c6a7-4e72-9842-4504c6dda0be
@@ -655,7 +655,7 @@ Com o variograma down hole calculado, podemos ajustá-lo com um modelo teórico 
 
 # ╔═╡ fc2ea8f3-064a-4d6d-8115-236c8160cc23
 md"""
-**Figura 08:** Ajuste teórico ao variograma experimental downhole.
+_**Figura 08:** Ajuste teórico ao variograma experimental downhole._
 """
 
 # ╔═╡ 0585add6-1320-4a31-a318-0c40b7a444fa
@@ -719,7 +719,7 @@ Utilize o slider `Azimute` para definir o azimute de cálculo. Automaticamente, 
 
 # ╔═╡ bda3cda3-9d57-495b-be79-1415aa95707f
 md"""
-**Figura 09:** Variogramas experimentais de azimutes de maior e menor continuidade.
+_**Figura 09:** Variogramas experimentais de azimutes de maior e menor continuidade._
 """
 
 # ╔═╡ 17b21a63-9fa6-4975-9302-5465cdd3d2fa
@@ -781,7 +781,7 @@ Utilize o slider `Mergulho` para definir o mergulho de cálculo e os outros para
 
 # ╔═╡ 774f8e10-fd10-4b16-abcf-20579f174f8a
 md"""
-**Figura 10:** Variograma experimental primário.
+_**Figura 10:** Variograma experimental primário._
 """
 
 # ╔═╡ 97670210-2c91-4be7-a607-0da83cb16f44
@@ -816,7 +816,7 @@ Agora que o variograma primário foi calculado, podemos utilizar os sliders abai
 
 # ╔═╡ 24981600-3336-4295-b567-8f05785b9346
 md"""
-**Figura 11:** Ajuste teórico ao variograma experimental primário.
+_**Figura 11:** Ajuste teórico ao variograma experimental primário._
 """
 
 # ╔═╡ 92d11f3b-c8be-4701-8576-704b73d1b619
@@ -881,7 +881,7 @@ Utilize o slider `Rake` para definir as direções de cálculo dos variogramas s
 
 # ╔═╡ a92f702d-8859-4f95-b676-36deab03e717
 md"""
-**Figura 12:** Variogramas experimentais secundário e terciário.
+_**Figura 12:** Variogramas experimentais secundário e terciário._
 """
 
 # ╔═╡ 120f4a9c-2ca6-49f1-8abc-999bcc559149
@@ -935,7 +935,7 @@ Como já elegemos o variograma experimental representante do eixo secundário, p
 
 # ╔═╡ b19e5ac0-21fd-4dcd-ac61-a36a67ee80dd
 md"""
-**Figura 13:** Ajuste teórico ao variograma experimental secundário.
+_**Figura 13:** Ajuste teórico ao variograma experimental secundário._
 """
 
 # ╔═╡ 922d81f3-0836-4b14-aaf2-83be903c8642
@@ -979,7 +979,7 @@ Finalmente, podemos também utilizar os sliders abaixo para modelar o variograma
 
 # ╔═╡ 33ba8a9b-f548-4984-8a31-1c381b31ced4
 md"""
-**Figura 14:** Ajuste teórico ao variograma experimental terciário.
+_**Figura 14:** Ajuste teórico ao variograma experimental terciário._
 """
 
 # ╔═╡ dacfe446-3c19-430d-8f5f-f276a022791f
@@ -1049,7 +1049,7 @@ end
 
 # ╔═╡ 5134e2cb-8c98-4e5e-9f13-722b8f828dc7
 md"""
-**Figura 15:** Modelo de variograma 3D anisotrópico.
+_**Figura 15:** Modelo de variograma 3D anisotrópico._
 """
 
 # ╔═╡ d700e40b-dd7f-4630-a29f-f27773000597
@@ -1110,13 +1110,9 @@ md"""
 
 Nesta primeira etapa, delimitaremos o domínio de estimativas que, no nosso caso, podemos chamar de modelo de blocos.
 
-Para definir o modelo de blocos, iremos configurar três parâmetros:
-
-- Ponto de origem do modelo de blocos;
-- Ponto de término do modelo de blocos;
-- Número de blocos nas direções X, Y e Z.
-
 Faremos algumas manipulações e, em seguida, utilizaremos a função `CartesianGrid` para criar o modelo de blocos, cujas dimensões dos blocos serão `20 m x 20 m x 10 m` (Figura 16)...
+
+> ⚠️ Note que, como temos dados 3D, chamaremos as unidades do domínio de estimação de *blocos*.
 """
 
 # ╔═╡ f7cee6a3-5ac2-44ff-9d5e-58ede7327c46
@@ -1139,7 +1135,7 @@ end
 
 # ╔═╡ a73cc834-c600-4278-bc77-49b85dc90256
 md"""
-**Figura 16:** Modelo de blocos.
+_**Figura 16:** Modelo de blocos._
 """
 
 # ╔═╡ 12d79d77-358c-4098-993a-d5be538929a2
@@ -1159,15 +1155,7 @@ md"""
 
 ### Definição do problema de estimação
 
-Para definirmos o problema de estimação, devemos definir os seguintes parâmetros:
-
-- Amostras georreferenciadas;
-- Domínio de estimativas;
-- Variável de interesse.
-
-Neste exemplo, passaremos os furos georreferenciados `samples` e a variável de interesse `:CU` como parâmetros da função `EstimationProblem`. Além disso, também passaremos, como domínio de estimativas, os `centroides` do modelo de blocos gerado anteriomente. Para isso, utilizaremos a função `centroid`...
-
-> ⚠️ *Centroide* é um termo genérico para se referir ao centro de um poliedro que, no nosso caso, representa cada um dos blocos.
+Neste exemplo, passaremos os furos georreferenciados `samples` e a variável de interesse `:CU` como parâmetros da função `EstimationProblem`. Além disso, também passaremos, como domínio de estimação, os centroides do modelo de blocos gerado anteriomente. Para isso, utilizaremos a função `centroid`...
 """
 
 # ╔═╡ affacc76-18e5-49b2-8e7f-77499d2503b9
@@ -1184,7 +1172,7 @@ md"""
 
 ### Definição do estimador
 
-Nesta etapa, devemos selecionar o estimador (i.e. solver) e configurar os parâmetros de vizinhança. Neste exemplo, utilizaremos três estimadores:
+Nesta etapa, devemos selecionar o estimador e configurar os parâmetros de vizinhança. Neste exemplo, utilizaremos três estimadores:
 
 - Inverso do Quadrado da Distância (IQD);
 - Krigagem Simples (KS);
@@ -1192,7 +1180,7 @@ Nesta etapa, devemos selecionar o estimador (i.e. solver) e configurar os parâm
 
 No caso dos estimadores KS e OK, utilizaremos o modelo de variograma `γ` e um volume de busca igual ao elipsoide de anisotropia `ellipsoid₂` definido anteriormente.
 
-A média estacionária, um parâmetro que deve ser informado no caso da KS, será definida como o valor da média declusterizada de Cu `μ`.
+A média do depósito, um parâmetro que deve ser informado no caso da KS, será definida como o valor da média declusterizada de Cu `μ`.
 
 Utilize os sliders abaixo para configurar o número mínimo `minneighbors` e máximo `maxneighbors` de amostras que serão utilizadas para se estimar cada bloco...
 """
@@ -1270,7 +1258,7 @@ end
 # ╔═╡ 3bc456e5-9030-41e5-a48c-179da59547c9
 if run && viz
 	md"""
-	**Figura 17:** Visualização das estimativas de Cu por $selection.
+	_**Figura 17:** Visualização das estimativas de Cu por $selection._
 	
 	Utilize os sliders abaixo para rotacionar e fatiar o modelo de estimativas gerado...
 	"""
@@ -1440,7 +1428,7 @@ end
 # ╔═╡ 6926d1bb-359d-46a5-abf5-e1700d0edcf0
 if run
 	md"""
-	**Figura 18:** Q-Q plots entre os teores amostrais e estimados de Cu (%).
+	_**Figura 18:** Q-Q plots entre os teores amostrais e estimados de Cu (%)._
 	"""
 end
 
@@ -1960,9 +1948,9 @@ uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 
 [[GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pkg", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll"]
-git-tree-sha1 = "dba1e8614e98949abfa60480b13653813d8f0157"
+git-tree-sha1 = "0c603255764a1fa0b61752d2bec14cfbd18f7fe8"
 uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
-version = "3.3.5+0"
+version = "3.3.5+1"
 
 [[GR]]
 deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Printf", "Random", "Serialization", "Sockets", "Test", "UUIDs"]

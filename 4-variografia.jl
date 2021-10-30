@@ -215,7 +215,7 @@ begin
 end
 
 # ╔═╡ 59c0673a-e117-4669-8156-6d3a8eb861e8
-md" **Figura 01:** Elementos do variograma."
+md" _**Figura 01:** Elementos do variograma._"
 
 # ╔═╡ 0c00aee8-9db5-4fca-b92d-e19aa4fe5c1b
 md"""
@@ -254,7 +254,7 @@ plot(γ₁, legend = false, ylims = (0,1.0), xlims = (0,60),
 
 # ╔═╡ 528f0bb5-4030-4006-a323-29f9cbc1efc0
 md"""
-**Figura 02:** Exemplo de variograma experimental.
+_**Figura 02:** Exemplo de variograma experimental._
 """
 
 # ╔═╡ 5e623ea7-03f9-46a9-ba54-6d48d1a64057
@@ -323,7 +323,7 @@ end
 
 # ╔═╡ facdf937-4056-4699-b505-d9cada0c8ce3
 md"""
-**Figura 03:** Exemplo de variograma direcional.
+_**Figura 03:** Exemplo de variograma direcional._
 """
 
 # ╔═╡ 5cb62b37-fe28-4816-b7ed-f5f40df255dc
@@ -366,7 +366,7 @@ end
 
 # ╔═╡ 8923e1c1-914d-47b5-a4b4-5f0c53c4e810
 md"""
-**Figura 04:** Exemplo de busca de pares de amostras em uma malha regular. A seta vermelha indica o vetor $h$.
+_**Figura 04:** Exemplo de busca de pares de amostras em uma malha regular. A seta vermelha indica o vetor $h$._
 """
 
 # ╔═╡ 3d25e2bc-9a6d-4712-92ed-de31dbdea3f2
@@ -405,7 +405,7 @@ end
 
 # ╔═╡ 9d60b923-72e7-42c8-8ef3-d4a590e3f600
 md"""
-**Figura 05:** Exemplo de busca de pares de amostras em uma malha irregular.
+_**Figura 05:** Exemplo de busca de pares de amostras em uma malha irregular._
 """
 
 # ╔═╡ 7c00b7a2-5c09-46f5-ba8d-03786fd606b8
@@ -481,7 +481,7 @@ end
 
 # ╔═╡ 650fc66a-3f8e-45d5-a898-5c783a8d12a1
 md"""
-**Figura 06:** Exemplo de busca de amostras colineares irregulares. Marque a caixa para visualizar a tolerância do passo.
+_**Figura 06:** Exemplo de busca de amostras colineares irregulares. Marque a caixa para visualizar a tolerância do passo._
 """
 
 # ╔═╡ 5e555810-f34d-402c-ac0a-17a423f420bc
@@ -494,7 +494,7 @@ A **largura da banda** é um parâmetro de tolerância que pode ser utilizado pa
 # ╔═╡ 6433f0dc-04f8-450e-9a94-f8cfa8cda552
 md"""
 ![bandwidth](https://i.postimg.cc/vHmM45Qh/bandwidth.png)
-**Figura 07:** Parâmetros utilizados para o cálculo do variograma experimental. A origem do gráfico pode ser entendida como o centro de uma amostra e os "alvos" como as demais amostras. 
+_**Figura 07:** Parâmetros utilizados para o cálculo do variograma experimental. A origem do gráfico pode ser entendida como o centro de uma amostra e os "alvos" como as demais amostras._
 """
 
 # ╔═╡ e80e5e16-59fb-4ec0-a9f0-6b8b97bc8d36
@@ -539,7 +539,7 @@ end
 
 # ╔═╡ f92eedbf-097d-45f6-a550-ccc8c2f9841b
 md"""
-**Figura 08:** Exemplo de ajuste de um modelo teórico a um variograma experimental.
+_**Figura 08:** Exemplo de ajuste de um modelo teórico a um variograma experimental._
 """
 
 # ╔═╡ 83593f8e-8dd2-40b1-903b-8712bb9eb048
@@ -610,7 +610,7 @@ end
 
 # ╔═╡ ab5e6c19-789b-4944-ba8e-f983a9a2652c
 md"""
-**Figura 09:** Tipos de modelo do variograma.
+_**Figura 09:** Tipos de modelo do variograma._
 """
 
 # ╔═╡ 8b4ee7b2-2a01-44ae-8539-27f1815fe634
@@ -668,7 +668,7 @@ end
 
 # ╔═╡ ee09dcab-2298-444c-ad9f-f79268c9056c
 md"""
-**Figura 10:** Tipos de anisotropia.
+_**Figura 10:** Tipos de anisotropia._
 """
 
 # ╔═╡ 0f28a997-4945-47fe-83b9-058726bc8041
@@ -758,7 +758,7 @@ end
 
 # ╔═╡ 864c9c06-e52b-4de8-bc16-d053fa3c0346
 md"""
-**Figura 11:** Exemplo de modelo de variograma imbricado.
+_**Figura 11:** Exemplo de modelo de variograma imbricado._
 """
 
 # ╔═╡ 538bf67b-33c6-45c3-b5bf-328922debb26
@@ -821,7 +821,7 @@ end
 
 # ╔═╡ 7e05a32f-44ba-45ec-8db2-6d23a966a298
 md"""
-**Figura 13:** Exemplo de modelo de variograma anisotrópico.
+_**Figura 12:** Exemplo de modelo de variograma anisotrópico._
 """
 
 # ╔═╡ ad8ca8f4-fc43-4008-8d94-eae74c84010a
@@ -854,7 +854,9 @@ Sabe-se que o modelo de variograma é utilizado como entrada na estimativa por k
 
 - O *modelo teórico* define o comportamento próximo a origem.
 
-O exemplo abaixo auxilia na compreensão da influência de cada um desses parâmetros nas estimativas resultantes. A Figura 13 mostra o modelo de variograma anisotrópico utilizado na estimativa por krigagem. A Figura 14 representa o mapa da localização das amostras.
+O exemplo abaixo auxilia na compreensão da influência de cada um desses parâmetros nas estimativas resultantes. A Figura 13 mostra o modelo de variograma anisotrópico utilizado na estimativa por Krigagem. A Figura 14 representa o mapa da localização das amostras.
+
+> ⚠️ Não se assuste com os termos *estimativa* e *Krigagem*. Aprenderemos sobre esses conceitos no próximo módulo!
 
 Utilize os sliders abaixo para ajustar os variogramas experimentais azul e vermelho. Em seguida, clique na caixa para visualizar as estimativas. Faça o exercício de analisar qual é o impacto de cada parâmetro do variograma nas estimativas resultantes.
 """
@@ -893,13 +895,13 @@ begin
 	
 	# modelo do variograma primário
 	γm_pri = model_type[m](nugget = Float64(Cₒ),
-						   sill = Float64(σ²),
-						   range = Float64(ry))
+						   sill   = Float64(σ²),
+						   range  = Float64(ry))
 	
 	# modelo do variograma secundário 
 	γm_sec = model_type[m](nugget = Float64(Cₒ),
-						   sill = Float64(σ²),
-						   range = Float64(rx))
+						   sill   = Float64(σ²),
+						   range  = Float64(rx))
 end;
 
 # ╔═╡ 308abd53-d536-4ff0-8e1d-9ac118742d93
@@ -934,7 +936,7 @@ end
 
 # ╔═╡ a0b3b930-5f2a-47a1-bc81-c70c2ff595e6
 md"""
-**Figura 13:** Modelo de variograma anisotrópico utilizado na estimativa.
+_**Figura 13:** Modelo de variograma anisotrópico utilizado na estimativa._
 """
 
 # ╔═╡ fb99bba7-e81b-4653-a7dc-3558f6fc7e2c
@@ -957,7 +959,7 @@ begin
 		dom = CartesianGrid((243,283),(8.,8.),(1.,1.))
 
 		# definição do problema de estimativa
-		problem = EstimationProblem(wl_georef, dom, :PB)
+		problem = EstimationProblem(geowl, dom, :Pb)
 
 		# definição do estimador (OK)
 		OK = Kriging(:PB => (variogram = γ,
@@ -970,7 +972,7 @@ begin
 		sol = solve(problem, OK)
 		
 		# manipulação das estimativas
-		estimates = sol |> @map({PB = _.PB, geometry = _.geometry}) |> GeoData
+		estimates = sol |> @map({Pb = _.Pb, geometry = _.geometry}) |> GeoData
 	end
 end;
 
@@ -978,19 +980,19 @@ end;
 begin
 	if show_model
 		# plotagem das estimativas		
-		plot(estimates, color=:coolwarm, xlabel="X", ylabel="Y",
+		plot(estimates, color=:jet, xlabel="X", ylabel="Y",
 			 xlims=(5,255), ylims=(5,295),clims = (0,12),
-			 marker=(:square,1.2), markerstrokewidth=0,
+			 marker=(:square,1.2), markerstrokewidth=0.,
 			 size=(500,500))
 		
 		# plotagem de amostras
-		plot!(geowl, color=:coolwarm, marker=(:square,2),
+		plot!(geowl, marker=(:jet,:circle,3),
 			  markerstrokecolor=:black, markerstrokewidth=0.3,
 		      title="Pb (%)")
 		
 	else
 		# plotagem de amostras
-		plot(geowl, color=:coolwarm, marker=(:square,2),
+		plot(geowl, marker=(:jet,:circle,3),
 			 markerstrokecolor=:black, markerstrokewidth=0.3,
 			 xlims=(5,255), ylims=(5,295),clims = (0,12),
 			 size=(500,500),title="Pb (%)", xlabel="X", ylabel="Y")
@@ -1000,7 +1002,7 @@ end
 
 # ╔═╡ 2f1d77a0-e5cd-4d77-8031-cff161f67a45
 md"""
-**Figura 14:** Mapa de localização das amostras de Pb (%). Ative a caixa para visualizar as estimativas.
+_**Figura 14:** Mapa de localização das amostras de Pb (%). Ative a caixa para visualizar as estimativas._
 """
 
 # ╔═╡ d5de8d26-7e90-4615-bd3b-cdfd002f98b2
@@ -1472,9 +1474,9 @@ uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 
 [[GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pkg", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll"]
-git-tree-sha1 = "dba1e8614e98949abfa60480b13653813d8f0157"
+git-tree-sha1 = "0c603255764a1fa0b61752d2bec14cfbd18f7fe8"
 uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
-version = "3.3.5+0"
+version = "3.3.5+1"
 
 [[GR]]
 deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Printf", "Random", "Serialization", "Sockets", "Test", "UUIDs"]

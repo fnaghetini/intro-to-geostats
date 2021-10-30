@@ -35,7 +35,7 @@ Este material é dividido em seis módulos:
 
 No módulo de **Lógica de Programação**, teremos uma breve introdução a alguns conceitos relacionados à lógica de programação (e.g. funções, estruturas condicionais, laços de repetição) e aos recursos interativos do [PlutoUI.jl](https://github.com/JuliaPluto/PlutoUI.jl). No módulo **Preparação de Amostras**, aprenderemos como gerar furos de sondagem a partir das tabelas de Collar, Survey e Assay e a compositar amostras. Já no módulo seguinte, **Análise Exploratória**, abordaremos técnicas de descrição univariada, bivariada e espacial, além de métodos de desagrupamento de amostras. No módulo **Variografia**, teremos nosso primeiro contato com uma das principais ferramentas geoestatísticas, o variograma. No módulo **Estimação**, aprenderemos sobre os principais métodos de estimação utilizados na Avaliação de Recursos Minerais: _Inverso da Potência da Distância (IPD)_, _Krigagem Simples (KS)_ e _Krigagem Ordinária (KO)_. Por fim, no módulo **Projeto Final**, colocaremos em prática todos os conceitos aprendidos nos módulos anteriores e executaremos um projeto de Avaliação de Recursos desde a geração dos furos de sondagem até a validação das estimativas obtidas.
 
-**Nota:** Os dados utilizados ao longo dos módulos encontram-se na pasta [data](https://github.com/fnaghetini/intro-to-geostats).
+**Nota:** os dados utilizados ao longo dos módulos encontram-se na pasta [data](https://github.com/fnaghetini/intro-to-geostats).
 
 ## Instruções
 
@@ -54,7 +54,7 @@ Não se preocupe! Para acessar o conteúdo deste material é bem simples, basta 
 julia> using Pkg
 julia> Pkg.add("Pluto")
 ```
-**Nota:** Tenha paciência, esse procedimento pode levar alguns minutos. Você saberá que a instalação terminou ao aparecer `julia>` no Julia REPL.
+**Nota:** tenha paciência, esse procedimento pode levar alguns minutos. Você saberá que a instalação terminou ao aparecer `julia>` no Julia REPL.
 
 5. Verifique qual é a versão instalada do Pluto, digitando o seguinte comando no Julia REPL:
 
@@ -80,15 +80,17 @@ julia> using Pluto
 julia> Pluto.run()
 ```
 
-**Nota:** Toda vez que quiser abrir qualquer um dos módulos deste material, você deverá executar esses dois comandos.
+**Nota:** toda vez que quiser abrir qualquer um dos módulos deste material, você deverá executar esses dois comandos.
 
 10. Copie o diretório da pasta **intro-to-geostats-main**, cole-o no campo **Open from file** da janela do Pluto e adicione o sufixo `\nome_do_modulo.jl` ao caminho para abrir o módulo de interesse. Em seguida, clique em **Open**. Aguarde alguns minutos até o conteúdo do módulo carregar. Na figura abaixo, por exemplo, o módulo **Variografia** será aberto:
 
 ![image](https://user-images.githubusercontent.com/63740520/139559509-8f699d90-632c-45da-8577-8ad45ac92d2f.png)
 
-**Nota:** Tenha paciência, esta etapa pode demorar alguns minutos. Na primeira vez que um determinado módulo é executado, todos os pacotes utilizados nele serão baixados.
+**Nota:** os seguintes prefixos abrirão os seis módulos deste material: `\1-logica_de_programacao.jl`, `\2-preparacao_de_amostras.jl`, `\3-analise_exploratoria.jl`, `\4-variografia.jl`, `\5-estimacao.jl` e `\6-projeto_final.jl`. Perceba que esses prefixos se referem aos nomes dos módulos.
 
-**Nota:** Você não precisará executar todos esses passos quando quiser abrir um dos módulos. Se você já tiver seguido esse passo a passo completo, para abrir um dos módulos, basta seguir os **passos 9 e 10**.
+**Nota:** tenha paciência, esta etapa pode demorar alguns minutos. Na primeira vez que um determinado módulo é executado, todos os pacotes utilizados nele serão baixados.
+
+**Nota:** você não precisará executar todos esses passos quando quiser abrir um dos módulos. Se você já tiver seguido esse passo a passo completo, para abrir um dos módulos, basta seguir os **passos 9 e 10**.
 
 ## Licença
 

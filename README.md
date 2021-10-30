@@ -39,7 +39,7 @@ No módulo de **Lógica de Programação**, teremos uma breve introdução a alg
 
 ## Instruções
 
-Não se preocupe! Para acessar o conteúdo deste material é bem simples, basta seguir o passo a passo abaixo:
+Não se preocupe! Para acessar o conteúdo deste material é bem simples, basta seguir o passo-a-passo abaixo:
 
 1. Baixe o instalador da Linguagem Julia, clicando [aqui](https://julialang.org/downloads/). É necessário que a versão do instalador seja **igual ou superior à versão 1.6.3**;
 
@@ -90,7 +90,7 @@ julia> Pluto.run()
 
 **Nota:** tenha paciência, esta etapa pode demorar alguns minutos. Na primeira vez que um determinado módulo é executado, todos os pacotes utilizados nele serão baixados.
 
-**Nota:** você não precisará executar todos esses passos quando quiser abrir um dos módulos. Se você já tiver seguido esse passo a passo completo, para abrir um dos módulos, basta seguir os **passos 9 e 10**.
+**Nota:** você não precisará executar todos esses passos quando quiser abrir um dos módulos. Se você já tiver seguido este passo-a-passo completo em algum momento, para abrir um dos módulos, basta seguir os **passos 9 e 10**.
 
 ## Licença
 

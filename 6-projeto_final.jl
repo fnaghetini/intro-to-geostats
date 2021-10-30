@@ -20,7 +20,7 @@ begin
 	using CSV, DataFrames, Query
     using Statistics, StatsBase
 	using LinearAlgebra, Random 
-	using FileIO, PlutoUI
+	using PlutoUI
     using Plots, StatsPlots
 	
 	# configurações de plotagem
@@ -373,7 +373,7 @@ md"""
 - A média do Cu é igual a 0,86%;
 - O coeficiente de variação do Cu é de 46% e, portanto, essa variável é pouco errática;
 - A princípio, os lowgrades do depósito correspondem a amostras ≤ 0,47%;
-- A princípio, os _high grades_ do depósito correspondem a amostras > 1,32%;
+- A princípio, os high grades do depósito correspondem a amostras > 1,32%;
 - Como X̅ > P50, Skew > 0 e tem-se cauda alongada à direita, a distribuição dos teores compostos de Cu é assimétrica positiva.
 """
 
@@ -413,7 +413,7 @@ cp |> @df scatter(:X, :Y, :Z,
 
 # ╔═╡ 862dd0cf-69ae-48e7-92fb-ff433f62e67c
 md"""
-Podemos, ainda, visualizar os *highgrades* e *lowgrades* de Cu (Figura 06). Como não temos muito conhecimento sobre o depósito, adotaremos a seguinte convenção:
+Podemos, ainda, visualizar os highgrades e lowgrades de Cu (Figura 06). Como não temos muito conhecimento sobre o depósito, adotaremos a seguinte convenção:
 - `lowgrades`: Cu (%) ≤ P10
 - `highgrades`: Cu (%) > P90
 
@@ -462,8 +462,8 @@ end
 md"""
 ##### Observações
 
-- Os *highgrades* ocorrem em regiões de maior densidade amostral;
-- Os *low grades* tendem a se concentrar em porções de densidade amostral baixa;
+- Os highgrades ocorrem em regiões de maior densidade amostral;
+- Os lowgrades tendem a se concentrar em porções de densidade amostral baixa;
 - As amostras apresentam-se ligeiramente agrupadas na porção sudeste do depósito.
 """
 
@@ -531,7 +531,7 @@ md"""
 
 ## 7. Variografia
 
-Durante o [módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/4-variografia.jl) tivemos uma breve introdução à variografia, com exemplos 2D. Neste módulo, entretanto, lidaremos com dados de sondagem 3D. Nesse sentido, adotaremos o fluxo de trabalho a seguir. Em cada etapa, listamos os principais parâmetros encontrados:
+Durante o [módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/4-variografia.jl) tivemos uma breve introdução à variografia, com exemplos 2D. Neste módulo, entretanto, lidaremos com dados de sondagem 3D e, por isso, adotaremos o fluxo de trabalho a seguir. Em cada etapa, listamos os principais parâmetros encontrados:
 
 1. **Variograma down hole:**
     - Efeito pepita e as contribuições das estruturas.
@@ -554,7 +554,7 @@ md"""
 
 Primeiramente, iremos calcular o **variograma experimental down hole**, com o intuito de se obter o *efeito pepita* e o valor de *contribuição por estrutura*.
 
-> ⚠️ Esses parâmetros serão utilizados na modelagem de todos os variogramas experimentais que serão calculados adiante!
+> ⚠️ Esses parâmetros serão utilizados na modelagem de todos os variogramas experimentais que serão calculados adiante.
 """
 
 # ╔═╡ 289865a9-906f-46f4-9faa-f62feebbc92a
@@ -644,7 +644,7 @@ begin
 		 legend=:bottomright, label=false, title="")
 	
 	# linha horizontal tracejada cinza (variância à priori)
-    hline!([σ²], color=:gray, label="σ²")
+    hline!([σ²], color=:gray80, label="σ²")
 
 end
 
@@ -695,12 +695,17 @@ begin
 		  lw=2, label=false)
     
     # linha horizontal tracejada cinza (variância à priori)
-    hline!([σ²], color=:gray, label="σ²")
+    hline!([σ²], color=:gray80, label="σ²")
     
     # linha vertical tracejada cinza (alcance)
-    vline!([range(γdh)], color=colordh, ls=:dash, primary=false)
+    vline!([range(γdh)], color=:black, label="a")
 
 end
+
+# ╔═╡ 2f5c5c2c-2f17-4da2-a8ef-fafc6286bd10
+md"""
+✔️ Agora encontramos os valores de *efeito pepita* e *contribuições ao patamar* que serão utilizados nos demais variogramas que veremos a seguir.
+"""
 
 # ╔═╡ 09d95ff8-3ba7-4031-946b-8ba768dae5d5
 md"""
@@ -751,7 +756,7 @@ begin
 
     plot!(gaziᵦ, color = coloraziᵦ, ms = 5, label="$(azi+90) °")
 
-    hline!([σ²], color = :gray, label="σ²")
+    hline!([σ²], color = :gray80, label="σ²")
 
 end
 
@@ -806,7 +811,7 @@ begin
 	plot(gpri, ylims=(0, σ²+0.05), color = colorpri, ms = 5,
 		 legend = :bottomright, label=false, title="$azi ° / $dip °")
 
-    hline!([σ²], color = :gray, label="σ²")
+    hline!([σ²], color = :gray80, label="σ²")
 end
 
 # ╔═╡ eb9ebce2-7476-4f44-ad4f-10a1ca522143
@@ -843,11 +848,11 @@ begin
 	     legend = :bottomright, label = "primário", title = "$azi °/ $dip °")
 
     plot!(γpri, 0, 350, ylims = (0, σ²+0.05), color = colorpri, lw = 2,
-		  label = "teórico")
+		  label = "")
 		
-    hline!([σ²], color = :gray, label="σ²")
+    hline!([σ²], color = :gray80, label="σ²")
 
-    vline!([range(γpri)], color = colorpri, ls = :dash, primary = false)
+    vline!([range(γpri)], color=:black, label="a")
 
 end
 
@@ -922,7 +927,7 @@ begin
 
     plot!(gter, color = colorter, ms = 5, label = "terciário")
 
-    hline!([σ²], color = :gray, label="σ²")
+    hline!([σ²], color = :gray80, label="σ²")
 
 end
 
@@ -964,9 +969,9 @@ begin
     plot!(γsec, 0, 250, ylims = (0, σ²+0.2), color = colorsec, lw = 2,
 	      label = false)
 
-    hline!([σ²], color = :gray, label="σ²")
+    hline!([σ²], color = :gray80, label="σ²")
 
-    vline!([range(γsec)], color = colorsec, ls = :dash, primary = false)
+    vline!([range(γsec)], color=:black, label="a")
 
 end
 
@@ -1009,9 +1014,9 @@ begin
     plot!(γter, 0, 250, ylims = (0, σ²+0.2), color = colorter, lw = 2,
 		  label = false)
 
-    hline!([σ²], color = :gray, label="σ²")
+    hline!([σ²], color = :gray80, label="σ²")
 
-    vline!([range(γter)], color = colorter, ls = :dash, primary = false)
+    vline!([range(γter)], color=:black, label="a")
 
 end
 
@@ -1044,7 +1049,7 @@ begin
     plot!(γter, 0, range(γpri)+10, color=colorter, lw=2, label="terciário",
 		  ylims=(0, σ²+0.05))
 	
-	hline!([σ²], color=:gray, label="σ²")
+	hline!([σ²], color=:gray80, label="σ²")
 end
 
 # ╔═╡ 5134e2cb-8c98-4e5e-9f13-722b8f828dc7
@@ -1445,23 +1450,14 @@ end
 md"""
 ## 10. Exportação das estimativas
 
-Nesta última seção, iremos exportar as estimativas geradas pelo método da Krigagem Ordinária em dois formatos distintos:
+Nesta última seção, iremos exportar as estimativas geradas pelo método da Krigagem Ordinária no formato CSV.
 
-- GSLIB;
-- CSV.
-
-Marque a caixa abaixo para executar a exportação das estimativas em ambos os formatos...
+Marque a caixa abaixo para executar a exportação das estimativas...
 
 > ⚠️ Para exportar as estimativas, a caixa *Executar estimativas* deve estar marcada.
 
 Salvar estimativas: $(@bind store CheckBox())
 """
-
-# ╔═╡ b96c4bd5-54ba-4394-b963-5c5ddc06cf3b
-# GSLIB
-if run && store
-	save("output/estimativas_KO.gslib", sol_ko)
-end;
 
 # ╔═╡ 79bc4b7d-72de-4c9e-94f5-3b5ba6bbff1d
 function csvtable(solution, variable)
@@ -1477,9 +1473,9 @@ function csvtable(solution, variable)
 	
 	mean = solution[variable]
 	
-	var  = solution[variable*"-variance"]
+	var  = solution[variable*"_variance"]
 	
-	DataFrame(MEAN=mean, VARIANCE=var, X=X, Y=Y, Z=Z)
+	DataFrame(TEOR=mean, VAR=var, X=X, Y=Y, Z=Z)
 end;
 
 # ╔═╡ 245c7304-1cc0-408a-97ec-867ac0cc81b0
@@ -1519,7 +1515,6 @@ Os seguintes pacotes foram utilizados neste notebook:
 |[StatsBase](https://github.com/JuliaStats/StatsBase.jl)   | Cálculo de estatísticas |
 |[LinearAlgebra](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/)   | Álgebra linear |
 |[Random](https://docs.julialang.org/en/v1/)               | Números aleatórios      |
-|[FileIO](https://github.com/JuliaIO/FileIO.jl)            | Coversão entre formatos |
 |[PlutoUI](https://github.com/fonsp/PlutoUI.jl)            | Widgets interativos     |
 |[Plots](https://github.com/JuliaPlots/Plots.jl)           | Visualização dos dados  |
 |[StatsPlots](https://github.com/JuliaPlots/StatsPlots.jl) | Visualização dos dados  |
@@ -1532,7 +1527,6 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DrillHoles = "9d36f3b5-8124-4f7e-bcda-df733105c718"
-FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 GeoStats = "dcc97b0b-8ce5-5539-9008-bb190f959ef6"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
@@ -1547,7 +1541,6 @@ StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 CSV = "~0.8.5"
 DataFrames = "~1.2.2"
 DrillHoles = "~0.1.4"
-FileIO = "~1.11.1"
 GeoStats = "~0.27.0"
 Plots = "~1.23.1"
 PlutoUI = "~0.7.16"
@@ -1886,12 +1879,6 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "c6033cc3892d0ef5bb9cd29b7f2f0331ea5184ea"
 uuid = "f5851436-0d7a-5f13-b9de-f02708fd171a"
 version = "3.3.10+0"
-
-[[FileIO]]
-deps = ["Pkg", "Requires", "UUIDs"]
-git-tree-sha1 = "3c041d2ac0a52a12a27af2782b34900d9c3ee68c"
-uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
-version = "1.11.1"
 
 [[FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Statistics"]
@@ -3138,6 +3125,7 @@ version = "0.9.1+5"
 # ╟─c6d0a87e-a09f-4e78-9672-c858b488fd39
 # ╟─fc2ea8f3-064a-4d6d-8115-236c8160cc23
 # ╟─0585add6-1320-4a31-a318-0c40b7a444fa
+# ╟─2f5c5c2c-2f17-4da2-a8ef-fafc6286bd10
 # ╟─09d95ff8-3ba7-4031-946b-8ba768dae5d5
 # ╟─d07a57c3-0a7a-49c2-a840-568e72d50545
 # ╟─bda3cda3-9d57-495b-be79-1415aa95707f
@@ -3204,7 +3192,6 @@ version = "0.9.1+5"
 # ╟─6926d1bb-359d-46a5-abf5-e1700d0edcf0
 # ╟─2181506b-76f5-4a57-adba-e90679b2b21b
 # ╟─5ad612f4-76e9-4867-b4c8-4c35540a5f47
-# ╠═b96c4bd5-54ba-4394-b963-5c5ddc06cf3b
 # ╠═245c7304-1cc0-408a-97ec-867ac0cc81b0
 # ╟─79bc4b7d-72de-4c9e-94f5-3b5ba6bbff1d
 # ╟─1164ba05-0835-4713-b11c-92b37085b744

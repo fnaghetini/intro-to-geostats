@@ -13,46 +13,55 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ 980f4910-96f3-11eb-0d4f-b71ad9888d73
+# ╔═╡ f9fb89e0-36a8-11ec-3fa3-d716ca093060
 begin
 	# carregando pacotes necessários
-	using GeoStats, DrillHoles
+	using GeoStats, Statistics
 	using CSV, DataFrames, Query
-    using Statistics, StatsBase
-	using LinearAlgebra, Random 
-	using FileIO, PlutoUI
-    using Plots, StatsPlots
+    using PlutoUI, Distributions
+    using Plots, StatsPlots, Random
 	
-	# configurações de plotagem
+	# configurações de visualização
 	gr(format=:png)
 end;
 
-# ╔═╡ 14ac7b6e-9538-40a0-93d5-0379fa009872
+# ╔═╡ 3e70ffa1-2a50-4dc4-a529-e4361ac6ad5f
 html"""
-<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp🏆&nbsp<b>Projeto Final</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
+<p style="background-color:lightgrey" xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">&nbsp&nbsp🎯&nbsp<b>Estimação</b></span> por <span property="cc:attributionName">Franco Naghetini</span> é licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>
 """
 
-# ╔═╡ 6b7e7c5d-7a86-4ea4-a47e-fb4148030c1a
+# ╔═╡ 9f8d2a06-275e-4689-8a69-b1f4dec807b3
 PlutoUI.TableOfContents(aside=true, title="Sumário",
 						indent=true, depth=2)
 
-# ╔═╡ 3afd7a32-3696-4cea-b00c-b52bfdb003ba
+# ╔═╡ 0d2c1d74-f691-4805-9aa2-e9d42da04284
 md"""
 ![ufmg-logo](https://logodownload.org/wp-content/uploads/2015/02/ufmg-logo-2.png)
 """
 
-# ╔═╡ c544614a-3e5c-4d22-9340-592aabf84871
+# ╔═╡ 84ad4d5f-b3c3-4c21-89f2-d15396e83d05
 md"""
-# 🏆 Projeto Final
+# 🎯 Estimação
 
-Este último módulo visa demonstrar, na prática, um fluxo de trabalho completo de estimativa de recursos realizado com o pacote [GeoStats.jl](https://github.com/JuliaEarth/GeoStats.jl). Para isso, utilizaremos todo o conhecimento adquirido nos cinco módulos anteriores. Abordaremos desde a etapa de importação dos dados brutos (tabelas Collar, Survey e Assay) até a geração de um modelo de teores 3D.
+Você com certeza já ouviu falar sobre **modelagem geológica 3D**. Durante esse procedimento, o geólogo utiliza os dados disponíveis (e.g. furos de sondagem, mapa geológico) e faz algumas inferências para gerar um modelo tridimensional da subsuperfície. Após a geração desse modelo (contínuo), ele normalmente é discretizado em pequenos "tijolos" denominados blocos. Por essa razão, o modelo geológico discretizado é chamado de **modelo de blocos**.
 
-> ⚠️ Nos dois últimos módulos trabalhamos com uma base de dados 2D (i.e. Walker Lake). Neste módulo, no entanto, trabalharemos com um banco de dados 3D e, por isso, adaptaremos alguns conceitos.
+Neste módulo, aprenderemos sobre diferentes **estimadores** (i.e. métodos de estimação) que visam atribuir um valor de teor a cada bloco do modelo de blocos. Para realizar essa tarefa, precisamos de amostras (e.g. furos de sondagem, amostras de solo) e do modelo de blocos, onde realizaremos as estimativas. O modelo de blocos, de forma genérica, pode ser chamado de **domínio de estimação** (ou grid de estimação).
 
-O produto final deste módulo é um modelo de blocos estimado (i.e. modelo de teores) por diferentes métodos: Inverso do Quadrado da Distância (IQD), Krigagem Simples (KS) e Krigagem Ordinária (KO).
+Podemos pensar que a estimação consiste na interpolação de amostras com teores conhecidos para atribuir teores (estimados) a regiões que não foram amostradas.
+
+> ⚠️ Neste módulo adotaremos uma convenção para facilitar a compreensão do conteúdo. O processo de atribuir valores de teor a unidades discretizadas será chamado de **estimação**, do inglês *estimation*. Por outro lado, os teores resultantes do processo de estimação serão chamados de **estimativas**, do inglês *estimates*. Ressalta-se que, na indústria, o termo *estimativa* é comumente utilizado para se referir tanto ao processo quanto aos valores estimados.
+
+Este módulo é estruturado de forma a seguir o fluxo de trabalho adotado pelo [GeoStats.jl](https://github.com/JuliaEarth/GeoStats.jl):
+
+- **Etapa 1:** Criação do domínio de estimativas;
+- **Etapa 2:** Definição do problema de estimação;
+- **Etapa 3:** Definição do estimador;
+- **Etapa 4:** Solução do problema de estimação.
+
+Entraremos em detalhe sobre cada uma das etapas durante o módulo.
 """
 
-# ╔═╡ 3353d0be-4280-4ffd-824b-745bb6b64f41
+# ╔═╡ 035ef186-a067-44c0-b9a0-bdac6f4d770b
 md"""
 >##### 📚 Sobre
 >- Você pode exportar este notebook como PDF ou HTML estático. Para isso, clique no ícone 🔺🔴, localizado no canto superior direito da pagina. Entretanto, ambos os formatos não são compatíveis com os recursos interativos do notebook.
@@ -67,1356 +76,612 @@ md"""
 >- Para mais informações acesse o [README](https://github.com/fnaghetini/intro-to-geostats/blob/main/README.md) do projeto 🚀
 """
 
-# ╔═╡ 8e2b3339-a65d-4e1b-a9fb-69b6cd4631ea
+# ╔═╡ 564423c2-6a3e-4919-a6fc-32f7d1664f86
 md"""
-## 1. Base de dados
+## 1. Conceitos básicos
 
-Neste módulo, utilizaremos uma base de dados desenvolvida pelo autor, denominada [Junipero](https://github.com/fnaghetini/intro-to-geostats/tree/main/data/Junipero). Ela consiste em conjunto de furos realizados durante uma campanha de sondagem em um depósito fictício de Cu Pórfiro. Portanto, estaremos interessados na estimativa da commodity Cu (%).
+Nesta primeira seção, teremos uma breve introdução a três dos principais *estimadores lineares ponderados* utilizados na *estimação* de recursos minerais:
 
-A Figura 01 mostra os campos presentes nas quatro tabelas do banco de dados.
+- Inverso da Potência da Distância;
+- Krigagem Simples;
+- Krigagem Ordinária.
 """
 
-# ╔═╡ af1aca7e-bde2-4e14-a664-b7c71ff80ffe
+# ╔═╡ a069cc27-d08e-47b4-9f75-24dab178b333
 md"""
-![tabelas_raw](https://i.postimg.cc/52Qz4t7Z/tables.jpg)
+### Estimadores lineares ponderados
 
-_**Figura 01:** Tabelas Collar, Survey, Assay e Litho e seus respectivos campos._
+Os três métodos listados acima compartilham a mesma equação para calcular estimativas $\hat{z}(x_o)$:
+
+```math
+\hat{z}(x_o) = \sum_{i=1}^{n} w_i \cdot z(x_i) = w_1 \cdot z(x_1) + w_2 \cdot z(x_2) + \cdots + w_n \cdot z(x_n)
+```
+
+em que $\{z(x_1), z(x_2), ..., z(x_n)\}$ são os valores das $n$ amostras que serão utilizadas na estimação da posição $x_0$, enquanto $\{w_1, w_2, ..., w_n\}$ representam os pesos atribuídos a cada $i$-ésima amostra (*Isaaks & Srivastava, 1989*).
+
+> ⚠️ Na Estatística, é muito comum representar estimativas com o símbolo "^".
+
+Os métodos caracterizados por essa equação são denominados **estimadores lineares ponderados** e se diferenciam entre si de acordo com a forma que os pesos $w_i$ são atribuídos a cada amostra.
 """
 
-# ╔═╡ ff01a7d7-d491-4d49-b470-a2af6783c82b
+# ╔═╡ 9b31cfec-400a-4068-84b8-8170b3c8ab58
 md"""
-## 2. Geração de furos
+### Inverso da Potência da Distância (IPD)
 
-Primeiramente, vamos importar as quatro tabelas (i.e. Collar, Survey, Assay e Litho), utilizando o pacote [DrillHoles.jl](https://github.com/JuliaEarth/DrillHoles.jl)...
+Uma abordagem intuitiva para atribuir pesos é pensar que amostras mais distantes do ponto a ser estimado devem receber pesos menores, enquanto amostras próximas devem receber pesos maiores.
+
+>⚠️ De acordo com a 1ª Lei da Geografia, proposta por Tobler na década de 1970: *"tudo está relacionado a tudo, mas coisas mais próximas são mais parecidas (relacionadas) entre si do que coisas mais distantes"*.
+
+Nesse sentido, no método **Inverso da Potência da Distância (IPD)**, o peso $w_i$ de uma amostra $z(x_i)$ é inversamente proporcional a sua distância Euclidiana $d_i$ até o ponto que está sendo estimado $\hat{z}(x_o)$ (*Isaaks & Srivastava, 1989*). É comum escolhermos uma potência $p$ arbitrária associada à distância:
+
+```math
+\hat{z}(x_o) = \frac{\sum_{i=1}^{n}\frac{1}{d_i^p}z(x_i)} {\sum_{i=1}^{n}\frac{1}{d_i^p}}
+```
+
+em que $w_i = \frac{1}{d_i^p}$. O denominador da equação acima é uma **condição de fechamento** que garante que a soma dos $n$ pesos sempre totalize em 1.
+
+>⚠️ Na Mineração, é muito comum adotar-se $p=2$. Nesse caso específico, o método pode ser chamado de **Inverso do Quadrado da Distância (IQD)**.
+
+A Figura 01 mostra um gráfico de distância por peso para diferentes potências $p$:
 """
 
-# ╔═╡ 444402c6-99a3-4829-9e66-c4962fb83612
+# ╔═╡ 951ca515-39a9-4e95-a53c-6fd7977a4cbb
 begin
-	collar = Collar(file="data/Junipero/collar.csv",
-					holeid=:HOLEID, x=:X, y=:Y, z=:Z)
+	# geração dos dados
+	ds = collect(1:100)
+	ws = [@. 1/(ds^p) for p in 1:5]
 
-	survey = Survey(file="data/Junipero/survey.csv",
-					holeid=:HOLEID, at=:AT, azm=:AZM, dip=:DIP)
+	# labels de cada gráfico
+	labels = ["p=$p" for p in 1:5]
 
-	assay  = Interval(file="data/Junipero/assay.csv",
-					 holeid=:HOLEID, from=:FROM, to=:TO)
-
-	litho  = Interval(file="data/Junipero/litho.csv",
-					  holeid=:HOLEID, from=:FROM, to=:TO)
-end;
-
-# ╔═╡ 0d0d610a-b06c-4c16-878d-8d2d124b8b9e
-md"""
-Em seguida, podemos utilizar a função `drillhole` do mesmo pacote para gerar os furos de sondagem...
-"""
-
-# ╔═╡ 1d7df6f8-f643-4c1e-92b4-52e51c4ccda8
-drillholes = drillhole(collar, survey, [assay, litho])
-
-# ╔═╡ bb8336ba-f347-418c-8883-47d86350bc94
-md"""
-Vamos, agora, armazenar uma cópia da tabela de furos na variável `dh`...
-"""
-
-# ╔═╡ 412cfe3d-f9f1-49a5-9f40-5ab97946df6d
-dh = copy(drillholes.table);
-
-# ╔═╡ d343401d-61dc-4a45-ab9b-beaff2534886
-md"""
-##### Observações
-
-- Após a geração dos furos, não há inconsistências em nenhuma das tabelas importadas.
-"""
-
-# ╔═╡ ec102b27-79e2-4a91-99d6-dff061752855
-md"""
-> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 2](https://github.com/fnaghetini/intro-to-geostats/blob/main/2-preparacao_de_amostras.jl).
-"""
-
-# ╔═╡ bedcf585-53ef-4cf6-9dc2-d3fc9cff7755
-md"""
-## 3. Limpeza dos dados
-
-Nesta seção, iremos verificar a necessidade de se realizar uma limpeza na base de dados. Uma das primeiras atitudes a se tomar quando se lida com um novo banco de dados é a visualização do sumário estatístico de suas colunas. Frequentemente são encontrados valores faltantes e eventuais inconsistências. Podemos fazer isso com a função `describe`...
-"""
-
-# ╔═╡ 15fd1c4d-fbf2-4389-bc1c-eabbbd26817b
-describe(dh)
-
-# ╔═╡ 39ae0ea7-9659-4c7b-b161-fd9c3495f4e3
-md"""
-##### Observações
-
-- Existem 307 valores faltantes das variáveis `CU` e `LITH`;
-- As variáveis que deveriam ser numéricas foram reconhecidas como tal;
-- Não existem valores anômalos que "saltam aos olhos".
-"""
-
-# ╔═╡ f9545a95-57c0-4de6-9ab7-3ac3728b3d27
-md"""
-Como o objetivo deste módulo é a geração de um modelo de estimativas de Cu (%), podemos remover os 307 valores faltantes do banco de dados e recalcular o sumário estatístico para validar essa operação. Para a remoção dos valores faltantes, utilizaremos a função `dropmissing!`...
-"""
-
-# ╔═╡ 4d5f2467-c7d5-4a82-9968-97f193090bd6
-begin
-    dropmissing!(dh)
-
-    describe(dh)
+	# plotagem
+	plot(ws, label=hcat(labels...), xlabel="Distância", ylabel="Peso", lw=1.5)
 end
 
-# ╔═╡ 2af7dfc5-a26a-4ad3-a046-31d1dfa107f1
+# ╔═╡ 28acc648-ac4a-4d1c-86ce-5bb329c6a141
+md"""
+_**Figura 01:** Relação entre distância e peso para diferentes potências $p$._
+"""
+
+# ╔═╡ 25ddae7c-a276-417e-92c8-9fc2076db219
 md"""
 ##### Observações
 
-- Após a aplicação da função `dropmissing!`, os 307 valores falantes de `CU` e `LITH` foram removidos com sucesso da tabela de furos `dh`.
+- Com o aumento da potência $p$, mais rapidamente os pesos diminuem em função do aumento da distância entre as amostras e o ponto a ser estimado.
 """
 
-# ╔═╡ ee6c8dfa-d8be-4b5a-bfe0-9e1b3f394e9d
+# ╔═╡ 69c94901-8d49-4fcc-97f4-bf857b04e627
 md"""
-> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl).
+### Krigagem
+
+**Krigagem** é um termo genérico aplicado a uma família de métodos de estimação que buscam *minimizar o erro (ou resíduo) da estimação*, normalmente pela estratégia de Mínimos Quadrados (*Sinclair & Blackwell, 2006*). Alguns exemplos são: Krigagem Simples (KS), Krigagem Ordinária (KO), Krigagem Universal (KU) e Krigagem com Deriva Externa (KDE). Neste módulo, abordaremos apenas os dois primeiros.
+
+>⚠️ Um **resíduo** (ou erro) consiste na diferença entre o valor estimado e o valor real $r = \hat{z}(x) - z(x)$ para um determinado ponto pertencente ao domínio de estimação.
+
+Os métodos de Krigagem estão associados ao acrônimo **B.L.U.E.** (*Best Linear Unbiased Estimator*). Eles são estimadores **lineares**, pois suas estimativas são combinações lineares ponderadas das amostras disponíveis. Além disso, são **não enviesados**, já que a média dos resíduos é idealmente igual a zero. Por fim, esses métodos são **"melhores"**, pois objetivam minimizar a variância dos resíduos $\sigma_r^2$, que pode ser escrita como (*Isaaks & Srivastava, 1989*):
+
+```math
+\sigma_r^2 = \frac{1}{n} \sum_{i=1}^{n} [\hat{z}(x_i) - z(x_i)]^2 = E[\hat{z}(x_i) - z(x_i)]^2
+```
+
+A minimização de $\sigma_r^2$ é justamente o diferencial dos estimadores da família da Krigagem, já que o método IPD também é linear e não enviesado (*Isaaks & Srivastava, 1989*). A Figura 02 mostra um exemplo de duas distribuições de resíduos hipotéticas...
 """
 
-# ╔═╡ f4bd13d4-70d3-4167-84ff-9d3c7200e143
-md"""
-## 4. Compositagem
-
-Nesta seção, iremos realizar a compositagem com o objetivo de adequar as amostras à escala de trabalho (hipotética) de 10 metros. Primeiramente, vamos analisar a distribuição do comprimento `LENGTH` das amostras brutas (Figura 02)...
-"""
-
-# ╔═╡ 41790d87-ce85-461f-a16d-04821a3624bb
-begin
-	X̅_dh = round(mean(dh.LENGTH), digits=2)
-	md_dh = round(median(dh.LENGTH), digits=2)
-	
-    # Plotagem da distribuição do comprimento das amostras brutas
-    dh |> @df histogram(:LENGTH,
-		                legend = :topleft,
-		                label  = false,
-		 				color  = :honeydew2,
-						alpha  = 0.75,
-	                    xlabel = "Suporte (m)",
-        				ylabel = "Freq. Absoluta",
-	                    title  = "Amostras Brutas")
-
-    # plotagem da média
-    vline!([X̅_dh], label="X̅ = $(X̅_dh) m")
-
-    # plotagem da mediana
-    vline!([md_dh], label="md = $(md_dh) m")
-end
-
-# ╔═╡ f40bca06-6a3e-4807-9857-ff17d21893bc
-md"""
-_**Figura 02:** Distribuição do comprimento das amostras brutas._
-"""
-
-# ╔═╡ 7ea21049-5edd-4979-9782-8a20d4bb287b
-md"""
-##### Observações
-
-- Grande parte das amostras apresenta um comprimento igual a 5 metros;
-- O suporte das amostras brutas apresenta uma distribuição assimétrica negativa (cauda alongada à esquerda);
-- O comprimento das amostras varia de 2,5 a 5,0 metros.
-"""
-
-# ╔═╡ d8ce39f1-8017-4df3-a55d-648bdd3dbc04
-md"""
-Vamos agora utilizar a função `composite` para realizar a compositagem das amostras pelo método do comprimento ótimo (`mode=:nodiscard`) para um tamanho `interval` de 10 metros...
-"""
-
-# ╔═╡ 32f75604-b01a-4a0b-a008-33b2a56f4b57
-begin
-	# compositagem (comprimento ótimo) para um intervalo de 10 m
-	compostas = composite(drillholes, interval=10.0, mode=:nodiscard)
-
-	# armazenando a tabela de furos compositados na variável "cp"
-	cp = compostas.table
-	
-	# remoção de eventuais valores faltantes
-	dropmissing!(cp)
-end;
-
-# ╔═╡ b6712822-7c4d-4936-bcc2-21b48be99a66
-md"""
-Agora, podemos analisar a distribuição do suporte das compostas ótimas (Figura 03)...
-"""
-
-# ╔═╡ 87808ab0-3bcb-428d-9ebf-71ffefbcb357
-begin
-	X̅_cp = round(mean(cp.LENGTH), digits=2)
-	md_cp = round(median(cp.LENGTH), digits=2)
-	
-    # plotagem da distribuição do comprimento das compostas ótimas
-    cp |> @df histogram(:LENGTH,
-	                    legend = :topleft,
-                        label  = false,
-                        color  = :honeydew2,
-                        alpha  = 0.75,
-	                    xlabel = "Suporte (m)",
-                        ylabel = "Freq. Absoluta",
-		                title  = "Compostas Ótimas")
-
-    # plotagem da média
-    vline!([X̅_cp], label="X̅ = $(X̅_cp) m")
-
-    # plotagem da mediana
-    vline!([md_cp], label="md = $(md_cp) m")
-end
-
-# ╔═╡ 280db32e-cebf-4d51-bfcb-54d456f2194b
-md"""
-_**Figura 03:** Distribuição do comprimento das compostas ótimas._
-"""
-
-# ╔═╡ 893d7d19-878b-4990-80b1-ef030b716048
-md"""
-##### Observações
-
-- A média do suporte das compostas ótimas encontra-se muito próxima do comprimento pré-estabelecido (10 m);
-- O suporte das compostas ótimas passou a apresentar uma distribuição aproximadamente simétrica.
-"""
-
-# ╔═╡ b85a7c2f-37e2-48b0-a1db-984e2e719f29
-md"""
-Podemos agora realizar uma comparação estatística entre as amostras brutas e as compostas ótimas a partir da função `compvalid`. Para isso, iremos avaliar a dispersão do comprimento das amostras e a média do teor de Cu (%).
-"""
-
-# ╔═╡ 676bea93-69a9-4f2c-bb3e-759a9d28b12e
-function compvalid(amostras::DataFrame, id::String)
-	
-	report = DataFrame(Amostras   = id,
-					   DP_suporte = std(amostras.LENGTH),
-					   Média_Au   = mean(amostras.CU))
-	return report
-end
-
-# ╔═╡ 59dfbb66-f188-49f1-87ba-4f7020c4c031
-[compvalid(dh, "Brutas")
- compvalid(cp, "Comp. Ótimo")]
-
-# ╔═╡ 7a021fbd-83ac-4a36-bb8c-98519e6f8acb
-md"""
-##### Observações
-
-- Houve uma redução < 1% na média de Cu;
-- Houve um aumento na dispersão do comprimento das amostras após a compositagem. Poderíamos testar outras configurações de compositagem, mas seguiremos com essas compostas.
-"""
-
-# ╔═╡ fb67daea-0b8b-47da-b06c-8256566f9ba0
-md"""
-> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 2](https://github.com/fnaghetini/intro-to-geostats/blob/main/2-preparacao_de_amostras.jl).
-"""
-
-# ╔═╡ f2be5f11-1923-4658-93cf-800ce57c32d3
-md"""
-## 5. Análise exploratória
-
-Nesta seção, iremos conduzir uma análise exploratória simples, visando descrever principalmente a variável `CU`.
-
-Primeiramente, vamos calcular sumário estatístico da variável `CU` e, em seguida, visualizar sua distribuição (Figura 04)...
-"""
-
-# ╔═╡ ecec08be-b9da-4913-9f5a-3a77631fa96e
-function sumario(teor::String, id::String)
-	q10 = quantile(cp[!,teor], 0.1)
-	q90 = quantile(cp[!,teor], 0.9)
-	
-	df = DataFrame(teor = id,
-                   X̄    = mean(cp[!,teor]),
-				   md   = median(cp[!,teor]),
-				   min  = minimum(cp[!,teor]),
-			       max  = maximum(cp[!,teor]),
-                   S²   = var(cp[!,teor]),
-				   S    = std(cp[!,teor]),
-                   q10  = q10,
-				   q90  = q90,
-                   Cᵥ   = variation(cp[!,teor]),
-                   skew = skewness(cp[!,teor]))
-				
-	return df
-end;
-
-# ╔═╡ d00f02fc-3c14-4911-a36b-209c747f96cb
-sumario_cu = sumario("CU", "Cu (amostral)")
-
-# ╔═╡ b95a6def-f3e6-4835-b15f-2a48577006f4
-begin
-	# cálculo da média e mediana
-	X̅_cu = round(sumario_cu.X̄[], digits=2)
-	md_cu = round(sumario_cu.md[], digits=2)
-	
-    # plotagem da distribuição dos teores compostos de Cu
-    cp |> @df histogram(:CU,
-		                bins   = 30,
-		 				label  = false,
-		                color  = :honeydew2,
-		                alpha  = 0.75,
-		                xlabel = "Cu (%)",
-            			ylabel = "Freq. Absoluta")
-
-    # plotagem da média
-    vline!([X̅_cu], label="X̄ = $(X̅_cu)%")
-
-    # plotagem da mediana
-    vline!([md_cu], label="md = $(md_cu)%")
-end
-
-# ╔═╡ 81a5831f-75ef-478b-aba5-70d19306798e
-md"""
-_**Figura 04:** Distribuição dos teores compostos de Cu (%)._
-"""
-
-# ╔═╡ 0808061f-4856-4b82-8560-46a59e669ac4
-md"""
-##### Observações
-
-- A média do Cu é igual a 0,86%;
-- O coeficiente de variação do Cu é de 46% e, portanto, essa variável é pouco errática;
-- A princípio, os lowgrades do depósito correspondem a amostras ≤ 0,47%;
-- A princípio, os _high grades_ do depósito correspondem a amostras > 1,32%;
-- Como X̅ > P50, Skew > 0 e tem-se cauda alongada à direita, a distribuição dos teores compostos de Cu é assimétrica positiva.
-"""
-
-# ╔═╡ c0604ed8-766e-4c5d-a628-b156615f8140
-md"""
-Como estamos lidando com dados geoespaciais, a visualização espacial da variável de interesse sempre deve ser realizada em conjunto com a sua descrição estatística.
-
-Nesse sentido, podemos utilizar o pacote [Plots.jl](https://github.com/JuliaPlots/Plots.jl) para visualizar a distribuição espacial dos teores de Cu (Figura 05). Utilize os sliders abaixo para analisar os dados por ângulos diferentes...
-"""
-
-# ╔═╡ eac8e835-83bc-4f9c-b25b-3aaddcf69611
-md"""
-_**Figura 05:** Distribuição espacial dos teores de Cu (%)._
-"""
-
-# ╔═╡ 8bb2f630-8234-4f7f-a05c-8206993bdd45
-md"""
-
-Rotação em Z: $(@bind α Slider(0:10:90, default=30, show_value=true))°
-
-Rotação em X: $(@bind β Slider(0:10:90, default=30, show_value=true))°
-
-"""
-
-# ╔═╡ 074bff0b-6b41-4bbc-9b5c-77fbf62c4dc6
-# Visualização dos furos por teor de Cu
-cp |> @df scatter(:X, :Y, :Z,
-	              marker_z = :CU,
-	              marker   = (:circle, 4),
-	              colorbar = true,
-	              color    = :jet,
-                  xlabel   = "X",
-	              ylabel   = "Y",
-	              zlabel   = "Z",
-	              label    = "Teor de Cu (%)",
-                  camera   = (α, β))
-
-# ╔═╡ 862dd0cf-69ae-48e7-92fb-ff433f62e67c
-md"""
-Podemos, ainda, visualizar os *highgrades* e *lowgrades* de Cu (Figura 06). Como não temos muito conhecimento sobre o depósito, adotaremos a seguinte convenção:
-- `lowgrades`: Cu (%) ≤ P10
-- `highgrades`: Cu (%) > P90
-
-Utilize os sliders acima para analisar esses teores por ângulos diferentes...
-"""
-
-# ╔═╡ 52c28a55-3a4a-4df3-841a-ab8fc748bf55
-md"""
-_**Figura 06:** Distribuição espacial dos highgrades e lowgrades de Cu (%)._
-"""
-
-# ╔═╡ 3ae99e49-6996-4b4a-b930-f6073994f25c
-begin	
-    # filtragem dos teores lowgrade
-    lg = cp |> @filter(_.CU ≤ sumario_cu.q10[])
-	
-	# filtragem dos teores highgrade
-    hg = cp |> @filter(_.CU > sumario_cu.q90[])
-end;
-
-# ╔═╡ ea0968ca-a997-40c6-a085-34b3aa89807e
-begin
-
-    # Visualização de todas as amostras (cinza claro)
-    @df cp scatter(:X, :Y, :Z,
-		           marker = (:circle, 4, :gray95, 0.5),
-		           label  = false,
-		           xlabel = "X",
-                   ylabel = "Y",
-		           zlabel = "Z",
-	               camera = (α, β))
-	
-	# Visualização de lowgrades (azul)
-    @df lg scatter!(:X, :Y, :Z,
-		            marker=(:circle, 4, :blue),
-		            label="lowgrades")
-    
-    # Visualização de highgrades (vermelho)
-    @df hg scatter!(:X, :Y, :Z,
-		            marker=(:circle, 4, :red),
-		            label="highgrades")
-
-end
-
-# ╔═╡ ccbcf57e-d00b-43df-8555-eee8bf4f9e6f
-md"""
-##### Observações
-
-- Os *highgrades* ocorrem em regiões de maior densidade amostral;
-- Os *low grades* tendem a se concentrar em porções de densidade amostral baixa;
-- As amostras apresentam-se ligeiramente agrupadas na porção sudeste do depósito.
-"""
-
-# ╔═╡ c6c41764-509c-4f40-b063-a5f85dcc16db
-md"""
-> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl).
-"""
-
-# ╔═╡ 3c2eb77b-60e9-4aeb-9d19-ba22293741f9
-md"""
-## 6. Desagrupamento
-
-Antes de calcularmos as estatísticas desagrupadas, devemos georreferenciar os dados, utilizando a função `georef`...
-"""
-
-# ╔═╡ 63b75ae2-8dca-40e3-afe0-68c6a639f54e
-samples = georef(cp, (:X,:Y,:Z))
-
-# ╔═╡ 5699c563-d6cb-4bc2-8063-e1be00722a41
-md"""
-Com os dados georreferenciados, podemos calcular as estatísticas desagrupadas do Cu (%). Utilize o slider abaixo para configurar o tamanho do bloco de desagrupamento... 
-"""
-
-# ╔═╡ 16cb8eaa-773e-4a42-ae8d-00bebddedc59
-md"""
-Tamanho de bloco: $(@bind s Slider(50.:10.:250., default=230., show_value=true)) m
-"""
-
-# ╔═╡ af160a03-10ea-404e-87a3-e6417058449f
-begin
-	# Sumário estatístico do Cu clusterizado
-	Cu_clus = sumario_cu[:,[:teor,:X̄,:S²,:q10,:md,:q90]]
-	
-	# Sumário estatístico do Cu declusterizado
-	Cu_decl = DataFrame(teor = "Cu (desagrupado)",
-						X̄    = mean(samples, :CU, s),
-						S²   = var(samples, :CU, s),
-						q10  = quantile(samples, :CU, 0.1, s),
-						md   = quantile(samples, :CU, 0.5, s),
-						q90  = quantile(samples, :CU, 0.9, s))
-	
-	# Razão das médias (%)
-	Xᵣ = (Cu_decl.X̄ / Cu_clus.X̄)[] * 100
-	
-	# Concatenação dos sumários
-	[Cu_clus
-     Cu_decl]
-end
-
-# ╔═╡ 161cc157-9667-48b5-8832-586c4bb0c476
-md"""
-##### Observações
-
-- A média desagrupada representa $(round(Xᵣ, digits=2))% da média original. Ou seja, há uma diferença de $(round((100-Xᵣ), digits=2))% de Cu entre a média original e a média desagrupada;
-- Utilizaremos essas estatísticas desagrupadas mais tarde, durante a validação das estimativas.
-"""
-
-# ╔═╡ 6ec16d83-d8fb-45d0-a7f8-d75f712b4c91
-md"""
-> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl).
-"""
-
-# ╔═╡ b02263dc-280a-40b4-be1e-9c3b6873e153
-md"""
-
-## 7. Variografia
-
-Durante o [módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/4-variografia.jl) tivemos uma breve introdução à variografia, com exemplos 2D. Neste módulo, entretanto, lidaremos com dados de sondagem 3D. Nesse sentido, adotaremos o fluxo de trabalho a seguir. Em cada etapa, listamos os principais parâmetros encontrados:
-
-1. **Variograma down hole:**
-    - Efeito pepita e as contribuições das estruturas.
-2. **Variograma azimute:**
-    - Azimute de maior continuidade;
-    - Primeira rotação do variograma (eixo Z).
-3. **Variograma primário:**
-    - Dip de maior continuidade, fixando-se o azimute;
-    - Segunda rotação do variograma (eixo X);
-    - Alcance da direção (azimute + dip) de maior continuidade (Y).
-4. **Variogramas secundário e terciário:**
-    - Terceira rotação do variograma (eixo Y);
-    - Alcance da direção de continuidade intermediária (X);
-    - Alcance da direção de menor continuidade (Z).
-"""
-
-# ╔═╡ 6d520cfe-aa7b-4083-b2bf-b34f840c0a75
-md"""
-### 1. Variograma down hole
-
-Primeiramente, iremos calcular o **variograma experimental down hole**, com o intuito de se obter o *efeito pepita* e o valor de *contribuição por estrutura*.
-
-> ⚠️ Esses parâmetros serão utilizados na modelagem de todos os variogramas experimentais que serão calculados adiante!
-"""
-
-# ╔═╡ 289865a9-906f-46f4-9faa-f62feebbc92a
-md"""
-Como o variograma down hole é calculado ao longo da orientação dos furos, devemos avaliar as estatísticas das variáveis `AZM` (azimute) e `DIP` (mergulho) pertencentes à tabela de perfilagem:
-"""
-
-# ╔═╡ 1db51803-8dc4-4db6-80a1-35a489b6fb9e
-begin
-	
-	# sumário estatístico da variável "AZM"
-	azmdf = DataFrame(Variable = "Azimute",
-                      Mean     = mean(compostas.trace.AZM),
-					  Median   = median(compostas.trace.AZM),
-					  Min      = minimum(compostas.trace.AZM),
-					  Max      = maximum(compostas.trace.AZM))
-	
-	# sumário estatístico da variável "DIP"
-	dipdf = DataFrame(Variable = "Dip",
-                      Mean     = mean(compostas.trace.DIP),
-					  Median   = median(compostas.trace.DIP),
-					  Min      = minimum(compostas.trace.DIP),
-					  Max      = maximum(compostas.trace.DIP))
-	
-	# azimute e dip médios
-	μazi = round(azmdf.Mean[], digits=2)
-	μdip = round(dipdf.Mean[], digits=2)
-	
-	# concatenação vertical dos sumários
-	[azmdf
-	 dipdf]
-
-end
-
-# ╔═╡ e49b7b48-77d8-4abf-a5df-70e9c65e3667
-begin
-	# converte coordenadas esféricas para cartesianas
-	function sph2cart(azi, dip)
-		θ, ϕ = deg2rad(azi), deg2rad(dip)
-		sin(θ)*cos(ϕ), cos(θ)*cos(ϕ), -sin(ϕ)
-	end
-	
-	# converte coordenadas cartesianas para esféricas
-	function cart2sph(x, y, z)
-		θ, ϕ = atan(x, y), atan(z, √(x^2 + y^2))
-		rad2deg(θ), rad2deg(ϕ)
-	end
-		
-	# Direcão ao longo dos furos
-	dirdh = sph2cart(μazi, μdip)
-end;
-
-# ╔═╡ a717d5d3-9f4e-4a2d-8e32-f0605bbd742f
-md"""
-Agora que sabemos a orientação média dos furos ($(round(μazi,digits=2))°/ $(round(μdip,digits=2))°), podemos calcular o variograma experimental down hole (Figura 07). Utilize os sliders abaixos para configurar os parâmetros necessários...
-"""
-
-# ╔═╡ 8348abd3-27f6-4161-bd04-c4be6a644888
-md"""
-_**Figura 07:** Variograma experimental downhole._
-"""
-
-# ╔═╡ 1465f010-c6a7-4e72-9842-4504c6dda0be
-md"""
-Número de passos: $(@bind nlagsdh Slider(5:1:30, default=11, show_value=true))
-
-Largura da banda: $(@bind toldh Slider(10:5:50, default=45, show_value=true)) m
-"""
-
-# ╔═╡ ffe3700c-262f-4949-b910-53cbe1dd597b
+# ╔═╡ 78866735-d01e-4c9d-abec-3ed54b8ed612
 begin
 	# semente aleatória
 	Random.seed!(1234)
-	
-	# cor para variogramas down hole
-	colordh = :brown
 
-	# cálculo variograma down hole para a variável Cu
-	gdh = DirectionalVariogram(dirdh, samples, :CU,
-		                       maxlag=150, nlags=nlagsdh, dtol=toldh)
-	
-	# variância a priori
-	σ² = var(samples[:CU])
-	
-	# plotagem do variograma experimental downhole
-    plot(gdh, ylims=(0, σ²+0.05), color=colordh, ms=5,
-		 legend=:bottomright, label=false, title="")
-	
-	# linha horizontal tracejada cinza (variância à priori)
-    hline!([σ²], color=:gray, label="σ²")
+	# N(μ=0, σ²=1)
+	𝒩₁ = Normal()
+	# N(μ=0, σ²=3)
+	𝒩₂ = Normal(0,3)
 
+	# geração de Z₁~ N(μ=0, σ²=1)
+	Z₁ = rand(𝒩₁, 2500)
+	# geração de Z₂ ~ N(μ=0, σ²=3)
+	Z₂ = rand(𝒩₂, 2500)
+
+	# histogramas
+	histogram(Z₂, bins=:scott, label="σ² = 3", alpha=0.7)
+	histogram!(Z₁, bins=:scott, alpha=0.7, label="σ² = 1",
+			   xlabel="Resíduo", ylabel="Freq. Absoluta")
 end
 
-# ╔═╡ 0b46230a-b305-4840-aaad-e985444cf54e
+# ╔═╡ d5d0ef84-7c79-4d5e-af5c-52090b1dd233
 md"""
-Com o variograma down hole calculado, podemos ajustá-lo com um modelo teórico conhecido. Utilize os sliders abaixo para encontrar o melhor ajuste para esse variograma experimental (Figura 08)...
+_**Figura 02:** Distribuições de resíduos hipotéticas._
 """
 
-# ╔═╡ fc2ea8f3-064a-4d6d-8115-236c8160cc23
+# ╔═╡ fa6d5e16-ad13-4e68-8ee8-d846db277917
 md"""
-_**Figura 08:** Ajuste teórico ao variograma experimental downhole._
+##### Observações
+
+- Ambas as distribuições de resíduos são *não enviesadas*, já que apresentam média igual a zero;
+- A distribuição azul apresenta uma maior dispersão de resíduos $\sigma_r^2$ do que a distribuição laranja;
+- O diferencial dos métodos de Krigagem é justamente minimizar essa dispersão dos resíduos $\sigma_r^2$, ou seja, o erro da estimação.
 """
 
-# ╔═╡ 0585add6-1320-4a31-a318-0c40b7a444fa
+# ╔═╡ 956f6c67-93f1-41bf-b921-e893111bbebe
 md"""
-Efeito pepita: $(@bind cₒ Slider(0.00:0.005:0.06, default=0.025, show_value=true))
+#### Krigagem Simples (KS)
 
-Contribuição 1ª estrutura: $(@bind c₁ Slider(0.045:0.005:0.18, default=0.055, show_value=true))
+Para se utilizar a **Krigagem Simples (KS)**, um estimador da família da Krigagem, deve-se ter conhecimento, à priori, da média real do depósito $\mu$. Esse seria o "maravilhoso caso em que conhecemos a média" (*Chilès & Delfiner, 2012*).
 
-Contribuição 2ª estrutura: $(@bind c₂ Slider(0.045:0.005:0.18, default=0.065, show_value=true))
+Na SK, ao minimizar a variância da estimação $\sigma_r^2$, obtemos as seguintes equações (*Sinclair & Blackwell, 2006*):
 
-Alcance 1ª estrutura: $(@bind rdh₁ Slider(10.0:2.0:140.0, default=110.0, show_value=true)) m
+```math
+\begin{bmatrix}
+	\gamma(x_1,x_1) & \gamma(x_1,x_2) & \cdots & \gamma(x_1,x_n) \\
+	\gamma(x_2,x_1) & \gamma(x_2,x_2) & \cdots & \gamma(x_2,x_n) \\
+	    \vdots      &     \vdots      & \ddots &      \vdots     \\
+	\gamma(x_n,x_1) & \gamma(x_n,x_2) & \cdots & \gamma(x_n,x_n) \\
+\end{bmatrix}
 
-Alcance 2ª estrutura: $(@bind rdh₂ Slider(10.0:2.0:140.0, default=110.0, show_value=true)) m
+\begin{bmatrix}
+	  w_1  \\
+	  w_2  \\
+	\vdots \\
+	  w_n  \\
+\end{bmatrix}
+
+=
+
+\begin{bmatrix}
+	\gamma(x_1,x_0) \\
+	\gamma(x_2,x_0) \\
+	    \vdots      \\
+	\gamma(x_n,x_0) \\
+\end{bmatrix}
+```
+em que $\gamma(x_1, x_j)$ representa o valor do variograma entre os pares das $n$ amostras utilizadas na estimação, $w_i$ representa os pesos que serão atribuídos às amostras e $\gamma(x_i, x_0)$ é o valor do variograma entre uma amostra e o ponto a ser estimado. O passo seguinte é realizar uma simples manipulação algébrica para isolar o vetor de pesos que, por sua vez, é a informação que desejamos obter.
+
+Especificamente na KS, a soma dos pesos $w_i$ não totaliza em 1 e, o peso restante é atribuído ao valor da média do depósito. Chamaremos esse peso atribuído a média de $w_\mu$:
+
+```math
+w_\mu = 1 - \sum_{i=1}^{n}w_i
+```
+
+>⚠️ A demonstração de como obter o sistema linear acima foge do escopo deste material. Para mais detalhes, consulte *Isaaks & Srivastava (1989)*.
+
+Como raramente temos acesso à média do depósito, a KS não é um método tão utilizado como a Krigagem Simples, que veremos a seguir (*Sinclair & Blackwell, 2006*).
 """
 
-# ╔═╡ c6d0a87e-a09f-4e78-9672-c858b488fd39
+# ╔═╡ eab5920c-fd1f-4e03-a6f3-90e3ce731b6e
+md"""
+#### Krigagem Ordinária (KO)
+
+Ao contrário da KS, na **Krigagem Ordinária (KO)**, a média do depósito não precisa ser conhecida. Nesse método, a minimização de $\sigma_r^2$ é realizada com uma restrição de que a soma dos pesos $w_i$ deve totalizar em 1 (*Sinclair & Blackwell, 2006*).
+
+Essa restrição é introduzida no processo de minimização a partir da criação de uma variável artificial, o *Parâmetro de Lagrange* $\lambda$. Portanto, uma equação adicional (equivalente a zero) é introduzida no sistema linear da KO (*Sinclair & Blackwell, 2006*):
+
+```math
+\begin{bmatrix}
+	\gamma(x_1,x_1) & \gamma(x_1,x_2) & \cdots & \gamma(x_1,x_n) &    1   \\
+	\gamma(x_2,x_1) & \gamma(x_2,x_2) & \cdots & \gamma(x_2,x_n) &    1   \\
+	    \vdots      &     \vdots      & \ddots &      \vdots     & \vdots \\
+	\gamma(x_n,x_1) & \gamma(x_n,x_2) & \cdots & \gamma(x_n,x_n) &    1   \\
+	       1        &         1       & \cdots &        1        &    0   \\
+\end{bmatrix}
+
+\begin{bmatrix}
+	  w_1   \\
+	  w_2   \\
+	\vdots  \\
+	  w_n   \\
+	\lambda \\
+\end{bmatrix}
+
+=
+
+\begin{bmatrix}
+	\gamma(x_1,x_0) \\
+	\gamma(x_2,x_0) \\
+	    \vdots      \\
+	\gamma(x_n,x_0) \\
+	       1        \\
+\end{bmatrix}
+```
+
+>⚠️ Note que o sistema linear da KO é muito similar àquele da KS. A única diferença é que adicionamos uma equação extra para garantir a condição de fechamento.
+
+Como a soma dos pesos $w_i$ totaliza em 1, não é necessário atribuir um peso $w_\mu$ à média real e, consequentemente, não precisamos ter conhecimento desse parâmetro. Isso corrobora o fato de a KO ser o estimador mais utilizado na indústria.
+"""
+
+# ╔═╡ 5a9f4bbf-202f-4191-b59d-f2bed05347ae
+md"""
+## 2. Criação do domínio de estimação
+
+Assim como no módulo anterior, também utilizaremos a famosa base de dados [Walker Lake](https://github.com/fnaghetini/intro-to-geostats/blob/main/data/Walker_Lake.csv). Primeiramente, vamos importar e georreferenciar esses dados. Novamente, apenas a variável `Pb` (em %) será considerada...
+"""
+
+# ╔═╡ 669d757d-dc19-43e1-b96f-8c1aa31f7579
 begin
-
-    # criação da primeira estrutura do modelo de variograma (efeito pepita)
-    γdhₒ = NuggetEffect(nugget=Float64(cₒ))
-
-    # criação da segunda estrutura do modelo de variograma (1ª contribuição ao sill)
-    γdh₁ = SphericalVariogram(sill=Float64(c₁), range=Float64(rdh₁))
-
-    # criação da terceira estrutura do modelo de variograma (2ª contribuição ao sill)
-    γdh₂ = SphericalVariogram(sill=Float64(c₂), range=Float64(rdh₂))
-
-    # aninhamento das três estruturas
-    γdh  = γdhₒ + γdh₁ + γdh₂
-
-    # plotagem do variograma experimental downhole
-    plot(gdh, color=colordh, ms=5, label=false,
-		 legend=:bottomright, title="Variograma Down Hole")
-
-    # plotagem do modelo de variograma aninhado
-    plot!(γdh, 0, 150, ylims=(0, σ²+0.05), color=colordh,
-		  lw=2, label=false)
-    
-    # linha horizontal tracejada cinza (variância à priori)
-    hline!([σ²], color=:gray, label="σ²")
-    
-    # linha vertical tracejada cinza (alcance)
-    vline!([range(γdh)], color=colordh, ls=:dash, primary=false)
-
+	# variáveis de interesse
+	VARS = [:X,:Y,:Pb]
+	# diretório dos dados
+	DIR = "data/Walker_Lake.csv"
+	
+	# importação dos dados
+	walkerlake = CSV.File(DIR, type = Float64) |> DataFrame
+	
+	# seleção das variáveis de interesse e remoção dos valores faltantes
+	f1(dados) = select(dados, VARS)
+	f2(dados) = dropmissing(dados)
+	wl = walkerlake |> f1 |> f2 |> DataFrame
+	
+	# georreferenciamento dos dados
+	geowl = georef(wl, (:X,:Y))
 end
 
-# ╔═╡ 09d95ff8-3ba7-4031-946b-8ba768dae5d5
+# ╔═╡ 207ca8d7-08df-47dd-943b-7f7846684e3b
 md"""
-### 2. Variograma azimute
+Agora, podemos criar o nosso **domínio de estimação**, ou seja, um grid 2D onde calcularemos as estimativas. Para definirmos esse domínio, precisamos informar três parâmetros à função `CartesianGrid`:
 
-O próximo passo é o cálculo do **variograma experimental do azimute de maior continuidade**. Nesta etapa, obteremos a *primeira rotação* do variograma.
+- Coordenada do ponto de origem do domínio (vértice inferior esquerdo);
+- Coordenada do ponto de término do domínio (vértice superior direito);
+- Número de células em cada direção (i.e. X e Y).
 
-> ⚠️ A primeira rotação do variograma ocorre em torno do eixo Z.
+Definiremos a "caixa delimitadora" do grid a partir da criação de um retângulo aderente à malha amostral, utilizando a função `boundingbox`. Dessa forma, podemos encontrar as coordenadas de origem e de término do domínio, obtendo as coordenadas mínima e máxima do retângulo, respectivamente.
 
-Calcularemos diversos variogramas experimentais ortogonais entre si e escolheremos aquele que apresentar maior continuidade/alcance (Figura 09).
+Ao invés de informarmos o número de células em cada direção, é mais conveniente informarmos as dimensões que cada uma das células deve ter, ou seja, o *tamanho da célula*. Para isso, basta fazermos algumas manipulações, como veremos a seguir.
 
-Utilize o slider `Azimute` para definir o azimute de cálculo. Automaticamente, o variograma de direção perpendicular àquela definida também será calculado. Utilize os demais sliders para configurar os parâmetros restantes...
+>⚠️ Aqui o termo *célula* foi adotado simplesmente por se tratar de um problema 2D. Em contextos 3D, o termo *bloco* é mais comum, como veremos no próximo módulo.
 
-> ⚠️ Normalmente, o variograma de menor continuidade é perpendicular ao variograma de maior alcance. Utilize essa informação para selecionar a direção mais contínua.
+O tamanho da célula (ou bloco) é um parâmetro crucial, principalmente quando o objetivo é realizar uma *Krigagem de blocos*. Como neste módulo realizaremos uma *Krigagem de pontos*, ou seja, estimaremos o centroide de cada célula, não iremos discutir sobre esse parâmetro com tanto rigor. Definiremos o tamanho das células como ½ do espaçamento médio entre amostras vizinhas que, no nosso caso, é de `10 m x 10 m`.
+
+>⚠️ Na estimação 3D de recursos, uma [heurística](https://en.wikipedia.org/wiki/Heuristic) comumente adotada é definir o tamanho do bloco como ¼ a ½ do espaçamento médio entre amostras vizinhas (*Abzalov, 2016*). Caso queira investigar as diferenças entre Krigagem de pontos e Krigagem de blocos, consulte *Isaaks & Srivastava (1989)*.
 """
 
-# ╔═╡ bda3cda3-9d57-495b-be79-1415aa95707f
-md"""
-_**Figura 09:** Variogramas experimentais de azimutes de maior e menor continuidade._
-"""
-
-# ╔═╡ 17b21a63-9fa6-4975-9302-5465cdd3d2fa
-md"""
-Azimute: $(@bind azi Slider(0.0:22.5:67.5, default=67.5, show_value=true)) °
-
-Número de passos: $(@bind nlagsazi Slider(5:1:20, default=8, show_value=true))
-
-Largura de banda: $(@bind dtolazi Slider(10:10:100, default=70, show_value=true)) m
-
-"""
-
-# ╔═╡ d07a57c3-0a7a-49c2-a840-568e72d50545
-begin
-
-    Random.seed!(1234)
-	
-	coloraziₐ = :orange
-	coloraziᵦ = :purple
-
-    gaziₐ = DirectionalVariogram(sph2cart(azi, 0), samples, :CU,
-                                 maxlag = 350, nlags = nlagsazi, dtol = dtolazi)
-
-    gaziᵦ = DirectionalVariogram(sph2cart((azi+90), 0), samples, :CU,
-		                         maxlag = 350, nlags = nlagsazi, dtol = dtolazi)
-	
-	plot(gaziₐ, ylims=(0, σ²+0.05), color = coloraziₐ, ms = 5,
-		 legend = :bottomright, label="$azi °")
-
-    plot!(gaziᵦ, color = coloraziᵦ, ms = 5, label="$(azi+90) °")
-
-    hline!([σ²], color = :gray, label="σ²")
-
-end
-
-# ╔═╡ 9389a6f4-8710-44c3-8a56-804017b6239b
-md"""
-✔️ Agora sabemos que a *primeira rotação do variograma é igual a $(azi)*º. Utilizaremos essa informação mais a frente para a criação do elipsoide de anisotropia.
-"""
-
-# ╔═╡ 99baafe5-6249-4eda-845f-d7f6219d5726
-# Cores dos variograms principais
-colorpri, colorsec, colorter = :red, :green, :blue;
-
-# ╔═╡ 294ac892-8952-49bc-a063-3d290c375ea5
-md"""
-### 3. Variograma primário
-
-Agora, calcularemos o **variograma experimental primário**, ou seja, aquele que representa a *direção (azimute/mergulho) de maior continuidade*.
-
-Nesta etapa, devemos encontrar o *maior alcance* do modelo de variograma final, além da *segunda rotação do variograma*.
-
-> ⚠️ A segunda rotação do variograma ocorre em torno do eixo X.
-
-Para o cálculo deste variograma experimental, devemos fixar o azimute de maior continuidade já encontrado ($azi °) e variar o mergulho. A orientação (azimute/mergulho) que fornecer o maior alcance, será eleita a *direção de maior continuidade* (Figura 10).
-
-Utilize o slider `Mergulho` para definir o mergulho de cálculo e os outros para configurar os demais parâmetros...
-"""
-
-# ╔═╡ 774f8e10-fd10-4b16-abcf-20579f174f8a
-md"""
-_**Figura 10:** Variograma experimental primário._
-"""
-
-# ╔═╡ 97670210-2c91-4be7-a607-0da83cb16f44
-md"""
-
-Mergulho: $(@bind dip Slider(0.0:22.5:90.0, default=22.5, show_value=true))°
-
-Número de passos: $(@bind nlagspri Slider(5:1:20, default=8, show_value=true))
-
-Largura de banda: $(@bind tolpri Slider(10:10:100, default=70, show_value=true)) m
-
-"""
-
-# ╔═╡ 668da8c2-2db6-4812-90ce-86b17b289cc6
-begin
-	
-    Random.seed!(1234)
-
-    gpri = DirectionalVariogram(sph2cart(azi, dip), samples, :CU,
-                                maxlag = 350, nlags = nlagspri, dtol = tolpri)
-
-	plot(gpri, ylims=(0, σ²+0.05), color = colorpri, ms = 5,
-		 legend = :bottomright, label=false, title="$azi ° / $dip °")
-
-    hline!([σ²], color = :gray, label="σ²")
-end
-
-# ╔═╡ eb9ebce2-7476-4f44-ad4f-10a1ca522143
-md"""
-Agora que o variograma primário foi calculado, podemos utilizar os sliders abaixo para ajustá-lo com um modelo teórico conhecido (Figura 11)...
-"""
-
-# ╔═╡ 24981600-3336-4295-b567-8f05785b9346
-md"""
-_**Figura 11:** Ajuste teórico ao variograma experimental primário._
-"""
-
-# ╔═╡ 92d11f3b-c8be-4701-8576-704b73d1b619
-md"""
-
-Alcance 1ª estrutura: $(@bind rpri₁ Slider(10.0:2.0:300.0, default=84.0, show_value=true)) m
-
-Alcance 2ª estrutura: $(@bind rpri₂ Slider(10.0:2.0:300.0, default=190.0, show_value=true)) m
-
-"""
-
-# ╔═╡ fa93796d-7bc0-4391-89a7-eeb63e1a3838
-begin
-
-    γpriₒ = NuggetEffect(nugget = Float64(cₒ))
-
-    γpri₁ = SphericalVariogram(sill = Float64(c₁), range = Float64(rpri₁))
-
-    γpri₂ = SphericalVariogram(sill = Float64(c₂), range = Float64(rpri₂))
-
-    γpri  = γpriₒ + γpri₁ + γpri₂
-
-    plot(gpri, color = colorpri, ms = 5,
-	     legend = :bottomright, label = "primário", title = "$azi °/ $dip °")
-
-    plot!(γpri, 0, 350, ylims = (0, σ²+0.05), color = colorpri, lw = 2,
-		  label = "teórico")
-		
-    hline!([σ²], color = :gray, label="σ²")
-
-    vline!([range(γpri)], color = colorpri, ls = :dash, primary = false)
-
-end
-
-# ╔═╡ 55373bb0-6953-4c6f-b1dd-2dacac90b6cc
-md"""
-✔️ Agora sabemos que a *segunda rotação do variograma é igual a $(dip)°*. Além disso, também encontramos os *alcances do eixo primário* do variograma.
-"""
-
-# ╔═╡ 6c048b83-d12c-4ce8-9e9a-b89bf3ef7638
-md"""
-
-### 4. Variogramas secundário e terciário
-
-Por definição, os três eixos principais do variograma são ortogonais entre si. Agora que encontramos a *direção de maior continuidade do variograma (eixo primário)*, sabemos que os outros dois eixos (secundário e terciário) pertencem a um plano cuja normal é o próprio eixo primário!
-
-Portanto, nesta etapa, encontraremos os *alcances intermediário e menor* do modelo de variograma final, bem como a *terceira rotação do variograma (rake)*.
-
-> ⚠️ A terceira rotação do variograma ocorre em torno do eixo Y.
-
-Como o eixo primário do variograma apresenta uma orientação $(azi)° / $(dip)°, podemos encontrar o plano que contém os eixos secundário e terciário. Ressalta-se ainda que *eixos secundário e terciário são ortogonais entre si*.
-
-> ⚠️ Iremos adotar a seguinte convenção de eixos:
->- Eixo primário (maior continuidade) = Y;
->- Eixo secundário (continuidade intermediária) = X;
->- Eixo terciário (menor continuidade) = Z.
-
-Para o cálculo dos variogramas experimentais secundário e terciário, escolheremos duas direções para serem eleitas as *direções secundária e terciária* do modelo de variograma (Figura 12).
-
-Utilize o slider `Rake` para definir as direções de cálculo dos variogramas secundário e terciário. Utilize os demais sliders para configurar os outros parâmetros...
-"""
-
-# ╔═╡ a92f702d-8859-4f95-b676-36deab03e717
-md"""
-_**Figura 12:** Variogramas experimentais secundário e terciário._
-"""
-
-# ╔═╡ 120f4a9c-2ca6-49f1-8abc-999bcc559149
-md"""
-
-Rake: $(@bind θ Slider(range(0, stop=90-180/8, step=180/8), default=45, show_value=true))°
-
-Número de passos: $(@bind nlagssec Slider(5:1:20, default=11, show_value=true))
-
-Largura de banda: $(@bind tolsec Slider(10:10:100, default=70, show_value=true)) m
-
-"""
-
-# ╔═╡ 0def0326-55ef-45db-855e-a9a683b2a76d
-begin
-
-    Random.seed!(1234)
-
-	# Encontra vetores u e v perpendiculares entre si e perpendiculares a normal
-	n = Vec(sph2cart(azi,dip))
-	u = Vec(sph2cart(azi+90,0))
-	v = n × u
-	
-	# Giro no plano perpendicular gerado por u e v
-	dirsec = cos(deg2rad(θ)) .* u .+ sin(deg2rad(θ)) .* v
-	dirter = cos(deg2rad(θ+90)) .* u .+ sin(deg2rad(θ+90)) .* v
-
-	# Variograma secundário
-    gsec = DirectionalVariogram(dirsec, samples, :CU,
-		                        maxlag = 250, nlags = nlagssec, dtol = tolsec)
-
-	# Variograma terciário
-    gter = DirectionalVariogram(dirter, samples, :CU,
-								maxlag = 250, nlags = nlagssec, dtol = tolsec)
-	
-	plot(gsec, ylims=(0, σ²+0.2), color = colorsec, ms = 5,
-		 legend = :bottomright, label = "secundário")
-
-    plot!(gter, color = colorter, ms = 5, label = "terciário")
-
-    hline!([σ²], color = :gray, label="σ²")
-
-end
-
-# ╔═╡ 34b9b30f-615d-43ff-8d07-ed757cd69a7f
-md"""
-✔️ Agora sabemos que a *terceira rotação do variograma é igual a $θ °*.
-
-Como já elegemos o variograma experimental representante do eixo secundário, podemos utilizar os sliders abaixo para modelá-lo (Figura 13)...
-"""
-
-# ╔═╡ b19e5ac0-21fd-4dcd-ac61-a36a67ee80dd
-md"""
-_**Figura 13:** Ajuste teórico ao variograma experimental secundário._
-"""
-
-# ╔═╡ 922d81f3-0836-4b14-aaf2-83be903c8642
-md"""
-
-Alcance 1ª estrutura: $(@bind rsec₁ Slider(10.0:2.0:200.0, default=60.0, show_value=true)) m
-
-Alcance 2ª estrutura: $(@bind rsec₂ Slider(10.0:2.0:200.0, default=84.0, show_value=true)) m
-
-"""
-
-# ╔═╡ a74b7c50-4d31-4bd3-a1ef-6869abf73185
-begin
-
-    γsecₒ = NuggetEffect(Float64(cₒ))
-	
-    γsec₁ = SphericalVariogram(sill = Float64(c₁), range = Float64(rsec₁))
-
-    γsec₂ = SphericalVariogram(sill = Float64(c₂), range = Float64(rsec₂))
-
-    γsec  = γsecₒ + γsec₁ + γsec₂
-
-    plot(gsec, color = colorsec, ms = 5,
-	     label = false, legend = :bottomright)
-
-    plot!(γsec, 0, 250, ylims = (0, σ²+0.2), color = colorsec, lw = 2,
-	      label = false)
-
-    hline!([σ²], color = :gray, label="σ²")
-
-    vline!([range(γsec)], color = colorsec, ls = :dash, primary = false)
-
-end
-
-# ╔═╡ fed7dbb1-8dfd-4242-a060-7b44508ce432
-md"""
-✔️ Agora encontramos os *alcances do eixo secundário* do variograma.
-
-Finalmente, podemos também utilizar os sliders abaixo para modelar o variograma terciário (Figura 14)...
-"""
-
-# ╔═╡ 33ba8a9b-f548-4984-8a31-1c381b31ced4
-md"""
-_**Figura 14:** Ajuste teórico ao variograma experimental terciário._
-"""
-
-# ╔═╡ dacfe446-3c19-430d-8f5f-f276a022791f
-md"""
-
-Alcance 1ª Estrutura: $(@bind rter₁ Slider(10.0:2.0:200.0, default=58.0, show_value=true)) m
-
-Alcance 2ª Estrutura: $(@bind rter₂ Slider(10.0:2.0:200.0, default=62.0, show_value=true)) m
-
-"""
-
-
-# ╔═╡ 0927d78e-9b50-4aaf-a93c-69578608a4f8
-begin
-
-    γterₒ = NuggetEffect(Float64(cₒ))
-
-    γter₁ = SphericalVariogram(sill = Float64(c₁), range = Float64(rter₁))
-
-    γter₂ = SphericalVariogram(sill = Float64(c₂), range = Float64(rter₂))
-
-    γter  = γterₒ + γter₁ + γter₂
-
-    plot(gter, color = colorter, ms = 5, label = false,
-	     legend = :bottomright)
-
-    plot!(γter, 0, 250, ylims = (0, σ²+0.2), color = colorter, lw = 2,
-		  label = false)
-
-    hline!([σ²], color = :gray, label="σ²")
-
-    vline!([range(γter)], color = colorter, ls = :dash, primary = false)
-
-end
-
-# ╔═╡ 38946a3f-d5a6-4a1c-a1d5-d4ec475f1545
-md"""
-✔️ Agora encontramos os *alcances do eixo terciário* do variograma.
-"""
-
-# ╔═╡ 483487c6-acf8-4551-8357-2e69e6ff44ff
-md"""
-### Modelo de variograma final
-
-Agora que temos as três direções principais do modelo de variograma, podemos sumarizar as informações obtidas nos passos anteriores na tabela abaixo. A Figura 15 é a representação gráfica das informações contidas nessa tabela.
-
-| Estrutura | Modelo | Alcance em Y | Alcance em X | Alcance em Z | Contribuição | Efeito Pepita |
-|:---:|:--------:|:--------:|:--------:|:--------:|:---:|:---:|
-|  0  |     -    |    -     |    -     |    -     |  -  | $cₒ |
-|  1  | Esférico |  $rpri₁  |  $rsec₁  |  $rter₁  | $c₁ |  -  |
-|  2  | Esférico |  $rpri₂  |  $rsec₂  |  $rter₂  | $c₂ |  -  |
-
-"""
-
-# ╔═╡ c9ac9fb4-5d03-43c9-833e-733e48565946
-begin
-    plot(γpri, color=colorpri, lw=2, label="primário",
-		 legend=:bottomright, title="")
-
-    plot!(γsec, color=colorsec, lw=2, label="secundário")
-
-    plot!(γter, 0, range(γpri)+10, color=colorter, lw=2, label="terciário",
-		  ylims=(0, σ²+0.05))
-	
-	hline!([σ²], color=:gray, label="σ²")
-end
-
-# ╔═╡ 5134e2cb-8c98-4e5e-9f13-722b8f828dc7
-md"""
-_**Figura 15:** Modelo de variograma 3D anisotrópico._
-"""
-
-# ╔═╡ d700e40b-dd7f-4630-a29f-f27773000597
-md"""
-Além das informações sumarizadas acima, devemos escolher uma convenção de rotação que, por sua vez, é utilizada para definir a orientação do elipsoide de anisotropia no espaço.
-
-A convenção de rotação que iremos adotar é a do clássico software **GSLIB**. Portanto, as rotações do do elipsoide de anisotropia serão:
-
-| Rotação | Eixo |   Ângulo   |
-|:-------:|:----:|:----------:|
-|    1ª   |   Z  |  $(azi)°   |
-|    2ª   |   X  |  $(-dip)°  |
-|    3ª   |   Y  |  $(-θ)°    |
-
-> ⚠️ Caso queira entender melhor a convenção de rotação GSLIB, consulte [Deutsch (2015)](https://geostatisticslessons.com/lessons/anglespecification).
-
-O elipsoide de anisotropia nada mais é do que uma representação do modelo de variograma que utilizaremos como entrada no sistema linear de Krigagem. Os eixos desse elipsoide representam os alcances (do variograma) e a orientação dessa geometria é definida pelas três rotações. Sabendo disso, podemos construir o modelo de variograma final...
-"""
-
-# ╔═╡ 38d15817-f3f2-496b-9d83-7dc55f4276dc
-begin
-	# elipsoides de anisotropia para cada estrutura
-	ellipsoid₁ = Ellipsoid([rpri₁, rsec₁, rter₁], [azi, -dip, -θ], convention=GSLIB)
-    ellipsoid₂ = Ellipsoid([rpri₂, rsec₂, rter₂], [azi, -dip, -θ], convention=GSLIB)
-
-	# estruturas do variograma final
-	γₒ = NuggetEffect(nugget=Float64(cₒ))
-	
-    γ₁ = SphericalVariogram(sill=Float64(c₁), distance=metric(ellipsoid₁))
-	
-    γ₂ = SphericalVariogram(sill=Float64(c₂), distance=metric(ellipsoid₂))
-
-	# aninhamento das estruturas e obtenção do modelo de variograma final
-    γ = γₒ + γ₁ + γ₂
-end;
-
-# ╔═╡ b2156251-26ae-4b1d-8757-ffdf3a02a2f8
-md"""
-🏆 Finalmente encontramos o modelo de variograma final `γ`, que será utilizado como entrada na estimação por Krigagem.
-"""
-
-# ╔═╡ 51f8bc33-a24f-4ce4-a81b-cd22fb8312ec
-md"""
-> ⚠️ Caso algo não tenha ficado claro, consulte o [módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/4-variografia.jl).
-"""
-
-# ╔═╡ 9baefd13-4c16-404f-ba34-5982497e8da6
-md"""
-## 8. Estimação
-
-Nesta seção, seguiremos o fluxo de trabalho do [GeoStats.jl](https://juliaearth.github.io/GeoStats.jl/stable/index.html#Quick-example), anteriormente apresentado no [módulo 5](https://github.com/fnaghetini/intro-to-geostats/blob/main/5-estimacao.jl).
-"""
-
-# ╔═╡ a7a59395-59ec-442a-b4b6-7db55d150d53
-md"""
-
-### Criação do modelo de blocos
-
-Nesta primeira etapa, delimitaremos o domínio de estimação que, no nosso caso, podemos chamar de modelo de blocos.
-
-Faremos algumas manipulações e, em seguida, utilizaremos a função `CartesianGrid` para criar o modelo de blocos, cujas dimensões dos blocos serão `20 m x 20 m x 10 m` (Figura 16)...
-
-> ⚠️ Note que, como temos dados 3D, chamaremos as unidades do domínio de estimação de *blocos*.
-"""
-
-# ╔═╡ f7cee6a3-5ac2-44ff-9d5e-58ede7327c46
+# ╔═╡ b14c6b92-81cc-482f-9746-d9a011cff5cd
 begin
 	# caixa delimitadora das amostras
-    bbox = boundingbox(samples)
+    bbox = boundingbox(geowl)
 	
 	# lados da caixa delimitadora
 	extent = maximum(bbox) - minimum(bbox)
 	
-	# dimensões dos blocos
-	blocksizes = (20., 20., 10.)
+	# Tamanho dos blocos em cada direção
+	blocksizes = (10., 10.)
 	
-	# número de blocos em cada direção
+	# Número de blocos em cada direção
 	nblocks = ceil.(Int, extent ./ blocksizes)
 
-	# modelo de blocos
-    grid = CartesianGrid(minimum(bbox), maximum(bbox), dims=Tuple(nblocks))
+	# Modelo de blocos para realização de estimativas
+    grid = CartesianGrid(minimum(bbox), maximum(bbox), dims = Tuple(nblocks))
 end
 
-# ╔═╡ a73cc834-c600-4278-bc77-49b85dc90256
+# ╔═╡ 9055d652-1c6c-4d73-9302-d58a35ffb975
 md"""
-_**Figura 16:** Modelo de blocos._
+A Figura 03 ilustra a distribuição espacial das amostras de Pb (%) sobre o grid de estimação definido acima. O nosso objetivo, neste módulo, é estimar valores de `Pb` para cada centroide das células.
 """
 
-# ╔═╡ 12d79d77-358c-4098-993a-d5be538929a2
-md"""
-Utilize os sliders abaixo para rotacionar o modelo de blocos...
-
-Rotação em Z: $(@bind ψ₁ Slider(0:5:90, default=45, show_value=true))°
-
-Rotação em X: $(@bind ψ₂ Slider(0:5:90, default=45, show_value=true))°
-"""
-
-# ╔═╡ 6f7663ed-c672-4d29-8b06-415dcdc8fbff
-plot(grid, camera = (ψ₁,ψ₂), xlabel = "X", ylabel = "Y", zlabel = "Z")
-
-# ╔═╡ a8adf478-620d-4744-aae5-99d0891fe6b0
-md"""
-
-### Definição do problema de estimação
-
-Neste exemplo, passaremos os furos georreferenciados `samples` e a variável de interesse `:CU` como parâmetros da função `EstimationProblem`. Além disso, também passaremos, como domínio de estimação, os centroides do modelo de blocos gerado anteriomente. Para isso, utilizaremos a função `centroid`...
-"""
-
-# ╔═╡ affacc76-18e5-49b2-8e7f-77499d2503b9
+# ╔═╡ 37462572-3c3d-46e1-8e2d-266e86470b6a
 begin
-	# centroides dos blocos
+	# plotagem do domínio de estimação
+	plot(grid, lw=0.5, alpha=0.5, grid=false)
+
+	# plotagem das amostras
+	plot!(geowl, marker=(:jet,:circle,3), markerstrokewidth=0.3,
+		  title="Pb (%)", xlims=(0,280), ylims=(0, 300), size=(500,500))
+end
+
+# ╔═╡ 4469f1a2-6054-4ba0-b402-03892d3a90e4
+md"""
+_**Figura 03:** Amostras de Pb (%) plotadas sobre o domínio de estimação._
+"""
+
+# ╔═╡ 2531eee8-72c5-4056-879c-b1b65273d51a
+md"""
+## 3. Definição do problema de estimação
+
+O passo seguinte é definir o **problema de estimação**. Para isso, basta informarmos três parâmetros à função `EstimationProblem`:
+
+- Amostras georreferenciadas;
+- Domínio de estimação;
+- Variável que será estimado.
+
+No nosso caso, conforme mencionado anteriormente, estamos interessados em estimar os centroides das células e, para isso, utilizaremos a função `centroid`.
+
+> ⚠️ *Centroide* é um termo genérico para se referir ao ponto central de uma célula.
+"""
+
+# ╔═╡ 36033c09-267c-48df-b6cd-ce2ee2a5eac6
+begin
+	# centroides das células
 	centroides = Collection(centroid.(grid))
-	
-	# problema de estimação
-	problem = EstimationProblem(samples, centroides, :CU)
+
+	# definição do problema de estimação
+	problema = EstimationProblem(geowl, centroides, :Pb)
 end
 
-# ╔═╡ 31cd3d10-a1e8-4ad8-958f-51de08d0fa54
+# ╔═╡ 3a034b2e-97a2-4a4f-bc60-c6634082254a
 md"""
+##### Observações
 
-### Definição do estimador
-
-Nesta etapa, devemos selecionar o estimador e configurar os parâmetros de vizinhança. Neste exemplo, utilizaremos três estimadores:
-
-- Inverso do Quadrado da Distância (IQD);
-- Krigagem Simples (KS);
-- Krigagem Ordinária (KO).
-
-No caso dos estimadores KS e OK, utilizaremos o modelo de variograma `γ` e um volume de busca igual ao elipsoide de anisotropia `ellipsoid₂` definido anteriormente.
-
-A média do depósito, um parâmetro que deve ser informado no caso da KS, será definida como o valor da média desagrupada de Cu `μ`.
-
-Utilize os sliders abaixo para configurar o número mínimo `minneighbors` e máximo `maxneighbors` de amostras que serão utilizadas para se estimar cada bloco...
+- Note que a saída da célula acima fornece um resumo do nosso problema de estimação:
+    - `data`: amostras (469 amostras);
+    - `domain`: domínio de estimação (725 centroides de células);
+    - `variables`: variável a ser estimada (Pb).
 """
 
-# ╔═╡ 9c61271d-4afe-4f7c-a521-8f799b6981ed
+# ╔═╡ 22b5fc9a-9d08-4e36-a500-329e5036081f
+function sph2cart(azi)
+	θ = deg2rad(azi)
+	sin(θ), cos(θ)
+end;
+
+# ╔═╡ 8aaca25b-8ebc-418c-ad48-344a31ba8ed9
 md"""
+## 4. Definição do estimador
 
-Número mínimo de amostras: $(@bind nmin Slider(2:1:6, default=4, show_value=true))
+Além de escolhermos qual estimador utilizaremos e obtermos o modelo de variograma (apenas no caso da Krigagem), devemos definir os chamados **parâmetros de vizinhança** ou, simplesmente, *vizinhança*. A vizinhança restringe o número de amostras que serão utilizadas na estimação de um ponto.
 
-Número máximo de amostras: $(@bind nmax Slider(6:1:20, default=8, show_value=true))
+Segundo *Chilès & Delfiner (2012)*, a teoria sempre foi construída considerando todas as $n$ amostras disponíveis para calcular cada uma das estimativas. Entretanto, na prática, $n$ pode ser suficientemente grande a ponto do cálculo das estimativas não ser computacionalmente viável. Nesse sentido, uma prática comum é definir um **número mínimo e máximo de amostras** que serão utilizadas para estimar um determinado ponto. Essas informações são exemplos de parâmetros de vizinhança e são representados pelos argumentos `minneighbors` e `maxneighbors`, respectivamente.
 
+Outro parâmetro importante é a **área de busca**, que, normalmente, é representada por uma elipse. Durante a estimação, o centroide da elipse coincide com a posição do ponto a ser estimado. Dessa forma, apenas as amostras que se situarem no interior da área de busca poderão ser utilizadas na estimativa. A elipse (ou elipsoide) de busca é representado pelo parâmetro `neighborhood`.
+
+> ⚠️ As dimensões de uma elipse são definidas por dois eixos principais ortogonais entre si, enquanto sua orientação é definida por uma rotação em relação ao Norte (i.e. azimute). É comum utilizar a elipse de anisotropia (obtida durante a variografia) como elipse de busca, uma vez que ela nos indica até qual distância duas amostras apresentam interdependência espacial.
 """
 
-# ╔═╡ 2a76c2b9-953e-4e4b-a98e-8e992943f60c
+# ╔═╡ 07175b65-bf21-49c4-9bfa-be5cf000f2ba
 begin
-	# média desagrupada
-    μ = mean(samples, :CU)
+	# variância amostral (definindo o patamar)
+	σ² = var(geowl[:Pb])
+
+	# elipsoide de anisotropia
+	elp = Ellipsoid([100.0,35.0],[0], convention = GSLIB)
+
+	# modelo de variograma
+	γ = SphericalVariogram(nugget = 3.0,
+					  	   sill = Float64(σ²),
+					       distance = metric(elp))
+end;
+
+# ╔═╡ 045cdf16-d264-4b5d-990b-c1bd2acb5613
+md"""
+Considerere uma estimação em que os números mínimo e máximo de amostras são iguais a 5 e 2, respectivamente. A elipse de busca apresenta uma rotação de 45°, ou seja, seu maior eixo está alinhado ao azimute 045°. A Figura 04 mostra três situações distintas que podem ocorrer durante a estimação do centroide de um bloco. As amostras em vermelho são externas à área de busca e não podem ser utilizadas na estimação, enquanto as amostras verdes, por se situarem dentro da elipse de busca, podem.
+
+- No **cenário A**, como existem 4 amostras no interior da elipse e o máximo permitido é de 5 amostras, todas elas serão utilizadas na estimação do centroide;
+
+- No **cenário B**, as 2 amostras internas à área de busca serão utilizadas na estimação;
+
+- No **cenário C**, como apenas 1 amostra está inserida dentro da elipse de busca e o mínimo de amostras é igual a 2, o centroide do bloco *não* será estimado.
+
+![Figura_04](https://i.postimg.cc/HLgMG7Sr/elipses.jpg)
+
+_**Figura 04:** Estimação do centroide de um bloco. (A) As quatro amostras internas à elipse de busca são utilizadas na estimação. (B) As duas amostras internas à elipse de busca são utilizadas na estimação. (C) Como não há amostras suficientes, o centroide não é estimado. Figura elaborada pelo autor._
+"""
+
+# ╔═╡ 79c812cf-849a-4eea-93d2-b08a3844d5a7
+md"""
+No nosso exemplo, iremos definir três estimadores distintos: IQD, KS e KO. Os números máximo e mínimo de amostras serão 4 e 8, respectivamente.
+
+No caso dos estimadores SK e KO, utilizaremos o modelo de variograma `γ` e uma elipse de busca `elp` igual à elipse de anisotropia. A média , que deve ser informada no caso da KS, será definida como o valor da média desagrupada de Pb `μₚ`.
+
+> ⚠️ O modelo de variograma `γ` utilizado apresenta o eixo primário alinhado N-S, com um alcance de 100 m e um eixo segundário alinhado E-W, com um alcance de 35 m. O efeito pepita considerado foi de 3.0, ou seja, cerca de 30% do valor do patamar.
+"""
+
+# ╔═╡ b2cb5618-72ba-43a3-9b04-cb2a8821bfa9
+begin
+	# média desclusterizada
+    μₚ = mean(geowl, :Pb, 25.)
 	
 	# IQD
-	IQD = IDW(:CU => (power=2, neighbors=nmax))
+	IQD = IDW(:Pb => (power=2, neighbors=8))
 
 	# KS
     KS = Kriging(
-		:CU => (variogram=γ, mean=μ, neighborhood=ellipsoid₂,
-			    minneighbors=nmin, maxneighbors=nmax)
+		:Pb => (variogram=γ, mean=μₚ, neighborhood=elp,
+			    minneighbors=4, maxneighbors=8)
 	)
 
 	# KO
     KO = Kriging(
-		:CU => (variogram=γ, neighborhood=ellipsoid₂,
-			    minneighbors=nmin, maxneighbors=nmax)
+		:Pb => (variogram=γ, neighborhood=elp,
+			    minneighbors=4, maxneighbors=8)
 	)
-
 end;
 
-# ╔═╡ 9b3fe534-78fa-48db-a101-e2a43f2478d6
+# ╔═╡ 14ba26ab-db0d-4993-9b98-56309ff23389
 md"""
+## 5. Solução do problema de estimação
 
-### Solução do problema de estimação
-
-Para gerar o modelo de estimativas de Cu, resolvemos o problema definido com os três estimadores para, posteriormente, compará-los. Clique na caixa abaixo para executar as estimativas...
+Para gerar as de estimativas de Pb (%), resolvemos o problema definido com os três estimadores. Para isso, devemos passar o problema de estimação e o estimador como parâmetros da função `solve`. Clique na caixa abaixo para executar as estimativas...
 
 Executar estimativas: $(@bind run CheckBox())
 """
 
-# ╔═╡ e9b7e9b7-146f-4763-ad79-c93e111b25b4
+# ╔═╡ d5977fdd-c9bc-4589-ae0e-f6cac6973fbb
 if run
-	sol_iqd = solve(problem, IQD)
+	sol_iqd = solve(problema, IQD)
 end
 
-# ╔═╡ 78117ae8-d77c-4508-9793-3e7e9dfbb913
+# ╔═╡ e570281a-39e3-438f-9c4a-395f321f12d4
 if run
-	sol_ks = solve(problem, KS)
+	sol_ks = solve(problema, KS)
 end
 
-# ╔═╡ 5e86ee34-60fe-43e4-851c-2f08072f836e
+# ╔═╡ 4af2bbf9-fc03-49d0-a19f-f34356c897f7
 if run
-	sol_ko = solve(problem, KO)
+	sol_ko = solve(problema, KO)
 end
 
-# ╔═╡ 50650d2f-350b-446d-8c4b-6aa19e18c148
-md"""
-Agora que os teores de Cu foram estimados, clique na caixa abaixo para visualizar o modelo de teores (Figura 17). Em seguida, selecione, na lista suspensa abaixo, a solução que deseja visualizar...
-
-Visualizar estimativas: $(@bind viz CheckBox())
-"""
-
-# ╔═╡ bce98bc9-c676-4a2e-bdac-10a74a9cdeae
-if run && viz
-md"""
-Solução: $(@bind selection Select(["IQD", "KS", "KO"], default="KO"))
-"""
-end
-
-# ╔═╡ 3bc456e5-9030-41e5-a48c-179da59547c9
-if run && viz
+# ╔═╡ 73b54c21-7b69-429b-a088-fba3d0c09459
+if run
 	md"""
-	_**Figura 17:** Visualização das estimativas de Cu por $selection._
-	
-	Utilize os sliders abaixo para rotacionar e fatiar o modelo de estimativas gerado...
+	Agora que os teores de Pb foram estimados, clique na caixa abaixo para visualizar o resultado (Figura 05). Em seguida, utilize a lista suspensa abaixo para selecionar a solução que deseja visualizar...
+
+	Visualizar estimativas: $(@bind viz CheckBox())
 	"""
 end
 
-# ╔═╡ 97b41da9-979a-4785-9ee4-19f43d912c49
+# ╔═╡ 5f90093b-4b1e-4e0d-b84c-4232bd3c1b1a
+if run && viz
+	md"""
+	Solução: $(@bind solucao Select(["IQD", "KS", "KO"], default="KO"))
+	"""
+end
+
+# ╔═╡ a49e5f8d-09cf-4baf-b7b4-d43858df8089
 if run && viz	
-	if selection == "IQD"
+	if solucao == "IQD"
 		sol = sol_iqd
-	elseif selection == "KS"
+	elseif solucao == "KS"
 		sol = sol_ks
-	elseif selection == "KO"
+	elseif solucao == "KO"
 		sol = sol_ko
 	end
 end;
 
-# ╔═╡ 63d5db73-1073-4b8d-bfab-93577579571f
+# ╔═╡ 60db4fd5-f06c-4821-a7ed-2f63033653ff
 if run && viz
-	cmin, cmax = coordinates.(extrema(grid))
-		
-	xm, ym, zm = cmin
-	xM, yM, zM = cmax
-	
+	ẑ = sol |> @map({Pb = _.Pb, geometry = _.geometry}) |> GeoData
+end;
+
+# ╔═╡ 2e9b95c5-a687-4881-b69e-6567ade520cb
+begin
+	if run && viz
+		# plotagem das estimativas		
+		plot(ẑ, color=:jet, xlabel="X", ylabel="Y",
+			 xlims=(0,280), ylims=(0, 300),clims = (0,12),
+			 marker=(:square,10), markerstrokewidth=0.2,
+			 title="Pb (%)", size=(500,500))
+
+		# plotagem de amostras
+		plot!(geowl, color=:jet, marker=(:circle,3),
+			  markerstrokecolor=:black, markerstrokewidth=0.5,
+		      title="Pb (%)")
+	end
+end
+
+# ╔═╡ 981efb6c-b1ea-4577-9c40-f3f374a23ba1
+if run && viz
 	md"""
-	Rotação em Z: $(@bind ϕ₁ Slider(0:5:90, default=45, show_value=true))°
-
-	Rotação em X: $(@bind ϕ₂ Slider(0:5:90, default=45, show_value=true))°
-
-	X: $(@bind x Slider(xm:xM, show_value=true, default=(xm+xM)/2)) m
-	
-	Y: $(@bind y Slider(ym:yM, show_value=true, default=(ym+yM)/2)) m
-	
-	Z: $(@bind z Slider(zm:zM, show_value=true, default=(zm+zM)/2)) m
+	_**Figura 05:** Visualização das estimativas de Pb por $solucao._
 	"""
 end
 
-# ╔═╡ b2197d9c-0342-4efe-8c9e-ecf45a07fcf3
+# ╔═╡ 4ce1c65d-701c-4615-90aa-9f6469e47211
 if run && viz
-	sol |> @filter(!isnan(_.CU)) |>
-	@map({CU = _.CU, COORDS = coordinates(centroid(_.geometry))}) |>
-	@map({CU = _.CU, X = _.COORDS[1], Y = _.COORDS[2], Z = _.COORDS[3]}) |>
-	@filter(_.X < x && _.Y < y && _.Z < z) |>
-	@df scatter(:X, :Y, :Z, marker_z = :CU, color = :jet, marker = (:square, 4),
-	            xlabel = "X", ylabel = "Y", zlabel = "Z",
-		        xlims = (xm, xM), ylims = (ym, yM), zlims = (zm, zM),
-	            label = "Cu (%) - $(selection)", camera = (ϕ₁, ϕ₂))
+	md"""
+	##### Observações
+
+	- Visualmente, as estimativas geradas por KO são muito similares àquelas geradas por KS, mas distintas daquelas produzidas por IQD;
+	- As estimativas geradas por Krigagem são muito mais contínuas na direção N-S do que na direção E-W. Esse resultado reflete o modelo de variograma informado e é coerente com a distribuição espacial dos teores de Pb (%) que, por sua vez, são também mais contínuos na direção N-S;
+	- Como discutido no módulo anterior, essa base de dados foi gerada a partir do modelo digital de elevação da região de Walker Lake, nos EUA. Nessa região, há uma serra orientada na direção N-S, o que valida a nossa hipótese de que os dados são mais contínuos ao longo dessa direção;
+	- Como não é possível informar um modelo de variograma na estimação por IQD, esse estimador não apresentou um desempenho tão bom ao reproduzir a maior continuidade do fenômeno (i.e. mineralização de Pb) na direção N-S;
+	- Esse exemplo enfatiza a importância do modelo de variograma na estimação. É justamente esse parâmetro que nos permite inserir o conhecimento geológico no cálculo das estimativas!
+	"""
 end
 
-# ╔═╡ 4f05c05d-c92a-460d-b3e0-d392111ef57a
+# ╔═╡ a2e173e6-fe66-44e6-b371-3ae194d7b0f9
 md"""
-## 9. Validação das estimativas
+## 6. Validação das estimativas
 
-Nesta etapa, iremos comparar as estimativas geradas pelos três estimadores por meio de duas abordagens de validação:
+Uma etapa tão importante quanto a própria estimação é a **validação das estimativas** resultantes.
 
-- Validação global das estimativas;
-- Q-Q plot entre teores amostrais e teores estimados.
+Existem diferentes abordagens de validação das estimativas, sendo a principal delas a **inspeção visual**, já realizada na seção anterior. Esse procedimento permite avaliar se as estimativas geradas fazem sentido geológico, ou seja, se elas são coerentes com as direções principais do(s) fenômeno(s) que controla(m) a mineralização (e.g. zonas de cisalhamento, estratos mineralizados). Além disso, durante essa inspeção, devemos verificar se "ilhas de altos teores" indesejadas foram geradas. Essa situação é muito comum em depósitos erráticos (e.g. Au), em função da presença de poucos valores extremamente altos no depósito que podem resultar em estimativas superotimistas.
+
+Uma outra inspeção que deve ser realizada é a **validação global das estimativas**. Para isso, devemos comparar as estatísticas desagrupadas das amostras com as estatísticas associadas às estimativas obtidas. Segundo *Sinclair & Blackwell (2006)*, os métodos de Krigagem levam em consideração a redundância de informação ao atribuir pesos às amostras. Em outras palavras, amostras muito próximas entre si são consideradas redundantes e recebem pesos menores. Portanto, como a Krigagem realiza um desagrupamento intrínseco, é mais conveniente comparar as estatísticas das estimativas resultantes com as estatísticas desagrupadas.
+
+A seguir compararemos quatro sumários estatísticos da variável Pb (%):
+- Teores amostrais desagrupados;
+- Teores estimados por IQD;
+- Teores estimados por KS;
+- Teores estimados por KO.
 """
 
-# ╔═╡ fb8dc6e2-8708-41c5-b4ca-0f04b7a2bde5
-md"""
-Na **validação global das estimativas**, nos atentaremos para a comparação entre os seguintes sumários estatísticos:
-
-- Cu (desagrupado);
-- Cu (estimado por IQD);
-- Cu (estimado por KS);
-- Cu (estimado por KO).
-
-> ⚠️ Como a Krigagem leva em consideração a redundância amostral, é mais conveniente compararmos a média Krigada com a a média desagrupada.
-
-Compare os quatro sumários estatísticos gerados abaixo...
-
-> ⚠️ Para visualizar os sumários estatísticos, a caixa *Executar estimativas* deve estar marcada. 
-"""
-
-# ╔═╡ 92b731f3-5eae-406e-a593-4e6d49f476d9
+# ╔═╡ e49569b3-0231-4b8e-98d9-21c68c4b1160
 if run
-	sol_ks_filt = sol_ks |> @filter(!isnan(_.CU)) |> DataFrame
-	sol_ko_filt = sol_ko |> @filter(!isnan(_.CU)) |> DataFrame
+	# tamanho da janela de desagrupamento
+	s = 25.0
+
+	# sumário estatístico de Pb desagrupado
+	sum_desag = DataFrame(teor = "Pb (desagrupado)",
+					  	  X̄    = mean(geowl, :Pb, s),
+					  	  S²   = var(geowl, :Pb, s),
+					  	  q10  = quantile(geowl, :Pb, 0.1, s),
+					  	  md   = quantile(geowl, :Pb, 0.5, s),
+					  	  q90  = quantile(geowl, :Pb, 0.9, s))
 end;
 
-# ╔═╡ c6b0f335-19cb-4fbe-a47b-2ba3fd664832
+# ╔═╡ 260d5fa1-b2d9-4e9d-9154-c07f2959bce5
+md"""
+> ⚠️ Para visualizar os sumários estatísticos, a caixa *Executar estimativas* deve estar marcada.
+"""
+
+# ╔═╡ 6b4e35a1-4f1a-4745-9370-f982762af210
+function sumario_est(est, id::String)
+	q10 = quantile(est[:Pb], 0.1)
+	q90 = quantile(est[:Pb], 0.9)
+	
+	df = DataFrame(teor = id,
+                   X̄    = mean(est[:Pb]),
+                   S²   = var(est[:Pb]),
+                   q10  = q10,
+				   md   = median(est[:Pb]),
+				   q90  = q90)
+				
+	return df
+end;
+
+# ╔═╡ b657f40a-b586-4011-ad48-aa18b0a46dc3
 if run
-	
-	stats_iqd = DataFrame(teor = "Cu (IQD)",
-                          X̄    = mean(sol_iqd[:CU]),
-                          S²   = var(sol_iqd[:CU]),
-                          q10  = quantile(sol_iqd[:CU], 0.1),
-                          md   = quantile(sol_iqd[:CU], 0.5),
-                          q90  = quantile(sol_iqd[:CU], 0.9))
-	
-	stats_ks = DataFrame(teor = "Cu (KS)",
-                         X̄    = mean(sol_ks_filt[!,:CU]),
-                         S²   = var(sol_ks_filt[!,:CU]),
-                         q10  = quantile(sol_ks_filt[!,:CU], 0.1),
-                         md   = quantile(sol_ks_filt[!,:CU], 0.5),
-                         q90  = quantile(sol_ks_filt[!,:CU], 0.9))
-
-	
-    stats_ko = DataFrame(teor = "Cu (KO)",
-                         X̄    = mean(sol_ko_filt[!,:CU]),
-                         S²   = var(sol_ko_filt[!,:CU]),
-                         q10  = quantile(sol_ko_filt[!,:CU], 0.1),
-                         md   = quantile(sol_ko_filt[!,:CU], 0.5),
-                         q90  = quantile(sol_ko_filt[!,:CU], 0.9))
-
-    [Cu_decl
-	 stats_iqd
-	 stats_ks
-	 stats_ko]
-
+	[sum_desag
+ 	 sumario_est(sol_iqd, "Pb (IQD)")
+ 	 sumario_est(sol_ks, "Pb (KS)")
+ 	 sumario_est(sol_ko, "Pb (KO)")]
 end
 
-# ╔═╡ ed97c749-30b7-4c72-b790-fef5a8332548
+# ╔═╡ b8589ac8-7305-48c1-8dff-880a7c659059
 if run
 	md"""
 	##### Observações
 
-	- As médias estimadas são próximas à média declusterizada;
-	- Nota-se uma suavização extrema da distribuição dos teores estimados pelos três métodos em relação à distribuição dos teores amostrais. Isso é evidenciado pela redução  de S²;
-	- IQD gerou estimativas menos suavizadas do que KO;
-	- KO gerou estimativas menos suavizadas do que KS e IQD.
+	- Vamos focar nas estatísticas `X̅` e `S²`, que representam média e variância, respectivamente;
+	- Os três métodos produziram estimativas cujas médias são próximas ao valor da média desagrupada;
+	- Os três métodos produziram estimativas suavizadas (i.e. com menores dispersões), fato evidenciado pelos valores de variância que, por sua vez, são sempre inferiores à variância desagrupada. A KS foi o estimador que gerou estimativas mais suavizadas;
+	- Veja como a inspeção visual é uma abordagem de validação importante. Se avaliássemos apenas os sumários estatísticos, provavelmente, chegaríamos à conclusão que o IQD era o método mais adequado, quando, na verdade, suas estimativas não representam, de forma fiel, a direção preferencial N-S da mineralização;
+	- A seguir, discutiremos outra abordagem de validação para avaliar (qualitativamente) o grau de suavização das estimativas obtidas.
 	"""
 end
 
-# ╔═╡ 263c1837-7474-462b-bd97-ee805baec458
+# ╔═╡ 466c7891-f632-4c02-990a-b5a99c1c162a
 md"""
-Já o **Q-Q plot entre os teores amostrais e os teores estimados** pode ser utilizado para realizar uma comparação entre as distribuições de Cu amostral e Cu estimado. Podemos analisar visualmente o grau de suavização dos diferentes estimadores.
+Um outro ponto que merece a nossa atenção é o **grau de suavização** das estimativas produzidas. Para isso, utilizaremos um gráfico que já conhecemos, o Q-Q Plot.
 
-Compare os Q-Q plots gerados abaixo (Figura 18)...
+O Q-Q plot entre os teores amostrais e os teores estimados pode ser utilizado para realizar uma comparação entre ambas as distribuições. Podemos analisar visualmente o grau de suavização dos diferentes estimadores a partir desse gráfico bivariado.
 
-> ⚠️ Para visualizar os Q-Q plots, a caixa *Executar estimativas* deve estar marcada. 
+A Figura 06 mostra os Q-Q plots entre os teores amostrais de Pb e os teores estimados de Pb pelos três métodos. Quanto mais distantes forem os pontos plotados da função identidade (X=Y), mais suaves são as estimativas em relação a distribuicão amostral.
+
+> ⚠️ Para visualizar os Q-Q plots, a caixa *Executar estimativas* deve estar marcada.
 """
 
-# ╔═╡ 193dde9b-1f4a-4313-a3a6-ba3c89600bcb
+# ╔═╡ 03d1da66-8202-4415-a44d-8c204e740960
 if run
-
 	qq_iqd = qqplot(
-				   samples[:CU], sol_iqd[:CU],
+				   geowl[:Pb], sol_iqd[:Pb],
 		           legend=:false, line=:red,
 				   marker=(:red, :circle, 3),
-                   xlabel="Cu amostral (%)",
-		           ylabel="Cu estimado (%)",
+                   xlabel="Pb amostral (%)",
+		           ylabel="Pb estimado (%)",
                    title="IQD"
                    )
 	
     qq_ks = qqplot(
-				   samples[:CU], sol_ks_filt[!,:CU],
-                   marker=(:blue, :circle, 3),
+				   geowl[:Pb], sol_ks[:Pb],
+				   marker=(:blue, :circle, 3),
                    line=:blue, legend=:false,
-		           xlabel="Cu amostral (%)",
+		           xlabel="Pb amostral (%)",
                    title="KS"
                    )
  
     qq_ko = qqplot(
-				   samples[:CU], sol_ko_filt[!,:CU],
+				   geowl[:Pb], sol_ko[:Pb],
 		           line=:green, legend=:false,
 				   marker=(:green, :circle, 3),
-                   xlabel="Cu amostral (%)",
+                   xlabel="Pb amostral (%)",
                    title="KO"
 				  )
 
@@ -1424,85 +689,51 @@ if run
 
 end
 
-# ╔═╡ 6926d1bb-359d-46a5-abf5-e1700d0edcf0
+# ╔═╡ 5b07d44b-af44-425b-9e3e-9a5f643e840d
 if run
 	md"""
-	_**Figura 18:** Q-Q plots entre os teores amostrais e estimados de Cu (%)._
+	_**Figura 06:** Q-Q plots entre os teores amostrais e estimados de Pb (%)._
 	"""
 end
 
-# ╔═╡ 2181506b-76f5-4a57-adba-e90679b2b21b
+# ╔═╡ 817bf734-d8a0-43cd-9553-a7980152afe5
 if run
 	md"""
 	##### Observações
 
-	- A KO mostra uma menor suavização em relação aos demais métodos;
-	- Métodos de Krigagem são conhecidos por suavizar inadequadamente a distribuição de teores.
+	- Os três métodos geraram estimativas suavizadas. Note que, pela rotação dos pontos em relação à reta X=Y, os teores de Pb estimados apresentam sempre dispersões inferiores em relação à dispersão dos teores de Pb amostrais. Esse fato é ligeiramente mais evidente no caso da KS;
+	- Em geral, há uma superestimação dos teores mais baixos e uma subestimação dos teores mais altos;
+	- Os estimadores da família da Krigagem tendem a gerar estimativas que não honram a real variabilidade do depósito (i.e. mais suavizadas). Uma alternativa seria a utilização de técnicas de **Simulação Geoestatística**. Para ter uma breve introdução a esse tópico, confira este [notebook](https://github.com/juliohm/CBMina2021/blob/main/notebook2.jl) e esta [videoaula](https://www.youtube.com/watch?v=3cLqK3lR56Y&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ) do Prof. Michael Pyrcz.
 	"""
 end
 
-# ╔═╡ 5ad612f4-76e9-4867-b4c8-4c35540a5f47
+# ╔═╡ b1b823ac-f9cf-4e5b-a622-4274f3785567
 md"""
-## 10. Exportação das estimativas
+## Referências
 
-Nesta última seção, iremos exportar as estimativas geradas pelo método da Krigagem Ordinária em dois formatos distintos:
+*Abzalov, M. [Applied mining geology](https://www.google.com.br/books/edition/Applied_Mining_Geology/Oy3RDAAAQBAJ?hl=pt-BR&gbpv=0). Switzerland: Springer International Publishing, 2016*
 
-- GSLIB;
-- CSV.
+*Chilès, J. P.; Delfiner, P. [Geostatistics: modeling spatial uncertainty](https://www.google.com.br/books/edition/Geostatistics/CUC55ZYqe84C?hl=pt-BR&gbpv=0). New Jersey: John Wiley & Sons, 2012.*
 
-Marque a caixa abaixo para executar a exportação das estimativas em ambos os formatos...
+*Isaaks, E. H.; Srivastava, M. R. [Applied geostatistics](https://www.google.com.br/books/edition/Applied_Geostatistics/gUXQzQEACAAJ?hl=pt-BR). New York: Oxford University Press, 1989.*
 
-> ⚠️ Para exportar as estimativas, a caixa *Executar estimativas* deve estar marcada.
-
-Salvar estimativas: $(@bind store CheckBox())
+*Sinclair, A. J.; Blackwell, G. H. [Applied mineral inventory estimation](https://www.google.com.br/books/edition/Applied_Mineral_Inventory_Estimation/oo7rCrFQJksC?hl=pt-BR&gbpv=0). New York: Cambridge University Press, 2006.*
 """
 
-# ╔═╡ b96c4bd5-54ba-4394-b963-5c5ddc06cf3b
-# GSLIB
-if run && store
-	save("output/estimativas_KO.gslib", sol_ko)
-end;
-
-# ╔═╡ 79bc4b7d-72de-4c9e-94f5-3b5ba6bbff1d
-function csvtable(solution, variable)
-	center = centroid.(domain(solution))
-	
-	coords = coordinates.(center)
-	
-	X = getindex.(coords, 1)
-	
-	Y = getindex.(coords, 2)
-	
-	Z = getindex.(coords, 3)
-	
-	mean = solution[variable]
-	
-	var  = solution[variable*"-variance"]
-	
-	DataFrame(MEAN=mean, VARIANCE=var, X=X, Y=Y, Z=Z)
-end;
-
-# ╔═╡ 245c7304-1cc0-408a-97ec-867ac0cc81b0
-# CSV
-if run && store
-	csvtable(sol_ko, "CU") |> CSV.write("output/estimativas_KO.csv")
-end;
-
-# ╔═╡ 1164ba05-0835-4713-b11c-92b37085b744
+# ╔═╡ 9cd2e572-23fc-4f7a-9b91-a5d3d13a9b48
 md"""
 ## Recursos adicionais
 
 Abaixo, são listados alguns recursos complementares a este notebook:
 
-> [Workshop GeoStats.jl - CBMina 2021](https://github.com/juliohm/CBMina2021)
+> [Videoaula Krigagem - LPM/UFRGS](https://www.youtube.com/watch?v=c8GKKsbAmxU)
 
-> [Tutoriais GeoStats.jl - Notebooks](https://github.com/JuliaEarth/GeoStatsTutorials)
+> [Videoaula Krigagem - University of Texas](https://www.youtube.com/watch?v=CVkmuwF8cJ8&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ)
 
-> [Tutoriais GeoStats.jl - Vídeos](https://www.youtube.com/playlist?list=PLsH4hc788Z1f1e61DN3EV9AhDlpbhhanw)
-
+Além dos dois recursos mencionados acima, sugere-se a leitura do Capítulo 10 do livro de *Sinclair & Blackwell (2006)* que, por sua vez, aborda uma série de discussões práticas sobre a Krigagem no contexto da estimação de recursos minerais.
 """
 
-# ╔═╡ 16baa4c7-2807-4aaf-9ace-dbc4d2f960c7
+# ╔═╡ c8ced4cd-a74f-48bc-8cca-fb3971930390
 md"""
 ## Pacotes utilizados
 
@@ -1511,19 +742,15 @@ Os seguintes pacotes foram utilizados neste notebook:
 |                       Pacote                             |        Descrição        |
 |:--------------------------------------------------------:|:-----------------------:|
 |[GeoStats](https://github.com/JuliaEarth/GeoStats.jl)     | Rotinas geoestatísticas |
-|[DrillHoles](https://github.com/JuliaEarth/DrillHoles.jl) | Furos de sondagem       |
 |[CSV](https://github.com/JuliaData/CSV.jl)                | Arquivos CSV            |
 |[DataFrames](https://github.com/JuliaData/DataFrames.jl)  | Manipulação de tabelas  |
 |[Query](https://github.com/queryverse/Query.jl)           | Realização de consultas |
 |[Statistics](https://docs.julialang.org/en/v1/)           | Cálculo de estatísticas |
-|[StatsBase](https://github.com/JuliaStats/StatsBase.jl)   | Cálculo de estatísticas |
-|[LinearAlgebra](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/)   | Álgebra linear |
-|[Random](https://docs.julialang.org/en/v1/)               | Números aleatórios      |
-|[FileIO](https://github.com/JuliaIO/FileIO.jl)            | Coversão entre formatos |
 |[PlutoUI](https://github.com/fonsp/PlutoUI.jl)            | Widgets interativos     |
+|[Distributions](https://github.com/JuliaStats/Distributions.jl) | Distribuições de probabilidade |
 |[Plots](https://github.com/JuliaPlots/Plots.jl)           | Visualização dos dados  |
 |[StatsPlots](https://github.com/JuliaPlots/StatsPlots.jl) | Visualização dos dados  |
-
+|[Random](https://docs.julialang.org/en/v1/)               | Números aleatórios      |
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1531,28 +758,23 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-DrillHoles = "9d36f3b5-8124-4f7e-bcda-df733105c718"
-FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 GeoStats = "dcc97b0b-8ce5-5539-9008-bb190f959ef6"
-LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 
 [compat]
-CSV = "~0.8.5"
+CSV = "~0.9.9"
 DataFrames = "~1.2.2"
-DrillHoles = "~0.1.4"
-FileIO = "~1.11.1"
+Distributions = "~0.25.23"
 GeoStats = "~0.27.0"
 Plots = "~1.23.1"
 PlutoUI = "~0.7.16"
 Query = "~1.0.0"
-StatsBase = "~0.33.12"
 StatsPlots = "~0.14.28"
 """
 
@@ -1640,10 +862,10 @@ uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
 version = "1.0.8+0"
 
 [[CSV]]
-deps = ["Dates", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode"]
-git-tree-sha1 = "b83aa3f513be680454437a0eee21001607e5d983"
+deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings"]
+git-tree-sha1 = "c0a735698d1a0a388c5c7ae9c7fb3da72fd5424e"
 uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
-version = "0.8.5"
+version = "0.9.9"
 
 [[Cairo_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
@@ -1680,6 +902,12 @@ deps = ["AxisArrays", "Distances", "Distributions", "FillArrays", "LinearAlgebra
 git-tree-sha1 = "110c70f633e0358ab5f71b54684d71a7e8fc3831"
 uuid = "5900dafe-f573-5c72-b367-76665857777b"
 version = "0.6.6"
+
+[[CodecZlib]]
+deps = ["TranscodingStreams", "Zlib_jll"]
+git-tree-sha1 = "ded953804d019afa9a3f98981d99b33e3db7b6da"
+uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
+version = "0.7.0"
 
 [[ColorSchemes]]
 deps = ["ColorTypes", "Colors", "FixedPointNumbers", "Random"]
@@ -1825,9 +1053,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Distributions]]
 deps = ["ChainRulesCore", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns"]
-git-tree-sha1 = "3fcfb6b34ea303642aee8f85234a0dcd0dc5ce73"
+git-tree-sha1 = "d249ebaa67716b39f91cf6052daf073634013c0f"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.22"
+version = "0.25.23"
 
 [[DocStringExtensions]]
 deps = ["LibGit2"]
@@ -1838,12 +1066,6 @@ version = "0.8.6"
 [[Downloads]]
 deps = ["ArgTools", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
-
-[[DrillHoles]]
-deps = ["CSV", "DataFrames", "StatsBase"]
-git-tree-sha1 = "b8ad18a7f8f61bebc10da2ded20456a2e2a32de5"
-uuid = "9d36f3b5-8124-4f7e-bcda-df733105c718"
-version = "0.1.4"
 
 [[EarCut_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1887,11 +1109,11 @@ git-tree-sha1 = "c6033cc3892d0ef5bb9cd29b7f2f0331ea5184ea"
 uuid = "f5851436-0d7a-5f13-b9de-f02708fd171a"
 version = "3.3.10+0"
 
-[[FileIO]]
-deps = ["Pkg", "Requires", "UUIDs"]
-git-tree-sha1 = "3c041d2ac0a52a12a27af2782b34900d9c3ee68c"
-uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
-version = "1.11.1"
+[[FilePathsBase]]
+deps = ["Dates", "Mmap", "Printf", "Test", "UUIDs"]
+git-tree-sha1 = "d962b5a47b6d191dbcd8ae0db841bc70a05a3f5b"
+uuid = "48062228-2e41-5def-b9a4-89aafe57970f"
+version = "0.9.13"
 
 [[FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Statistics"]
@@ -2077,6 +1299,12 @@ version = "0.5.0"
 git-tree-sha1 = "7f6a4508b4a6f46db5ccd9799a3fc71ef5cad6e6"
 uuid = "22cec73e-a1b8-11e9-2c92-598750a2cf9c"
 version = "0.2.11"
+
+[[InlineStrings]]
+deps = ["Parsers"]
+git-tree-sha1 = "19cb49649f8c41de7fea32d089d37de917b553da"
+uuid = "842dd82b-1e85-43dc-bf29-5d0ee9dffc48"
+version = "1.0.1"
 
 [[IntelOpenMP_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2447,9 +1675,9 @@ version = "0.12.3"
 
 [[Parsers]]
 deps = ["Dates"]
-git-tree-sha1 = "bfd7d8c7fd87f04543810d9cbd3995972236ba1b"
+git-tree-sha1 = "f19e978f81eca5fd7620650d7dbea58f825802ee"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "1.1.2"
+version = "2.1.0"
 
 [[Pixman_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2793,6 +2021,12 @@ uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
+[[TranscodingStreams]]
+deps = ["Random", "Test"]
+git-tree-sha1 = "216b95ea110b5972db65aa90f88d8d89dcb8851c"
+uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
+version = "0.9.6"
+
 [[Transducers]]
 deps = ["Adapt", "ArgCheck", "BangBang", "Baselet", "CompositionsBase", "DefineSingletons", "Distributed", "InitialValues", "Logging", "Markdown", "MicroCollections", "Requires", "Setfield", "SplittablesBase", "Tables"]
 git-tree-sha1 = "bccb153150744d476a6a8d4facf5299325d5a442"
@@ -2830,9 +2064,9 @@ version = "2.4.6"
 
 [[Variography]]
 deps = ["Distances", "GeoStatsBase", "InteractiveUtils", "LinearAlgebra", "Meshes", "NearestNeighbors", "Optim", "Parameters", "Printf", "Random", "RecipesBase", "Setfield", "SpecialFunctions", "Transducers"]
-git-tree-sha1 = "4909032736b2e197d6cd16fa434fabae09419562"
+git-tree-sha1 = "97817eb256ae53195bbe85e3e2fbc9b61b709186"
 uuid = "04a0146e-e6df-5636-8d7f-62fa9eb0b20c"
-version = "0.12.24"
+version = "0.12.22"
 
 [[Wayland_jll]]
 deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg", "XML2_jll"]
@@ -2845,6 +2079,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Wayland_jll"]
 git-tree-sha1 = "2839f1c1296940218e35df0bbb220f2a79686670"
 uuid = "2381bf8a-dfd0-557d-9999-79630e7b1b91"
 version = "1.18.0+4"
+
+[[WeakRefStrings]]
+deps = ["DataAPI", "InlineStrings", "Parsers"]
+git-tree-sha1 = "c69f9da3ff2f4f02e811c3323c22e5dfcb584cfa"
+uuid = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
+version = "1.4.1"
 
 [[Widgets]]
 deps = ["Colors", "Dates", "Observables", "OrderedCollections"]
@@ -3064,150 +2304,63 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─980f4910-96f3-11eb-0d4f-b71ad9888d73
-# ╟─14ac7b6e-9538-40a0-93d5-0379fa009872
-# ╟─6b7e7c5d-7a86-4ea4-a47e-fb4148030c1a
-# ╟─3afd7a32-3696-4cea-b00c-b52bfdb003ba
-# ╟─c544614a-3e5c-4d22-9340-592aabf84871
-# ╟─3353d0be-4280-4ffd-824b-745bb6b64f41
-# ╟─8e2b3339-a65d-4e1b-a9fb-69b6cd4631ea
-# ╟─af1aca7e-bde2-4e14-a664-b7c71ff80ffe
-# ╟─ff01a7d7-d491-4d49-b470-a2af6783c82b
-# ╠═444402c6-99a3-4829-9e66-c4962fb83612
-# ╟─0d0d610a-b06c-4c16-878d-8d2d124b8b9e
-# ╠═1d7df6f8-f643-4c1e-92b4-52e51c4ccda8
-# ╟─bb8336ba-f347-418c-8883-47d86350bc94
-# ╠═412cfe3d-f9f1-49a5-9f40-5ab97946df6d
-# ╟─d343401d-61dc-4a45-ab9b-beaff2534886
-# ╟─ec102b27-79e2-4a91-99d6-dff061752855
-# ╟─bedcf585-53ef-4cf6-9dc2-d3fc9cff7755
-# ╠═15fd1c4d-fbf2-4389-bc1c-eabbbd26817b
-# ╟─39ae0ea7-9659-4c7b-b161-fd9c3495f4e3
-# ╟─f9545a95-57c0-4de6-9ab7-3ac3728b3d27
-# ╠═4d5f2467-c7d5-4a82-9968-97f193090bd6
-# ╟─2af7dfc5-a26a-4ad3-a046-31d1dfa107f1
-# ╟─ee6c8dfa-d8be-4b5a-bfe0-9e1b3f394e9d
-# ╟─f4bd13d4-70d3-4167-84ff-9d3c7200e143
-# ╟─41790d87-ce85-461f-a16d-04821a3624bb
-# ╟─f40bca06-6a3e-4807-9857-ff17d21893bc
-# ╟─7ea21049-5edd-4979-9782-8a20d4bb287b
-# ╟─d8ce39f1-8017-4df3-a55d-648bdd3dbc04
-# ╠═32f75604-b01a-4a0b-a008-33b2a56f4b57
-# ╟─b6712822-7c4d-4936-bcc2-21b48be99a66
-# ╟─87808ab0-3bcb-428d-9ebf-71ffefbcb357
-# ╟─280db32e-cebf-4d51-bfcb-54d456f2194b
-# ╟─893d7d19-878b-4990-80b1-ef030b716048
-# ╟─b85a7c2f-37e2-48b0-a1db-984e2e719f29
-# ╠═676bea93-69a9-4f2c-bb3e-759a9d28b12e
-# ╠═59dfbb66-f188-49f1-87ba-4f7020c4c031
-# ╟─7a021fbd-83ac-4a36-bb8c-98519e6f8acb
-# ╟─fb67daea-0b8b-47da-b06c-8256566f9ba0
-# ╟─f2be5f11-1923-4658-93cf-800ce57c32d3
-# ╟─ecec08be-b9da-4913-9f5a-3a77631fa96e
-# ╟─d00f02fc-3c14-4911-a36b-209c747f96cb
-# ╟─b95a6def-f3e6-4835-b15f-2a48577006f4
-# ╟─81a5831f-75ef-478b-aba5-70d19306798e
-# ╟─0808061f-4856-4b82-8560-46a59e669ac4
-# ╟─c0604ed8-766e-4c5d-a628-b156615f8140
-# ╟─074bff0b-6b41-4bbc-9b5c-77fbf62c4dc6
-# ╟─eac8e835-83bc-4f9c-b25b-3aaddcf69611
-# ╟─8bb2f630-8234-4f7f-a05c-8206993bdd45
-# ╟─862dd0cf-69ae-48e7-92fb-ff433f62e67c
-# ╟─ea0968ca-a997-40c6-a085-34b3aa89807e
-# ╟─52c28a55-3a4a-4df3-841a-ab8fc748bf55
-# ╟─3ae99e49-6996-4b4a-b930-f6073994f25c
-# ╟─ccbcf57e-d00b-43df-8555-eee8bf4f9e6f
-# ╟─c6c41764-509c-4f40-b063-a5f85dcc16db
-# ╟─3c2eb77b-60e9-4aeb-9d19-ba22293741f9
-# ╠═63b75ae2-8dca-40e3-afe0-68c6a639f54e
-# ╟─5699c563-d6cb-4bc2-8063-e1be00722a41
-# ╟─16cb8eaa-773e-4a42-ae8d-00bebddedc59
-# ╟─af160a03-10ea-404e-87a3-e6417058449f
-# ╟─161cc157-9667-48b5-8832-586c4bb0c476
-# ╟─6ec16d83-d8fb-45d0-a7f8-d75f712b4c91
-# ╟─e49b7b48-77d8-4abf-a5df-70e9c65e3667
-# ╟─b02263dc-280a-40b4-be1e-9c3b6873e153
-# ╟─6d520cfe-aa7b-4083-b2bf-b34f840c0a75
-# ╟─289865a9-906f-46f4-9faa-f62feebbc92a
-# ╟─1db51803-8dc4-4db6-80a1-35a489b6fb9e
-# ╟─a717d5d3-9f4e-4a2d-8e32-f0605bbd742f
-# ╟─ffe3700c-262f-4949-b910-53cbe1dd597b
-# ╟─8348abd3-27f6-4161-bd04-c4be6a644888
-# ╟─1465f010-c6a7-4e72-9842-4504c6dda0be
-# ╟─0b46230a-b305-4840-aaad-e985444cf54e
-# ╟─c6d0a87e-a09f-4e78-9672-c858b488fd39
-# ╟─fc2ea8f3-064a-4d6d-8115-236c8160cc23
-# ╟─0585add6-1320-4a31-a318-0c40b7a444fa
-# ╟─09d95ff8-3ba7-4031-946b-8ba768dae5d5
-# ╟─d07a57c3-0a7a-49c2-a840-568e72d50545
-# ╟─bda3cda3-9d57-495b-be79-1415aa95707f
-# ╟─17b21a63-9fa6-4975-9302-5465cdd3d2fa
-# ╟─9389a6f4-8710-44c3-8a56-804017b6239b
-# ╟─99baafe5-6249-4eda-845f-d7f6219d5726
-# ╟─294ac892-8952-49bc-a063-3d290c375ea5
-# ╟─668da8c2-2db6-4812-90ce-86b17b289cc6
-# ╟─774f8e10-fd10-4b16-abcf-20579f174f8a
-# ╟─97670210-2c91-4be7-a607-0da83cb16f44
-# ╟─eb9ebce2-7476-4f44-ad4f-10a1ca522143
-# ╟─fa93796d-7bc0-4391-89a7-eeb63e1a3838
-# ╟─24981600-3336-4295-b567-8f05785b9346
-# ╟─92d11f3b-c8be-4701-8576-704b73d1b619
-# ╟─55373bb0-6953-4c6f-b1dd-2dacac90b6cc
-# ╟─6c048b83-d12c-4ce8-9e9a-b89bf3ef7638
-# ╟─0def0326-55ef-45db-855e-a9a683b2a76d
-# ╟─a92f702d-8859-4f95-b676-36deab03e717
-# ╟─120f4a9c-2ca6-49f1-8abc-999bcc559149
-# ╟─34b9b30f-615d-43ff-8d07-ed757cd69a7f
-# ╟─a74b7c50-4d31-4bd3-a1ef-6869abf73185
-# ╟─b19e5ac0-21fd-4dcd-ac61-a36a67ee80dd
-# ╟─922d81f3-0836-4b14-aaf2-83be903c8642
-# ╟─fed7dbb1-8dfd-4242-a060-7b44508ce432
-# ╟─0927d78e-9b50-4aaf-a93c-69578608a4f8
-# ╟─33ba8a9b-f548-4984-8a31-1c381b31ced4
-# ╟─dacfe446-3c19-430d-8f5f-f276a022791f
-# ╟─38946a3f-d5a6-4a1c-a1d5-d4ec475f1545
-# ╟─483487c6-acf8-4551-8357-2e69e6ff44ff
-# ╟─c9ac9fb4-5d03-43c9-833e-733e48565946
-# ╟─5134e2cb-8c98-4e5e-9f13-722b8f828dc7
-# ╟─d700e40b-dd7f-4630-a29f-f27773000597
-# ╠═38d15817-f3f2-496b-9d83-7dc55f4276dc
-# ╟─b2156251-26ae-4b1d-8757-ffdf3a02a2f8
-# ╟─51f8bc33-a24f-4ce4-a81b-cd22fb8312ec
-# ╟─9baefd13-4c16-404f-ba34-5982497e8da6
-# ╟─a7a59395-59ec-442a-b4b6-7db55d150d53
-# ╠═f7cee6a3-5ac2-44ff-9d5e-58ede7327c46
-# ╟─6f7663ed-c672-4d29-8b06-415dcdc8fbff
-# ╟─a73cc834-c600-4278-bc77-49b85dc90256
-# ╟─12d79d77-358c-4098-993a-d5be538929a2
-# ╟─a8adf478-620d-4744-aae5-99d0891fe6b0
-# ╠═affacc76-18e5-49b2-8e7f-77499d2503b9
-# ╟─31cd3d10-a1e8-4ad8-958f-51de08d0fa54
-# ╠═2a76c2b9-953e-4e4b-a98e-8e992943f60c
-# ╟─9c61271d-4afe-4f7c-a521-8f799b6981ed
-# ╟─9b3fe534-78fa-48db-a101-e2a43f2478d6
-# ╠═e9b7e9b7-146f-4763-ad79-c93e111b25b4
-# ╠═78117ae8-d77c-4508-9793-3e7e9dfbb913
-# ╠═5e86ee34-60fe-43e4-851c-2f08072f836e
-# ╟─50650d2f-350b-446d-8c4b-6aa19e18c148
-# ╟─bce98bc9-c676-4a2e-bdac-10a74a9cdeae
-# ╟─b2197d9c-0342-4efe-8c9e-ecf45a07fcf3
-# ╟─3bc456e5-9030-41e5-a48c-179da59547c9
-# ╟─97b41da9-979a-4785-9ee4-19f43d912c49
-# ╟─63d5db73-1073-4b8d-bfab-93577579571f
-# ╟─4f05c05d-c92a-460d-b3e0-d392111ef57a
-# ╟─fb8dc6e2-8708-41c5-b4ca-0f04b7a2bde5
-# ╟─92b731f3-5eae-406e-a593-4e6d49f476d9
-# ╟─c6b0f335-19cb-4fbe-a47b-2ba3fd664832
-# ╟─ed97c749-30b7-4c72-b790-fef5a8332548
-# ╟─263c1837-7474-462b-bd97-ee805baec458
-# ╟─193dde9b-1f4a-4313-a3a6-ba3c89600bcb
-# ╟─6926d1bb-359d-46a5-abf5-e1700d0edcf0
-# ╟─2181506b-76f5-4a57-adba-e90679b2b21b
-# ╟─5ad612f4-76e9-4867-b4c8-4c35540a5f47
-# ╠═b96c4bd5-54ba-4394-b963-5c5ddc06cf3b
-# ╠═245c7304-1cc0-408a-97ec-867ac0cc81b0
-# ╟─79bc4b7d-72de-4c9e-94f5-3b5ba6bbff1d
-# ╟─1164ba05-0835-4713-b11c-92b37085b744
-# ╟─16baa4c7-2807-4aaf-9ace-dbc4d2f960c7
+# ╟─f9fb89e0-36a8-11ec-3fa3-d716ca093060
+# ╟─3e70ffa1-2a50-4dc4-a529-e4361ac6ad5f
+# ╟─9f8d2a06-275e-4689-8a69-b1f4dec807b3
+# ╟─0d2c1d74-f691-4805-9aa2-e9d42da04284
+# ╟─84ad4d5f-b3c3-4c21-89f2-d15396e83d05
+# ╟─035ef186-a067-44c0-b9a0-bdac6f4d770b
+# ╟─564423c2-6a3e-4919-a6fc-32f7d1664f86
+# ╟─a069cc27-d08e-47b4-9f75-24dab178b333
+# ╟─9b31cfec-400a-4068-84b8-8170b3c8ab58
+# ╟─951ca515-39a9-4e95-a53c-6fd7977a4cbb
+# ╟─28acc648-ac4a-4d1c-86ce-5bb329c6a141
+# ╟─25ddae7c-a276-417e-92c8-9fc2076db219
+# ╟─69c94901-8d49-4fcc-97f4-bf857b04e627
+# ╟─78866735-d01e-4c9d-abec-3ed54b8ed612
+# ╟─d5d0ef84-7c79-4d5e-af5c-52090b1dd233
+# ╟─fa6d5e16-ad13-4e68-8ee8-d846db277917
+# ╟─956f6c67-93f1-41bf-b921-e893111bbebe
+# ╟─eab5920c-fd1f-4e03-a6f3-90e3ce731b6e
+# ╟─5a9f4bbf-202f-4191-b59d-f2bed05347ae
+# ╠═669d757d-dc19-43e1-b96f-8c1aa31f7579
+# ╟─207ca8d7-08df-47dd-943b-7f7846684e3b
+# ╠═b14c6b92-81cc-482f-9746-d9a011cff5cd
+# ╟─9055d652-1c6c-4d73-9302-d58a35ffb975
+# ╟─37462572-3c3d-46e1-8e2d-266e86470b6a
+# ╟─4469f1a2-6054-4ba0-b402-03892d3a90e4
+# ╟─2531eee8-72c5-4056-879c-b1b65273d51a
+# ╠═36033c09-267c-48df-b6cd-ce2ee2a5eac6
+# ╟─3a034b2e-97a2-4a4f-bc60-c6634082254a
+# ╟─22b5fc9a-9d08-4e36-a500-329e5036081f
+# ╟─8aaca25b-8ebc-418c-ad48-344a31ba8ed9
+# ╟─07175b65-bf21-49c4-9bfa-be5cf000f2ba
+# ╟─045cdf16-d264-4b5d-990b-c1bd2acb5613
+# ╟─79c812cf-849a-4eea-93d2-b08a3844d5a7
+# ╠═b2cb5618-72ba-43a3-9b04-cb2a8821bfa9
+# ╟─14ba26ab-db0d-4993-9b98-56309ff23389
+# ╠═d5977fdd-c9bc-4589-ae0e-f6cac6973fbb
+# ╠═e570281a-39e3-438f-9c4a-395f321f12d4
+# ╠═4af2bbf9-fc03-49d0-a19f-f34356c897f7
+# ╟─73b54c21-7b69-429b-a088-fba3d0c09459
+# ╟─5f90093b-4b1e-4e0d-b84c-4232bd3c1b1a
+# ╟─a49e5f8d-09cf-4baf-b7b4-d43858df8089
+# ╟─60db4fd5-f06c-4821-a7ed-2f63033653ff
+# ╟─2e9b95c5-a687-4881-b69e-6567ade520cb
+# ╟─981efb6c-b1ea-4577-9c40-f3f374a23ba1
+# ╟─4ce1c65d-701c-4615-90aa-9f6469e47211
+# ╟─a2e173e6-fe66-44e6-b371-3ae194d7b0f9
+# ╟─e49569b3-0231-4b8e-98d9-21c68c4b1160
+# ╟─260d5fa1-b2d9-4e9d-9154-c07f2959bce5
+# ╟─6b4e35a1-4f1a-4745-9370-f982762af210
+# ╟─b657f40a-b586-4011-ad48-aa18b0a46dc3
+# ╟─b8589ac8-7305-48c1-8dff-880a7c659059
+# ╟─466c7891-f632-4c02-990a-b5a99c1c162a
+# ╟─03d1da66-8202-4415-a44d-8c204e740960
+# ╟─5b07d44b-af44-425b-9e3e-9a5f643e840d
+# ╟─817bf734-d8a0-43cd-9553-a7980152afe5
+# ╟─b1b823ac-f9cf-4e5b-a622-4274f3785567
+# ╟─9cd2e572-23fc-4f7a-9b91-a5d3d13a9b48
+# ╟─c8ced4cd-a74f-48bc-8cca-fb3971930390
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

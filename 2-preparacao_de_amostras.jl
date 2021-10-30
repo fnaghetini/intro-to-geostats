@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.1
+# v0.17.0
 
 using Markdown
 using InteractiveUtils
@@ -95,7 +95,7 @@ Normalmente, os dados de sondagem são constituídos por um conjunto de tabelas 
 # ╔═╡ a5bc3c03-856b-4ee2-a71c-8c7e1fe3c641
 md"""
 ![Figura_01](https://i.postimg.cc/52Qz4t7Z/tables.jpg)
-**Figura 01:** Tabelas Collar, Survey, Assay e Litho relacionadas entre si pelo campo-chave `HOLEID`.
+_**Figura 01:** Tabelas Collar, Survey, Assay e Litho relacionadas entre si pelo campo-chave `HOLEID`._
 """
 
 # ╔═╡ ae22a6f0-d857-4229-a003-728d43a50d46
@@ -261,7 +261,7 @@ histogram(furos[!,:LENGTH], bins=:scott, legend=false,
 		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
 
 # ╔═╡ 4d5eab4d-8510-45ed-97f9-31c6e3af6ab4
-md"**Figura 02:** Distribuição do suporte das amostras brutas."
+md"_**Figura 02:** Distribuição do suporte das amostras brutas._"
 
 # ╔═╡ 99aac39c-f375-42a9-a422-ee1f7ef3a490
 md"""
@@ -317,7 +317,7 @@ histogram(cp_fixo[!,:LENGTH], bins=:scott, legend=false,
 		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
 
 # ╔═╡ 66b7f878-c620-4fee-84c0-273bdbc46440
-md"**Figura 03:** Distribuição do suporte das compostas resultantes do método do comprimento fixo."
+md"_**Figura 03:** Distribuição do suporte das compostas resultantes do método do comprimento fixo._"
 
 # ╔═╡ 7d398c89-f763-4d3b-b196-2949bd91ae9a
 md"""
@@ -354,7 +354,7 @@ histogram(cp_otimo[!,:LENGTH], bins=:scott, legend=false,
 		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
 
 # ╔═╡ 0d9d4d97-e1ff-47a5-9a58-c76788b55468
-md"**Figura 04:** Distribuição do suporte das compostas resultantes do método do comprimento ótimo."
+md"_**Figura 04:** Distribuição do suporte das compostas resultantes do método do comprimento ótimo._"
 
 # ╔═╡ 959927f2-74b6-411d-89f8-034c031d7422
 md"""
@@ -458,7 +458,7 @@ end
 
 # ╔═╡ d9cd1583-abec-4dc1-a9db-5bbcf74a48c8
 if viz_furos
-	md"""**Figura 05:** Visualização dos teores compostos de Au (método do comprimento ótimo)."""
+	md"""_**Figura 05:** Visualização dos teores compostos de Au (método do comprimento ótimo)._"""
 end
 
 # ╔═╡ 96ae1d18-a0fd-4846-9d4a-843952e14caa
@@ -828,9 +828,9 @@ uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 
 [[GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pkg", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll"]
-git-tree-sha1 = "dba1e8614e98949abfa60480b13653813d8f0157"
+git-tree-sha1 = "0c603255764a1fa0b61752d2bec14cfbd18f7fe8"
 uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
-version = "3.3.5+0"
+version = "3.3.5+1"
 
 [[GR]]
 deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Printf", "Random", "Serialization", "Sockets", "Test", "UUIDs"]

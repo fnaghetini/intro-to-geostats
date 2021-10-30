@@ -19,7 +19,7 @@ begin
 	using GeoStats, Statistics
 	using CSV, DataFrames, Query
     using PlutoUI, Distributions
-    using Plots, Random
+    using Plots, StatsPlots, Random
 	
 	# configurações de visualização
 	gr(format=:png)
@@ -290,7 +290,7 @@ Como a soma dos pesos $w_i$ totaliza em 1, não é necessário atribuir um peso 
 
 # ╔═╡ 5a9f4bbf-202f-4191-b59d-f2bed05347ae
 md"""
-## 2. Criação do domínio de estimativas
+## 2. Criação do domínio de estimação
 
 Assim como no módulo anterior, também utilizaremos a famosa base de dados [Walker Lake](https://github.com/fnaghetini/intro-to-geostats/blob/main/data/Walker_Lake.csv). Primeiramente, vamos importar e georreferenciar esses dados. Novamente, apenas a variável `Pb` (em %) será considerada...
 """
@@ -328,9 +328,9 @@ Ao invés de informarmos o número de células em cada direção, é mais conven
 
 >⚠️ Aqui o termo *célula* foi adotado simplesmente por se tratar de um problema 2D. Em contextos 3D, o termo *bloco* é mais comum, como veremos no próximo módulo.
 
-O tamanho da célula (ou bloco) é um parâmetro crucial, principalmente quando o objetivo é realizar uma *Krigagem de blocos*. Como neste módulo realizaremos uma *Krigagem de pontos*, ou seja, estimaremos o centroide de cada célula, não iremos discutir sobre esse parâmetro com tanto rigor. Definiremos o tamanho das células como ¼ do espaçamento médio entre amostras vizinhas que, no nosso caso, é de `5 m x 5 m`.
+O tamanho da célula (ou bloco) é um parâmetro crucial, principalmente quando o objetivo é realizar uma *Krigagem de blocos*. Como neste módulo realizaremos uma *Krigagem de pontos*, ou seja, estimaremos o centroide de cada célula, não iremos discutir sobre esse parâmetro com tanto rigor. Definiremos o tamanho das células como ½ do espaçamento médio entre amostras vizinhas que, no nosso caso, é de `10 m x 10 m`.
 
->⚠️ Caso queira investigar as diferenças entre Krigagem de pontos e Krigagem de blocos, consulte *Isaaks & Srivastava (1989)*.
+>⚠️ Na estimação 3D de recursos, uma [heurística](https://en.wikipedia.org/wiki/Heuristic) comumente adotada é definir o tamanho do bloco como ¼ a ½ do espaçamento médio entre amostras vizinhas (*Abzalov, 2016*). Caso queira investigar as diferenças entre Krigagem de pontos e Krigagem de blocos, consulte *Isaaks & Srivastava (1989)*.
 """
 
 # ╔═╡ b14c6b92-81cc-482f-9746-d9a011cff5cd
@@ -342,7 +342,7 @@ begin
 	extent = maximum(bbox) - minimum(bbox)
 	
 	# Tamanho dos blocos em cada direção
-	blocksizes = (5., 5.)
+	blocksizes = (10., 10.)
 	
 	# Número de blocos em cada direção
 	nblocks = ceil.(Int, extent ./ blocksizes)
@@ -359,7 +359,7 @@ A Figura 03 ilustra a distribuição espacial das amostras de Pb (%) sobre o gri
 # ╔═╡ 37462572-3c3d-46e1-8e2d-266e86470b6a
 begin
 	# plotagem do domínio de estimação
-	plot(grid, lw=0.5, color=:gray70)
+	plot(grid, lw=0.5, alpha=0.5, grid=false)
 
 	# plotagem das amostras
 	plot!(geowl, marker=(:jet,:circle,3), markerstrokewidth=0.3,
@@ -459,12 +459,13 @@ No nosso exemplo, iremos definir três estimadores distintos: IQD, KS e KO. Os n
 
 No caso dos estimadores SK e KO, utilizaremos o modelo de variograma `γ` e uma elipse de busca `elp` igual à elipse de anisotropia. A média , que deve ser informada no caso da KS, será definida como o valor da média desagrupada de Pb `μₚ`.
 
+> ⚠️ O modelo de variograma `γ` utilizado apresenta o eixo primário alinhado N-S, com um alcance de 100 m e um eixo segundário alinhado E-W, com um alcance de 35 m. O efeito pepita considerado foi de 3.0, ou seja, cerca de 30% do valor do patamar.
 """
 
 # ╔═╡ b2cb5618-72ba-43a3-9b04-cb2a8821bfa9
 begin
 	# média desclusterizada
-    μₚ = mean(geowl, :Pb)
+    μₚ = mean(geowl, :Pb, 25.)
 	
 	# IQD
 	IQD = IDW(:Pb => (power=2, neighbors=8))
@@ -507,11 +508,13 @@ if run
 end
 
 # ╔═╡ 73b54c21-7b69-429b-a088-fba3d0c09459
-md"""
-Agora que os teores de Pb foram estimados, clique na caixa abaixo para visualizar o resultado (Figura 05). Em seguida, utilize a lista suspensa abaixo para selecionar a solução que deseja visualizar...
+if run
+	md"""
+	Agora que os teores de Pb foram estimados, clique na caixa abaixo para visualizar o resultado (Figura 05). Em seguida, utilize a lista suspensa abaixo para selecionar a solução que deseja visualizar...
 
-Visualizar estimativas: $(@bind viz CheckBox())
-"""
+	Visualizar estimativas: $(@bind viz CheckBox())
+	"""
+end
 
 # ╔═╡ 5f90093b-4b1e-4e0d-b84c-4232bd3c1b1a
 if run && viz
@@ -542,7 +545,7 @@ begin
 		# plotagem das estimativas		
 		plot(ẑ, color=:jet, xlabel="X", ylabel="Y",
 			 xlims=(0,280), ylims=(0, 300),clims = (0,12),
-			 marker=(:square,10), markerstrokewidth=0.,
+			 marker=(:square,10), markerstrokewidth=0.2,
 			 title="Pb (%)", size=(500,500))
 
 		# plotagem de amostras
@@ -559,18 +562,156 @@ if run && viz
 	"""
 end
 
+# ╔═╡ 4ce1c65d-701c-4615-90aa-9f6469e47211
+if run && viz
+	md"""
+	##### Observações
+
+	- Visualmente, as estimativas geradas por KO são muito similares àquelas geradas por KS, mas distintas daquelas produzidas por IQD;
+	- As estimativas geradas por Krigagem são muito mais contínuas na direção N-S do que na direção E-W. Esse resultado reflete o modelo de variograma informado e é coerente com a distribuição espacial dos teores de Pb (%) que, por sua vez, são também mais contínuos na direção N-S;
+	- Como discutido no módulo anterior, essa base de dados foi gerada a partir do modelo digital de elevação da região de Walker Lake, nos EUA. Nessa região, há uma serra orientada na direção N-S, o que valida a nossa hipótese de que os dados são mais contínuos ao longo dessa direção;
+	- Como não é possível informar um modelo de variograma na estimação por IQD, esse estimador não apresentou um desempenho tão bom ao reproduzir a maior continuidade do fenômeno (i.e. mineralização de Pb) na direção N-S;
+	- Esse exemplo enfatiza a importância do modelo de variograma na estimação. É justamente esse parâmetro que nos permite inserir o conhecimento geológico no cálculo das estimativas!
+	"""
+end
+
 # ╔═╡ a2e173e6-fe66-44e6-b371-3ae194d7b0f9
 md"""
 ## 6. Validação das estimativas
 
+Uma etapa tão importante quanto a própria estimação é a **validação das estimativas** resultantes.
+
+Existem diferentes abordagens de validação das estimativas, sendo a principal delas a **inspeção visual**, já realizada na seção anterior. Esse procedimento permite avaliar se as estimativas geradas fazem sentido geológico, ou seja, se elas são coerentes com as direções principais do(s) fenômeno(s) que controla(m) a mineralização (e.g. zonas de cisalhamento, estratos mineralizados). Além disso, durante essa inspeção, devemos verificar se "ilhas de altos teores" indesejadas foram geradas. Essa situação é muito comum em depósitos erráticos (e.g. Au), em função da presença de poucos valores extremamente altos no depósito que podem resultar em estimativas superotimistas.
+
+Uma outra inspeção que deve ser realizada é a **validação global das estimativas**. Para isso, devemos comparar as estatísticas desagrupadas das amostras com as estatísticas associadas às estimativas obtidas. Segundo *Sinclair & Blackwell (2006)*, os métodos de Krigagem levam em consideração a redundância de informação ao atribuir pesos às amostras. Em outras palavras, amostras muito próximas entre si são consideradas redundantes e recebem pesos menores. Portanto, como a Krigagem realiza um desagrupamento intrínseco, é mais conveniente comparar as estatísticas das estimativas resultantes com as estatísticas desagrupadas.
+
+A seguir compararemos quatro sumários estatísticos da variável Pb (%):
+- Teores amostrais desagrupados;
+- Teores estimados por IQD;
+- Teores estimados por KS;
+- Teores estimados por KO.
 """
 
 # ╔═╡ e49569b3-0231-4b8e-98d9-21c68c4b1160
+if run
+	# tamanho da janela de desagrupamento
+	s = 25.0
 
+	# sumário estatístico de Pb desagrupado
+	sum_desag = DataFrame(teor = "Pb (desagrupado)",
+					  	  X̄    = mean(geowl, :Pb, s),
+					  	  S²   = var(geowl, :Pb, s),
+					  	  q10  = quantile(geowl, :Pb, 0.1, s),
+					  	  md   = quantile(geowl, :Pb, 0.5, s),
+					  	  q90  = quantile(geowl, :Pb, 0.9, s))
+end;
+
+# ╔═╡ 260d5fa1-b2d9-4e9d-9154-c07f2959bce5
+md"""
+> ⚠️ Para visualizar os sumários estatísticos, a caixa *Executar estimativas* deve estar marcada.
+"""
+
+# ╔═╡ 6b4e35a1-4f1a-4745-9370-f982762af210
+function sumario_est(est, id::String)
+	q10 = quantile(est[:Pb], 0.1)
+	q90 = quantile(est[:Pb], 0.9)
+	
+	df = DataFrame(teor = id,
+                   X̄    = mean(est[:Pb]),
+                   S²   = var(est[:Pb]),
+                   q10  = q10,
+				   md   = median(est[:Pb]),
+				   q90  = q90)
+				
+	return df
+end;
+
+# ╔═╡ b657f40a-b586-4011-ad48-aa18b0a46dc3
+if run
+	[sum_desag
+ 	 sumario_est(sol_iqd, "Pb (IQD)")
+ 	 sumario_est(sol_ks, "Pb (KS)")
+ 	 sumario_est(sol_ko, "Pb (KO)")]
+end
+
+# ╔═╡ b8589ac8-7305-48c1-8dff-880a7c659059
+if run
+	md"""
+	##### Observações
+
+	- Vamos focar nas estatísticas `X̅` e `S²`, que representam média e variância, respectivamente;
+	- Os três métodos produziram estimativas cujas médias são próximas ao valor da média desagrupada;
+	- Os três métodos produziram estimativas suavizadas (i.e. com menores dispersões), fato evidenciado pelos valores de variância que, por sua vez, são sempre inferiores à variância desagrupada. A KS foi o estimador que gerou estimativas mais suavizadas;
+	- Veja como a inspeção visual é uma abordagem de validação importante. Se avaliássemos apenas os sumários estatísticos, provavelmente, chegaríamos à conclusão que o IQD era o método mais adequado, quando, na verdade, suas estimativas não representam, de forma fiel, a direção preferencial N-S da mineralização;
+	- A seguir, discutiremos outra abordagem de validação para avaliar (qualitativamente) o grau de suavização das estimativas obtidas.
+	"""
+end
+
+# ╔═╡ 466c7891-f632-4c02-990a-b5a99c1c162a
+md"""
+Um outro ponto que merece a nossa atenção é o **grau de suavização** das estimativas produzidas. Para isso, utilizaremos um gráfico que já conhecemos, o Q-Q Plot.
+
+O Q-Q plot entre os teores amostrais e os teores estimados pode ser utilizado para realizar uma comparação entre ambas as distribuições. Podemos analisar visualmente o grau de suavização dos diferentes estimadores a partir desse gráfico bivariado.
+
+A Figura 06 mostra os Q-Q plots entre os teores amostrais de Pb e os teores estimados de Pb pelos três métodos. Quanto mais distantes forem os pontos plotados da função identidade (X=Y), mais suaves são as estimativas em relação a distribuicão amostral.
+
+> ⚠️ Para visualizar os Q-Q plots, a caixa *Executar estimativas* deve estar marcada.
+"""
+
+# ╔═╡ 03d1da66-8202-4415-a44d-8c204e740960
+if run
+	qq_iqd = qqplot(
+				   geowl[:Pb], sol_iqd[:Pb],
+		           legend=:false, line=:red,
+				   marker=(:red, :circle, 3),
+                   xlabel="Pb amostral (%)",
+		           ylabel="Pb estimado (%)",
+                   title="IQD"
+                   )
+	
+    qq_ks = qqplot(
+				   geowl[:Pb], sol_ks[:Pb],
+				   marker=(:blue, :circle, 3),
+                   line=:blue, legend=:false,
+		           xlabel="Pb amostral (%)",
+                   title="KS"
+                   )
+ 
+    qq_ko = qqplot(
+				   geowl[:Pb], sol_ko[:Pb],
+		           line=:green, legend=:false,
+				   marker=(:green, :circle, 3),
+                   xlabel="Pb amostral (%)",
+                   title="KO"
+				  )
+
+    plot(qq_iqd, qq_ks, qq_ko, layout=(1,3), size=(700,500))
+
+end
+
+# ╔═╡ 5b07d44b-af44-425b-9e3e-9a5f643e840d
+if run
+	md"""
+	_**Figura 06:** Q-Q plots entre os teores amostrais e estimados de Pb (%)._
+	"""
+end
+
+# ╔═╡ 817bf734-d8a0-43cd-9553-a7980152afe5
+if run
+	md"""
+	##### Observações
+
+	- Os três métodos geraram estimativas suavizadas. Note que, pela rotação dos pontos em relação à reta X=Y, os teores de Pb estimados apresentam sempre dispersões inferiores em relação à dispersão dos teores de Pb amostrais. Esse fato é ligeiramente mais evidente no caso da KS;
+	- Em geral, há uma superestimação dos teores mais baixos e uma subestimação dos teores mais altos;
+	- Os estimadores da família da Krigagem tendem a gerar estimativas que não honram a real variabilidade do depósito (i.e. mais suavizadas). Uma alternativa seria a utilização de técnicas de **Simulação Geoestatística**. Para ter uma breve introdução a esse tópico, confira este [notebook](https://github.com/juliohm/CBMina2021/blob/main/notebook2.jl) e esta [videoaula](https://www.youtube.com/watch?v=3cLqK3lR56Y&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ) do Prof. Michael Pyrcz.
+	"""
+end
 
 # ╔═╡ b1b823ac-f9cf-4e5b-a622-4274f3785567
 md"""
 ## Referências
+
+*Abzalov, M. [Applied mining geology](https://www.google.com.br/books/edition/Applied_Mining_Geology/Oy3RDAAAQBAJ?hl=pt-BR&gbpv=0). Switzerland: Springer International Publishing, 2016*
 
 *Chilès, J. P.; Delfiner, P. [Geostatistics: modeling spatial uncertainty](https://www.google.com.br/books/edition/Geostatistics/CUC55ZYqe84C?hl=pt-BR&gbpv=0). New Jersey: John Wiley & Sons, 2012.*
 
@@ -588,6 +729,8 @@ Abaixo, são listados alguns recursos complementares a este notebook:
 > [Videoaula Krigagem - LPM/UFRGS](https://www.youtube.com/watch?v=c8GKKsbAmxU)
 
 > [Videoaula Krigagem - University of Texas](https://www.youtube.com/watch?v=CVkmuwF8cJ8&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ)
+
+Além dos dois recursos mencionados acima, sugere-se a leitura do Capítulo 10 do livro de *Sinclair & Blackwell (2006)* que, por sua vez, aborda uma série de discussões práticas sobre a Krigagem no contexto da estimação de recursos minerais.
 """
 
 # ╔═╡ c8ced4cd-a74f-48bc-8cca-fb3971930390
@@ -604,8 +747,10 @@ Os seguintes pacotes foram utilizados neste notebook:
 |[Query](https://github.com/queryverse/Query.jl)           | Realização de consultas |
 |[Statistics](https://docs.julialang.org/en/v1/)           | Cálculo de estatísticas |
 |[PlutoUI](https://github.com/fonsp/PlutoUI.jl)            | Widgets interativos     |
+|[Distributions](https://github.com/JuliaStats/Distributions.jl) | Distribuições de probabilidade |
 |[Plots](https://github.com/JuliaPlots/Plots.jl)           | Visualização dos dados  |
-
+|[StatsPlots](https://github.com/JuliaPlots/StatsPlots.jl) | Visualização dos dados  |
+|[Random](https://docs.julialang.org/en/v1/)               | Números aleatórios      |
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -620,6 +765,7 @@ PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 
 [compat]
 CSV = "~0.9.9"
@@ -629,6 +775,7 @@ GeoStats = "~0.27.0"
 Plots = "~1.23.1"
 PlutoUI = "~0.7.16"
 Query = "~1.0.0"
+StatsPlots = "~0.14.28"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -655,6 +802,18 @@ version = "2.1.0"
 [[ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 
+[[Arpack]]
+deps = ["Arpack_jll", "Libdl", "LinearAlgebra"]
+git-tree-sha1 = "2ff92b71ba1747c5fdd541f8fc87736d82f40ec9"
+uuid = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
+version = "0.4.0"
+
+[[Arpack_jll]]
+deps = ["Libdl", "OpenBLAS_jll", "Pkg"]
+git-tree-sha1 = "e214a9b9bd1b4e1b4f15b22c0994862b66af7ff7"
+uuid = "68821587-b530-5797-8361-c406ea357684"
+version = "3.5.0+3"
+
 [[ArrayInterface]]
 deps = ["Compat", "IfElse", "LinearAlgebra", "Requires", "SparseArrays", "Static"]
 git-tree-sha1 = "a8101545d6b15ff1ebc927e877e28b0ab4bc4f16"
@@ -669,6 +828,12 @@ deps = ["LinearAlgebra", "RecipesBase", "Statistics", "StatsBase", "UnicodePlots
 git-tree-sha1 = "8bdad2055f64dd71a25826d752e0222726f25f20"
 uuid = "77b51b56-6f8f-5c3a-9cb4-d71f9594ea6e"
 version = "0.8.7"
+
+[[AxisAlgorithms]]
+deps = ["LinearAlgebra", "Random", "SparseArrays", "WoodburyMatrices"]
+git-tree-sha1 = "66771c8d21c8ff5e3a93379480a2307ac36863f7"
+uuid = "13072b0f-2c55-5437-9ae7-d433b7a33950"
+version = "1.0.1"
 
 [[AxisArrays]]
 deps = ["Dates", "IntervalSets", "IterTools", "RangeArrays"]
@@ -1004,9 +1169,9 @@ uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 
 [[GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pkg", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll"]
-git-tree-sha1 = "dba1e8614e98949abfa60480b13653813d8f0157"
+git-tree-sha1 = "0c603255764a1fa0b61752d2bec14cfbd18f7fe8"
 uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
-version = "3.3.5+0"
+version = "3.3.5+1"
 
 [[GR]]
 deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Printf", "Random", "Serialization", "Sockets", "Test", "UUIDs"]
@@ -1151,6 +1316,12 @@ version = "2018.0.3+2"
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
+[[Interpolations]]
+deps = ["AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "Requires", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
+git-tree-sha1 = "61aa005707ea2cebf47c8d780da8dc9bc4e0c512"
+uuid = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+version = "0.13.4"
+
 [[IntervalSets]]
 deps = ["Dates", "EllipsisNotation", "Statistics"]
 git-tree-sha1 = "3cc368af3f110a767ac786560045dceddfc16758"
@@ -1206,6 +1377,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "d735490ac75c5cb9f1b00d8b5509c11984dc6943"
 uuid = "aacddb02-875f-59d6-b918-886e6ef4fbf8"
 version = "2.1.0+0"
+
+[[KernelDensity]]
+deps = ["Distributions", "DocStringExtensions", "FFTW", "Interpolations", "StatsBase"]
+git-tree-sha1 = "591e8dc09ad18386189610acafb970032c519707"
+uuid = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"
+version = "0.6.3"
 
 [[KrigingEstimators]]
 deps = ["Combinatorics", "GeoStatsBase", "LinearAlgebra", "Meshes", "Statistics", "Variography"]
@@ -1398,6 +1575,12 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 [[MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
 
+[[MultivariateStats]]
+deps = ["Arpack", "LinearAlgebra", "SparseArrays", "Statistics", "StatsBase"]
+git-tree-sha1 = "8d958ff1854b166003238fe191ec34b9d592860a"
+uuid = "6f286f6a-111f-5878-ab1e-185364afe411"
+version = "0.8.0"
+
 [[NLSolversBase]]
 deps = ["DiffResults", "Distributed", "FiniteDiff", "ForwardDiff"]
 git-tree-sha1 = "144bab5b1443545bc4e791536c9f1eacb4eed06a"
@@ -1418,6 +1601,11 @@ version = "0.4.9"
 [[NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 
+[[Observables]]
+git-tree-sha1 = "fe29afdef3d0c4a8286128d4e45cc50621b1e43d"
+uuid = "510215fc-4207-5dde-b226-833fc4488ee2"
+version = "0.4.0"
+
 [[OffsetArrays]]
 deps = ["Adapt"]
 git-tree-sha1 = "c0e9e582987d36d5a61e650e6e543b9e44d9914b"
@@ -1429,6 +1617,10 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "7937eda4681660b4d6aeeecc2f7e1c81c8ee4e2f"
 uuid = "e7412a2a-1a6e-54c0-be00-318e2571c051"
 version = "1.3.5+0"
+
+[[OpenBLAS_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
+uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
 
 [[OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -1592,6 +1784,12 @@ git-tree-sha1 = "b9039e93773ddcfc828f12aadf7115b4b4d225f5"
 uuid = "b3c3ace0-ae52-54e7-9d0b-2c1406fd6b9d"
 version = "0.3.2"
 
+[[Ratios]]
+deps = ["Requires"]
+git-tree-sha1 = "01d341f502250e81f6fec0afe662aa861392a3aa"
+uuid = "c84ed2f1-dad5-54f0-aa8e-dbefe2724439"
+version = "0.4.2"
+
 [[RecipesBase]]
 git-tree-sha1 = "44a75aa7a527910ee3d1751d1f0e4148698add9e"
 uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
@@ -1753,6 +1951,12 @@ git-tree-sha1 = "95072ef1a22b057b1e80f73c2a89ad238ae4cfff"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 version = "0.9.12"
 
+[[StatsPlots]]
+deps = ["Clustering", "DataStructures", "DataValues", "Distributions", "Interpolations", "KernelDensity", "LinearAlgebra", "MultivariateStats", "Observables", "Plots", "RecipesBase", "RecipesPipeline", "Reexport", "StatsBase", "TableOperations", "Tables", "Widgets"]
+git-tree-sha1 = "eb007bb78d8a46ab98cd14188e3cec139a4476cf"
+uuid = "f3b207a7-027a-5e70-b257-86293d7955fd"
+version = "0.14.28"
+
 [[StringDistances]]
 deps = ["Distances", "StatsAPI"]
 git-tree-sha1 = "00e86048552d34bb486cad935754dd9516bdb46e"
@@ -1881,6 +2085,18 @@ deps = ["DataAPI", "InlineStrings", "Parsers"]
 git-tree-sha1 = "c69f9da3ff2f4f02e811c3323c22e5dfcb584cfa"
 uuid = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
 version = "1.4.1"
+
+[[Widgets]]
+deps = ["Colors", "Dates", "Observables", "OrderedCollections"]
+git-tree-sha1 = "80661f59d28714632132c73779f8becc19a113f2"
+uuid = "cc8bc4a8-27d6-5769-a93b-9d913e69aa62"
+version = "0.6.4"
+
+[[WoodburyMatrices]]
+deps = ["LinearAlgebra", "SparseArrays"]
+git-tree-sha1 = "de67fa59e33ad156a590055375a30b23c40299d3"
+uuid = "efce3f68-66dc-5838-9240-27a6d6f5f9b6"
+version = "0.5.5"
 
 [[XML2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "Zlib_jll"]
@@ -2132,8 +2348,17 @@ version = "0.9.1+5"
 # ╟─60db4fd5-f06c-4821-a7ed-2f63033653ff
 # ╟─2e9b95c5-a687-4881-b69e-6567ade520cb
 # ╟─981efb6c-b1ea-4577-9c40-f3f374a23ba1
+# ╟─4ce1c65d-701c-4615-90aa-9f6469e47211
 # ╟─a2e173e6-fe66-44e6-b371-3ae194d7b0f9
-# ╠═e49569b3-0231-4b8e-98d9-21c68c4b1160
+# ╟─e49569b3-0231-4b8e-98d9-21c68c4b1160
+# ╟─260d5fa1-b2d9-4e9d-9154-c07f2959bce5
+# ╟─6b4e35a1-4f1a-4745-9370-f982762af210
+# ╟─b657f40a-b586-4011-ad48-aa18b0a46dc3
+# ╟─b8589ac8-7305-48c1-8dff-880a7c659059
+# ╟─466c7891-f632-4c02-990a-b5a99c1c162a
+# ╟─03d1da66-8202-4415-a44d-8c204e740960
+# ╟─5b07d44b-af44-425b-9e3e-9a5f643e840d
+# ╟─817bf734-d8a0-43cd-9553-a7980152afe5
 # ╟─b1b823ac-f9cf-4e5b-a622-4274f3785567
 # ╟─9cd2e572-23fc-4f7a-9b91-a5d3d13a9b48
 # ╟─c8ced4cd-a74f-48bc-8cca-fb3971930390

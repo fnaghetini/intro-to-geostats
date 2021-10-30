@@ -856,7 +856,7 @@ Sabe-se que o modelo de variograma é utilizado como entrada na estimativa por k
 
 O exemplo abaixo auxilia na compreensão da influência de cada um desses parâmetros nas estimativas resultantes. A Figura 13 mostra o modelo de variograma anisotrópico utilizado na estimativa por Krigagem. A Figura 14 representa o mapa da localização das amostras.
 
-> ⚠️ Não se assuste com os termos *estimativa* e *Krigagem*. Aprenderemos sobre esses conceitos no próximo módulo!
+> ⚠️ Não se assuste com os termos *estimativa* e *Krigagem*. Aprenderemos sobre esses conceitos no [módulo 5](https://github.com/fnaghetini/intro-to-geostats/blob/main/5-estimacao.jl).
 
 Utilize os sliders abaixo para ajustar os variogramas experimentais azul e vermelho. Em seguida, clique na caixa para visualizar as estimativas. Faça o exercício de analisar qual é o impacto de cada parâmetro do variograma nas estimativas resultantes.
 """

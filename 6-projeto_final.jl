@@ -1100,7 +1100,7 @@ md"""
 md"""
 ## 8. Estimação
 
-Nesta seção, seguiremos o fluxo de trabalho do [GeoStats.jl](https://juliaearth.github.io/GeoStats.jl/stable/index.html#Quick-example), anteriormente apresentado no [módulo 5]().
+Nesta seção, seguiremos o fluxo de trabalho do [GeoStats.jl](https://juliaearth.github.io/GeoStats.jl/stable/index.html#Quick-example), anteriormente apresentado no [módulo 5](https://github.com/fnaghetini/intro-to-geostats/blob/main/5-estimacao.jl).
 """
 
 # ╔═╡ a7a59395-59ec-442a-b4b6-7db55d150d53
@@ -1108,7 +1108,7 @@ md"""
 
 ### Criação do modelo de blocos
 
-Nesta primeira etapa, delimitaremos o domínio de estimativas que, no nosso caso, podemos chamar de modelo de blocos.
+Nesta primeira etapa, delimitaremos o domínio de estimação que, no nosso caso, podemos chamar de modelo de blocos.
 
 Faremos algumas manipulações e, em seguida, utilizaremos a função `CartesianGrid` para criar o modelo de blocos, cujas dimensões dos blocos serão `20 m x 20 m x 10 m` (Figura 16)...
 
@@ -1180,7 +1180,7 @@ Nesta etapa, devemos selecionar o estimador e configurar os parâmetros de vizin
 
 No caso dos estimadores KS e OK, utilizaremos o modelo de variograma `γ` e um volume de busca igual ao elipsoide de anisotropia `ellipsoid₂` definido anteriormente.
 
-A média do depósito, um parâmetro que deve ser informado no caso da KS, será definida como o valor da média declusterizada de Cu `μ`.
+A média do depósito, um parâmetro que deve ser informado no caso da KS, será definida como o valor da média desagrupada de Cu `μ`.
 
 Utilize os sliders abaixo para configurar o número mínimo `minneighbors` e máximo `maxneighbors` de amostras que serão utilizadas para se estimar cada bloco...
 """
@@ -1196,7 +1196,7 @@ Número máximo de amostras: $(@bind nmax Slider(6:1:20, default=8, show_value=t
 
 # ╔═╡ 2a76c2b9-953e-4e4b-a98e-8e992943f60c
 begin
-	# média desclusterizada
+	# média desagrupada
     μ = mean(samples, :CU)
 	
 	# IQD
@@ -1321,7 +1321,6 @@ Nesta etapa, iremos comparar as estimativas geradas pelos três estimadores por 
 md"""
 Na **validação global das estimativas**, nos atentaremos para a comparação entre os seguintes sumários estatísticos:
 
-- Cu (amostral);
 - Cu (desagrupado);
 - Cu (estimado por IQD);
 - Cu (estimado por KS);
@@ -1329,7 +1328,7 @@ Na **validação global das estimativas**, nos atentaremos para a comparação e
 
 > ⚠️ Como a Krigagem leva em consideração a redundância amostral, é mais conveniente compararmos a média Krigada com a a média desagrupada.
 
-Compare os cinco sumários estatísticos gerados abaixo...
+Compare os quatro sumários estatísticos gerados abaixo...
 
 > ⚠️ Para visualizar os sumários estatísticos, a caixa *Executar estimativas* deve estar marcada. 
 """
@@ -1344,11 +1343,11 @@ end;
 if run
 	
 	stats_iqd = DataFrame(teor = "Cu (IQD)",
-                         X̄    = mean(sol_iqd[:CU]),
-                         S²   = var(sol_iqd[:CU]),
-                         q10  = quantile(sol_iqd[:CU], 0.1),
-                         md   = quantile(sol_iqd[:CU], 0.5),
-                         q90  = quantile(sol_iqd[:CU], 0.9))
+                          X̄    = mean(sol_iqd[:CU]),
+                          S²   = var(sol_iqd[:CU]),
+                          q10  = quantile(sol_iqd[:CU], 0.1),
+                          md   = quantile(sol_iqd[:CU], 0.5),
+                          q90  = quantile(sol_iqd[:CU], 0.9))
 	
 	stats_ks = DataFrame(teor = "Cu (KS)",
                          X̄    = mean(sol_ks_filt[!,:CU]),
@@ -1365,8 +1364,7 @@ if run
                          md   = quantile(sol_ko_filt[!,:CU], 0.5),
                          q90  = quantile(sol_ko_filt[!,:CU], 0.9))
 
-    [Cu_clus
-	 Cu_decl
+    [Cu_decl
 	 stats_iqd
 	 stats_ks
 	 stats_ko]
@@ -1382,8 +1380,6 @@ if run
 	- Nota-se uma suavização extrema da distribuição dos teores estimados pelos três métodos em relação à distribuição dos teores amostrais. Isso é evidenciado pela redução  de S²;
 	- IQD gerou estimativas menos suavizadas do que KO;
 	- KO gerou estimativas menos suavizadas do que KS e IQD.
-	
-	> ⚠️ Os estimadores da família da Krigagem tendem a gerar estimativas que não honram a real variabilidade do depósito (i.e. mais suavizadas). Uma alternativa seria a utilização de técnicas de **Simulação Geoestatística**. Para ter uma breve introdução a esse tópico, confira este [notebook](https://github.com/juliohm/CBMina2021/blob/main/notebook2.jl) e esta [videoaula](https://www.youtube.com/watch?v=3cLqK3lR56Y&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ) do Prof. Michael Pyrcz. 
 	"""
 end
 
@@ -1401,7 +1397,8 @@ if run
 
 	qq_iqd = qqplot(
 				   samples[:CU], sol_iqd[:CU],
-		           color=:red, legend=:false,
+		           legend=:false, line=:red,
+				   marker=(:red, :circle, 3),
                    xlabel="Cu amostral (%)",
 		           ylabel="Cu estimado (%)",
                    title="IQD"
@@ -1409,14 +1406,16 @@ if run
 	
     qq_ks = qqplot(
 				   samples[:CU], sol_ks_filt[!,:CU],
-                   color=:red, legend=:false,
+                   marker=(:blue, :circle, 3),
+                   line=:blue, legend=:false,
 		           xlabel="Cu amostral (%)",
                    title="KS"
                    )
  
     qq_ko = qqplot(
 				   samples[:CU], sol_ko_filt[!,:CU],
-		           color=:green,
+		           line=:green, legend=:false,
+				   marker=(:green, :circle, 3),
                    xlabel="Cu amostral (%)",
                    title="KO"
 				  )

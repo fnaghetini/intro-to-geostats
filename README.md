@@ -122,13 +122,17 @@ julia> Pluto.run()
 
 ## Recursos recomendados
 
+> [GeoStats.jl Tutorials](https://github.com/JuliaEarth/GeoStatsTutorials)
+
+> [Minicurso GeoStats.jl - CBMina 2021](https://github.com/juliohm/CBMina2021)
+
 > [Introdução à Geoestatística - LPM/UFRGS](https://www.youtube.com/watch?v=G_phXlFDINw&list=PL0EYHNpWwMVkKgf_SiPWN37OblHCUIOen)
 
 > [Data Analytics and Geostatistics - University of Texas](https://www.youtube.com/watch?v=pxckixOlguA&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ)
 
-> [GeoStats.jl Tutorials](https://github.com/JuliaEarth/GeoStatsTutorials)
+> [Aulas do Prof. Jef Caers](https://www.youtube.com/channel/UCaB-AGfrMdx2U6LGQZn9REw)
 
-> [Minicurso GeoStats.jl - CBMina 2021](https://github.com/juliohm/CBMina2021)
+> [Aulas do Prof. Edward Isaaks](https://www.youtube.com/user/sadeddy/featured)
 
 <hr>
 

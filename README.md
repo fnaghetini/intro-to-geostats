@@ -82,11 +82,11 @@ julia> Pluto.run()
 
 **Nota:** toda vez que quiser abrir qualquer um dos módulos deste material, você deverá executar esses dois comandos.
 
-10. Copie o diretório da pasta **intro-to-geostats-main**, cole-o no campo **Open from file** da janela do Pluto e adicione o sufixo `\nome_do_modulo.jl` ao caminho para abrir o módulo de interesse. Em seguida, clique em **Open**. Aguarde alguns minutos até o conteúdo do módulo carregar. Na figura abaixo, por exemplo, o módulo **Variografia** será aberto:
+10. Copie o caminho da pasta **intro-to-geostats-main**, cole-o no campo **Open from file** da janela do Pluto e adicione o sufixo `\nome_do_modulo.jl` ao caminho para abrir o módulo de interesse. Em seguida, clique em **Open**. Aguarde alguns minutos até o conteúdo do módulo carregar. Na figura abaixo, por exemplo, o módulo **Variografia** será aberto:
 
 ![image](https://user-images.githubusercontent.com/63740520/139559509-8f699d90-632c-45da-8577-8ad45ac92d2f.png)
 
-**Nota:** os seguintes prefixos abrirão os seis módulos deste material: `\1-logica_de_programacao.jl`, `\2-preparacao_de_amostras.jl`, `\3-analise_exploratoria.jl`, `\4-variografia.jl`, `\5-estimacao.jl` e `\6-projeto_final.jl`. Perceba que esses prefixos se referem aos nomes dos módulos.
+**Nota:** os seguintes sufixos abrirão os seis módulos deste material: `\1-logica_de_programacao.jl`, `\2-preparacao_de_amostras.jl`, `\3-analise_exploratoria.jl`, `\4-variografia.jl`, `\5-estimacao.jl` e `\6-projeto_final.jl`. Perceba que esses prefixos se referem aos nomes dos módulos.
 
 **Nota:** tenha paciência, esta etapa pode demorar alguns minutos. Na primeira vez que um determinado módulo é executado, todos os pacotes utilizados nele serão baixados.
 

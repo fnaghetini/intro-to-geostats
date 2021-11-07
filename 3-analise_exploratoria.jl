@@ -63,7 +63,7 @@ md"""
 >- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."` (e.g. esta célula). Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
 >- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
 >- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
->- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
+>- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://github.com/fnaghetini/intro-to-geostats/blob/main/LICENSE) para saber mais detalhes.
 >- Para mais informações acesse o [README](https://github.com/fnaghetini/intro-to-geostats/blob/main/README.md) do projeto 🚀
 """
 
@@ -130,7 +130,7 @@ md"""
 
 ## 2. Importação dos dados
 
-Neste módulo, iremos trabalhar com o banco de dados [Jura](https://rdrr.io/cran/gstat/man/jura.html) do excelente livro de *Goovaerts (1997)*. Esse banco de dados é constituído por amostras de solo que possuem os seguintes atributos:
+Neste módulo, iremos trabalhar com o banco de dados [Jura](https://github.com/fnaghetini/intro-to-geostats/blob/main/data/jura.csv) do excelente livro de *Goovaerts (1997)*. Esse banco de dados é constituído por amostras de solo que possuem os seguintes atributos:
 
 - `Xloc` e `Yloc`: coordenadas locais X e Y.
 - `Landuse` e `Rock`: tipo de uso do solo e tipo de rocha, respectivamente.
@@ -774,7 +774,7 @@ Nas seções anteriores aprendemos sobre técnicas de visualização do espaço 
 md"""
 ### Georreferenciamento
 
-Em Julia, o **georreferenciamento dos dados** consiste em informar quais colunas devem ser tratadas como coordenadas geográficas e quais devem ser entendidas como atributos/variáveis. Para georrefenciar os nossos dados, iremos utilizar a função `georef` do pacote [GeoStats](https://juliaearth.github.io/GeoStats.jl/stable/).
+Em Julia, o **georreferenciamento dos dados** consiste em informar quais colunas devem ser tratadas como coordenadas geográficas e quais devem ser entendidas como atributos/variáveis. Para georrefenciar os nossos dados, iremos utilizar a função `georef` do pacote [GeoStats.jl](https://juliaearth.github.io/GeoStats.jl/stable/).
 """
 
 # ╔═╡ 447ead1b-53a3-42a3-ad9d-6bc7c099c40f
@@ -884,7 +884,7 @@ end;
 md"""
 Normalmente, o tamanho do bloco de desagrupamento é escolhido em função das dimensões da malha. Nesse sentido, o valor default do slider foi definido como o espaçamento médio da malha (i.e. $\approx 0,25$).
 
-> ⚠️ Voltaremos a mencionar as técnicas de desagrupamento no [módulo 5](). As estatísticas desagrupadas são utilizadas na validação das estimativas.
+> ⚠️ Voltaremos a mencionar as técnicas de desagrupamento no [módulo 5](https://github.com/fnaghetini/intro-to-geostats/blob/main/5-estimacao.jl). As estatísticas desagrupadas são utilizadas na validação das estimativas.
 """
 
 # ╔═╡ 47cf20cd-62f6-43c2-b531-31eab994aa15

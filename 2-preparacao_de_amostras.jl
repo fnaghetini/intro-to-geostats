@@ -72,7 +72,7 @@ md"""
 >- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."` (e.g. esta célula). Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
 >- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
 >- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
->- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
+>- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://github.com/fnaghetini/intro-to-geostats/blob/main/LICENSE) para saber mais detalhes.
 >- Para mais informações acesse o [README](https://github.com/fnaghetini/intro-to-geostats/blob/main/README.md) do projeto 🚀
 """
 
@@ -235,9 +235,9 @@ Você pode estar se perguntando o porque devemos uniformizar o suporte amostral.
 
 | Amostra | Teor (g/t) | Tamanho (m) |
 |:-------:|:----------:|:-----------:|
-|  AM01   |    2,5     |      2      |
-|  AM02   |    0,5     |     10      |
-|  AM03   |    0,2     |     15      |
+|  AM01   |    2,5     |     2,0     |
+|  AM02   |    0,5     |     10,0    |
+|  AM03   |    0,2     |     15,0    |
 
 O teor médio entre essas amostras é de aproximadamente 1 g/t. Repare que, independentemente do tamanho, cada amostra contribui igualmente para o cálculo da média. Entretanto, se fizermos uma análise crítica, perceberemos que uma amostra de 15 metros de comprimento não pode ter o mesmo peso no cálculo do que uma amostra de 2 metros. Se regularizarmos o suporte amostral, no entanto, esse problema será mitigado.
 """

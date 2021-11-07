@@ -64,7 +64,7 @@ md"""
 >- Algumas células deste notebook encontram-se encapsuladas pela expressão `md"..."` (e.g. esta célula). Essas são células de texto chamadas de *markdown*. Caso deseje aprender um pouco mais sobre a linguagem *markdown*, clique [aqui](https://docs.pipz.com/central-de-ajuda/learning-center/guia-basico-de-markdown#open).
 >- No Pluto, todos os pacotes devem ser importados/baixados na primeira célula do notebook. Clique no ícone 👁️ para exibir essa célula ou consulte a seção *Pacotes utilizados* deste notebook para saber mais informações sobre os pacotes.
 >- Utilize a macro ` @which` para verificar a qual pacote uma determinada função pertence.
->- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1) para saber mais detalhes.
+>- Você pode utilizar este notebook da forma que quiser, basta referenciar [este link](https://github.com/fnaghetini/intro-to-geostats). Consulte a [licença]  (https://github.com/fnaghetini/intro-to-geostats/blob/main/LICENSE) para saber mais detalhes.
 >- Para mais informações acesse o [README](https://github.com/fnaghetini/intro-to-geostats/blob/main/README.md) do projeto 🚀
 """
 
@@ -105,7 +105,7 @@ A distribuição de teores nos depósitos minerais é frequentemente anisotrópi
 md"""
 ### Banco de dados
 
-Neste módulo, iremos trabalhar com o banco de dados [Walker Lake]() do excelente livro de *Isaaks & Srivastava (1989)*. Segundo os autores, esse banco de dados foi gerado a partir de um modelo digital de elevação da região de Walker Lake, situada no estado de Nevada (EUA).
+Neste módulo, iremos trabalhar com o banco de dados [Walker Lake](https://github.com/fnaghetini/intro-to-geostats/blob/main/data/Walker_Lake.csv) do excelente livro de *Isaaks & Srivastava (1989)*. Segundo os autores, esse banco de dados foi gerado a partir de um modelo digital de elevação da região de Walker Lake, situada no estado de Nevada (EUA).
 
 Originalmente, *Isaaks & Srivastava (1989)* adaptaram essa informação de elevação para gerar duas variáveis anônimas `U` e `V`. Entretanto, ao realizar manipulações nessa base de dados, o autor deste material irá se referir a essas variáveis como teores fictícios de `Ag` (em ppm) e `Pb` (em %), respectivamente.
 
@@ -1026,7 +1026,7 @@ md"""
 
 *Sinclair, A. J.; Vallée, M. [Reviewing continuity: an essential element of quality control for deposit and reserve estimation](https://www.google.com.br/books/edition/Applied_Mineral_Inventory_Estimation/oo7rCrFQJksC?hl=pt-BR&gbpv=0). Exploration and Mining Geology, 3(2), 1994. 95-108.*
 
-*Yamamoto, J. K.; Landim, P. M. B. [Geoestatística: conceitos e aplicações](https://www.google.com.br/books/edition/Geoestat%C3%ADstica/QUsrBwAAQBAJ?hl=pt-BR&gbpv=0). São Paulo: Oficina de textos, 2015.*
+*Yamamoto, J. K.; Landim, P. M. B. [Geoestatística: conceitos e aplicações](https://www.google.com.br/books/edition/Geoestat%C3%ADstica/QUsrBwAAQBAJ?hl=pt-BR&gbpv=0). São Paulo: Oficina de Textos, 2015.*
 """
 
 # ╔═╡ 838f3147-299c-4e12-a4b0-a9f29d19f2d7

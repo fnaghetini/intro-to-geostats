@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.17.0
+# v0.17.1
 
 using Markdown
 using InteractiveUtils
@@ -7,8 +7,9 @@ using InteractiveUtils
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
     quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
     end
 end
@@ -368,7 +369,7 @@ O **coeficiente de variação** é uma medida de dispersão que, diferentemente 
 O coeficiente de variação consiste na razão entre o desvio padrão e a média da variável de interesse:
 
 ```math
-C_v = \frac{\overline{X}}{S}
+C_v = \frac{S}{\overline{X}}
 ```
 
 > ⚠️ O coeficiente de variação é de suma importância, uma vez que fornece avisos sobre eventuais dificuldades na estimativa. Caso essa estatística seja superior a 1, possivelmente as estimativas finais terão uma grande incerteza associada em função da alta variabilidade natural da variável (*Isaaks & Srivastava, 1989*).
@@ -515,12 +516,6 @@ Teor: $(@bind teor2 Select(TEORES))
 # ╔═╡ 6c227179-d25f-4b13-86b1-f69e3f74bb8f
 begin
 	media = mean(dados[!,teor2])
-	q1 = quantile(dados[!,teor2], 0.25)
-	q2 = median(dados[!,teor2])
-	q3 = quantile(dados[!,teor2], 0.75)
-	iqr = q3 - q1
-	min = minimum(dados[!,teor2])
-	LS = q3 + (1.5 * iqr)
 	
 	boxplot(dados[!,teor2], label=false, alpha=0.75,
 			color=:honeydew2, ylabel="$teor2 (ppm)",
@@ -853,7 +848,7 @@ Nesse sentido, como frequentemente há um agrupamento amostral preferencial nas 
 
 # ╔═╡ 612bcc28-c174-43be-834c-8b1f74632631
 md"""
-Uma forma de mitigar esse viés amostral intrínseco à indústria da mineração é a utilização de técnicas de **desagrupamento** (ou declusterização). Essas técnicas atribuem um peso a cada amostra baseado na sua proximidade com as amostras circunvizinhas. Nesse sentido, dados situados em regiões de maior densidade amostral (i.e. muitas amostras próximas) recebem pesos baixos, enquanto dados localizados em porções de baixa densidade amostral ganham pesos maiores. A premissa é que dados mais próximos são mais redundantes e podem enviesar enviesar as estatísticas (*Deutsch, 2015*).
+Uma forma de mitigar esse viés amostral intrínseco à indústria da mineração é a utilização de técnicas de **desagrupamento** (ou declusterização). Essas técnicas atribuem um peso a cada amostra baseado na sua proximidade com as amostras circunvizinhas. Nesse sentido, dados situados em regiões de maior densidade amostral (i.e. muitas amostras próximas) recebem pesos baixos, enquanto dados localizados em porções de baixa densidade amostral ganham pesos maiores. A premissa é que dados mais próximos são mais redundantes e podem enviesar as estatísticas (*Deutsch, 2015*).
 
 Podemos utilizar os pesos de desagrupamento para recalcular as estatísticas dos teores. Esses pesos são calculados em função de um tamanho de um bloco especificado. 
 

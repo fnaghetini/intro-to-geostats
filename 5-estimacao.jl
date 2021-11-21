@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.17.0
+# v0.17.1
 
 using Markdown
 using InteractiveUtils
@@ -7,8 +7,9 @@ using InteractiveUtils
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
     quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
     end
 end
@@ -440,7 +441,7 @@ end;
 
 # ╔═╡ 045cdf16-d264-4b5d-990b-c1bd2acb5613
 md"""
-Considerere uma estimação em que os números mínimo e máximo de amostras são iguais a 5 e 2, respectivamente. A elipse de busca apresenta uma rotação de 45°, ou seja, seu maior eixo está alinhado ao azimute 045°. A Figura 04 mostra três situações distintas que podem ocorrer durante a estimação do centroide de um bloco. As amostras em vermelho são externas à área de busca e não podem ser utilizadas na estimação, enquanto as amostras verdes, por se situarem dentro da elipse de busca, podem.
+Considerere uma estimação em que os números mínimo e máximo de amostras são iguais a 2 e 5, respectivamente. A elipse de busca apresenta uma rotação de 45°, ou seja, seu maior eixo está alinhado ao azimute 045°. A Figura 04 mostra três situações distintas que podem ocorrer durante a estimação do centroide de um bloco. As amostras em vermelho são externas à área de busca e não podem ser utilizadas na estimação, enquanto as amostras verdes, por se situarem dentro da elipse de busca, podem.
 
 - No **cenário A**, como existem 4 amostras no interior da elipse e o máximo permitido é de 5 amostras, todas elas serão utilizadas na estimação do centroide;
 
@@ -457,7 +458,7 @@ _**Figura 04:** Estimação do centroide de um bloco. (A) As quatro amostras int
 md"""
 No nosso exemplo, iremos definir três estimadores distintos: IQD, KS e KO. Os números máximo e mínimo de amostras serão 4 e 8, respectivamente.
 
-No caso dos estimadores SK e KO, utilizaremos o modelo de variograma `γ` e uma elipse de busca `elp` igual à elipse de anisotropia. A média , que deve ser informada no caso da KS, será definida como o valor da média desagrupada de Pb `μₚ`.
+No caso dos estimadores KS e KO, utilizaremos o modelo de variograma `γ` e uma elipse de busca `elp` igual à elipse de anisotropia. A média , que deve ser informada no caso da KS, será definida como o valor da média desagrupada de Pb `μₚ`.
 
 > ⚠️ O modelo de variograma `γ` utilizado apresenta o eixo primário alinhado N-S, com um alcance de 100 m e um eixo segundário alinhado E-W, com um alcance de 35 m. O efeito pepita considerado foi de 3.0, ou seja, cerca de 30% do valor do patamar.
 """

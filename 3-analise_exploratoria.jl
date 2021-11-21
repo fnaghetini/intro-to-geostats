@@ -43,7 +43,7 @@ md"""
 # ╔═╡ b53bfda4-60de-43c8-9852-faa1051050e2
 md""" # 🔎 Análise Exploratória
 
-A **Análise Exploratória dos Dados (AED)** consiste em uma abordagem para organizar e sumarizar um determinado conjunto de dados, a partir de estatísticas descritivas e técnicas de visualização de dados. Segundo *Tukey (1977)*, pesquisador que propôs o termo, a AED pode ser comparada ao trabalho de investigação realizado por um detetive. Pode-se dizer ainda que, durante a AED, *os dados são transformados em informações*.
+A **Análise Exploratória dos Dados (AED)** consiste em uma abordagem para organizar e sumarizar um determinado conjunto de dados, a partir de estatísticas descritivas e técnicas de visualização de dados. Segundo *Tukey (1977)*, estatístico que propôs o termo, a AED pode ser comparada ao trabalho de investigação realizado por um detetive. Pode-se dizer ainda que, durante a AED, *os dados são transformados em informações*.
 
 De forma mais descontraída, pode-se dizer que:
 
@@ -72,7 +72,7 @@ md"""
 md"""
 ## 1. Conceitos básicos
 
-Nesta primeira seção, iremos aprender/revisar alguns conceitos básicos sobre Estatística Clássica.
+Nesta primeira seção, iremos revisar alguns conceitos básicos sobre Estatística Clássica.
 """
 
 # ╔═╡ a8c53b89-634b-4526-be62-f51f22c3c607
@@ -102,9 +102,9 @@ md"""
 
 Os **parâmetros** são as quantidades da população sobre as quais temos interesse. Normalmente são representadas por letras gregas, como $\mu$ (média populacional), $\sigma^2$ (variância populacional) e $\sigma$ (desvio padrão populacional) (*Magalhães & De Lima, 2015*).
 
-Por outro lado, os **estimadores**, às vezes chamados de **estatísticas**, correspondem à combinação dos elementos da amostra construída com a finalidade de representar ou estimar um parâmetro de interesse na população. São representados por letras do alfabeto latino, como X̅ (média amostral), $S^2$ (variância amostral) e $S$ (desvio padrão amostral) (*Magalhães & De Lima, 2015*).
+Por outro lado, os **estimadores**, às vezes chamados de **estatísticas**, correspondem à combinação dos elementos da amostra, construída com a finalidade de representar ou estimar um parâmetro de interesse na população. São representados por letras do alfabeto latino, como X̅ (média amostral), $S^2$ (variância amostral) e $S$ (desvio padrão amostral) (*Magalhães & De Lima, 2015*).
 
-Como só temos acesso à amostra (e.g. furos de sondagem), iremos trabalhar com estimadores (i.e. estatísticas).
+Como só temos acesso à amostra (e.g. furos de sondagem), iremos trabalhar com estimadores/estatísticas.
 
 """
 
@@ -112,7 +112,7 @@ Como só temos acesso à amostra (e.g. furos de sondagem), iremos trabalhar com 
 md"""
 ### Tipos de variáveis
 
-As **variáveis qualitativas** apresentam como possíveis realizações uma qualidade ou atributo de um indivíduo pesquisado. Essas variáveis podem ainda ser divididas em **nominais**, quando não existe uma ordenação nas possíveis realizações, e **ordinais**, quando existe uma ordem nos seus resultados (*Bussab & Morettin, 2017*). Litologia e grau de alteração são exemplos de variáveis qualitativas nominais e ordinais, respectivamente.
+As **variáveis qualitativas** apresentam, como possíveis realizações, uma qualidade ou atributo de um indivíduo pesquisado. Essas variáveis podem ainda ser divididas em **nominais**, quando não existe uma ordenação nas possíveis realizações, e **ordinais**, quando existe uma ordem nos seus resultados (*Bussab & Morettin, 2017*). Litologia e grau de alteração são exemplos de variáveis qualitativas nominais e ordinais, respectivamente.
 
 As **variáveis quantitativas** também estão sujeitas a uma classificação dicotômica. As variáveis **discretas** são aquelas cujos possíveis valores formam um conjunto finito ou enumerável de números (1, 2, ...). Já as variáveis **contínuas** apresentam possíveis valores pertencentes a um intervalo de números reais resultantes de uma mensuração (*Bussab & Morettin, 2017*). Zona mineralizada e teor são exemplos de variáveis quantitativas discretas e contínuas, respectivamente.
 
@@ -131,7 +131,7 @@ md"""
 
 ## 2. Importação dos dados
 
-Neste módulo, iremos trabalhar com o banco de dados [Jura](https://github.com/fnaghetini/intro-to-geostats/blob/main/data/jura.csv) do excelente livro de *Goovaerts (1997)*. Esse banco de dados é constituído por amostras de solo que possuem os seguintes atributos:
+Neste módulo, iremos trabalhar com o banco de dados [Jura](https://github.com/fnaghetini/intro-to-geostats/blob/main/data/jura.csv), do excelente livro de *Goovaerts (1997)*. Esse banco de dados é constituído por amostras de solo que possuem os seguintes atributos:
 
 - `Xloc` e `Yloc`: coordenadas locais X e Y.
 - `Landuse` e `Rock`: tipo de uso do solo e tipo de rocha, respectivamente.
@@ -139,7 +139,7 @@ Neste módulo, iremos trabalhar com o banco de dados [Jura](https://github.com/f
 
 > ⚠️ Algumas modificações no banco de dados foram realizadas pelo autor para exemplificar algumas rotinas típicas da AED.
 
-Os dados estão no formato CSV no arquivo `data/Jura.csv`. Para carregá-los no notebook, utilizaremos os pacotes [CSV.jl](https://github.com/JuliaData/CSV.jl) e [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl).
+Para carregar os dados no notebook, utilizaremos os pacotes [CSV.jl](https://github.com/JuliaData/CSV.jl) e [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl).
 
 Especificamos o caminho do arquivo e redirecionamos o resultado para uma tabela `DataFrame` utilizando o operador `|>`, conhecido como *pipe*.
 
@@ -163,17 +163,11 @@ md"""
 ##### Observações
 
 - Cada atributo (coluna) tem um tipo de elemento `eltype`;
-
-- Todos os elementos (exceto `Ni` e `Pb`) têm valores faltantes. Elementos faltantes, neste caso, têm o tipo `Union{Missing,Float64}` que representa a união do tipo `Float64` com o tipo `Missing`;
-
+- Todos os elementos, exceto `Ni` e `Pb`, têm valores faltantes. Elementos faltantes, neste caso, têm o tipo `Union{Missing,Float64}` que representa a união do tipo `Float64` com o tipo `Missing`;
 - Os valores dos elementos amostrados encontram-se em escalas distintas;
-
 - As coordenadas `Xloc` e `Yloc` são variáveis quantitativas contínuas;
-
 - Os elementos químicos amostrados são variáveis quantitativas contínuas;
-
 - As colunas `Landuse` e `Rock` podem ser classificadas como variáveis qualitativas nominais.
-
 """
 
 # ╔═╡ 71004e57-95c2-403d-992e-4cf0875a6d2e
@@ -181,7 +175,7 @@ md"""
 
 ## 3. Limpeza dos dados
 
-O próximo passo é a limpeza dos dados, uma das etapas que mais demandam tempo do fluxo de trabalho. Usaremos o pacote [Query.jl](https://github.com/queryverse/Query.jl) para manipular os dados de forma sucinta e performática. Esse pacote introduz um conjunto de operações que podem ser facilmente concatenadas para produzir novas tabelas, como:
+O próximo passo é a **limpeza dos dados**, uma das etapas que mais demandam tempo do fluxo de trabalho. Usaremos o [Query.jl](https://github.com/queryverse/Query.jl) para manipular os dados de forma sucinta e performática. Esse pacote introduz um conjunto de operações que podem ser facilmente concatenadas para produzir novas tabelas, como:
 
 ```julia
 dados |> @rename(...) |> @filter(...)
@@ -221,14 +215,14 @@ md"""
 
 ## 4. Descrição univariada
 
-Diferentemente de outras áreas do conhecimento, como Medicina e Física, em problemas geoespaciais, devemos nos atentar dois **tipos de espaço** distintos:
+Diferentemente de outras áreas do conhecimento, como Medicina, em problemas geoespaciais, devemos nos atentar dois **tipos de espaço** distintos:
 
 1. Espaço de atributos
 2. Espaço geográfico
 
-O **espaço geográfico** é constituído pelas coordenadas espaciais da região de estudo. No nosso caso, esse espaço é representado pelas variáveis `X` e `Y`.
+O **espaço de atributos** é formado pelos valores das variáveis de interesse do estudo. No nosso exemplo, esse espaço é constituído pelos elementos químicos amostrados e pelas variáveis `Landuse` e `Rock`.
 
-Por outro lado, o **espaço de atributos** é formado pelos valores das variáveis de interesse do estudo. No nosso exemplo, esse espaço é constituído pelos elementos químicos amostrados e pelas variáveis `Landuse` e `Rock`.
+Por outro lado, o **espaço geográfico** é constituído pelas coordenadas espaciais da região de estudo. No nosso caso, esse espaço é representado pelas variáveis `X` e `Y`.
 
 Nesta seção, as principais técnicas de sumarização e visualização univariadas (i.e. uma variável por vez) e, portanto, estaremos interessados no espaço de atributos.
 """
@@ -263,7 +257,7 @@ A **média aritmética**, ou simplesmente média, consiste na soma das observaç
 \overline{X} = \frac{1}{n} \sum_{i=1}^{n} x_i
 ```
 
-> ⚠️ Além da média aritmética, existem outros tipos de média, como a geométrica e a harmônica.
+> ⚠️ Além da média aritmética, existem outros tipos de média, como geométrica e harmônica.
 
 Podemos utilizar a função `mean` para computar a média da variável `Cr`...
 """
@@ -482,8 +476,8 @@ begin
 			  color=:honeydew2, alpha=0.75,
 			  xlabel="$teor1 (ppm)", ylabel="Freq. Absoluta")
 	
-	vline!([X̅], color=:red, label="Média")
-	vline!([md], color=:green, label="Mediana")
+	vline!([X̅], color=:red, label="X̅")
+	vline!([md], color=:green, label="md(X)")
 end
 
 # ╔═╡ f18ea3c8-fbc0-4c8c-a8f6-e2d083809a38
@@ -494,14 +488,14 @@ md"""
 ##### Observações
 - As variáveis que apresentam distribuições assimétricas positivas possuem caudas alongadas à direita. Essa forma de distribuição é típica de elementos menores;
 - A variável `Co`, que possui distribuição ligeiramente assimétrica negativa, exibe uma distribuição com cauda alongada à esquerda. Esse tipo de assimetria é mais comum em elementos maiores (e.g. Fe₂O₃+FeO, Al₂O₃);
-- A variável `Cr` mostra uma distribuição aproximadamente simétrica, o que não é algo típico de metais.
+- A variável `Cr` mostra uma distribuição aproximadamente simétrica, o que não é algo típico de elementos geoquímicos.
 """
 
 # ╔═╡ 0acf95ad-4bd9-4022-b9f9-ce9a886ed1ed
 md"""
 ### Boxplot
 
-O **boxplot**, assim como o histograma, é um gráfico univariado que visa representar a distribuição de uma variável contínua. Essa visualização dá uma ideia da posição, dispersão, simetria e valores extremos de uma variável de interesse (*Bussab & Morettin, 2017*). A Figura 03 ilustra os elementos que constituem o boxplot.
+O **boxplot**, assim como o histograma, é um gráfico univariado que visa representar a distribuição de uma variável contínua. Essa visualização dá uma ideia da posição, dispersão, simetria e valores extremos de uma variável de interesse (*Bussab & Morettin, 2017*). A Figura 04 ilustra os elementos que constituem o boxplot.
 
 ![Figura 04](https://i.postimg.cc/HnRG8289/Figura-03.png)
 
@@ -522,7 +516,7 @@ begin
 			xticks=false, xaxis=false)
 	
 	plot!([media], seriestype = :scatter, color=:red,
-		  marker=(:star5,5), label="Média")
+		  marker=(:star5,5), label="X̅")
 end
 
 # ╔═╡ ef54af89-22e2-4149-9fb4-9fc0b48b76c8
@@ -588,7 +582,7 @@ md"""
 
 - A maior parte da área é composta por regiões de `Campo`;
 
-- Há um grande desbalanceamento na distribuição das litologias. As rochas pertencentes ao `Kimmeridgiano` e ao `Sequentiano` são predominantes na área, enquanto litotipos associados ao Portlandiano são escassos.
+- Há um grande desbalanceamento na distribuição das litologias. As rochas pertencentes ao `Kimmeridgiano` e ao `Sequentiano` são predominantes na área, enquanto litotipos associados ao `Portlandiano` são escassos.
 """
 
 # ╔═╡ c42c2eb0-2047-4490-9ebb-9b0203466836
@@ -663,7 +657,7 @@ md"""
 md"""
 ### Diagrama de dispersão
 
-O **diagrama de dispersão**, também chamado de *scatterplot*, é um o dispositivo útil para se verificar a associação entre duas variáveis (*Bussab & Morettin, 2017*). No eixo horizontal é representado pelos valores de uma variável, enquanto o eixo vertical é rotulado com os valores da outra variável.
+O **diagrama de dispersão**, também chamado de *scatterplot*, é um o dispositivo útil para se verificar a associação entre duas variáveis (*Bussab & Morettin, 2017*). O eixo horizontal é representado pelos valores de uma variável, enquanto o eixo vertical é rotulado com os valores da outra variável.
 
 > ⚠️ É sempre interessante visualizar o diagrama de dispersão (gráfico) em conjunto com o coeficiente de Pearson (estatística) para analisar a relação entre um par de variáveis.
 
@@ -710,7 +704,7 @@ O **Q-Q plot** é um dispositivo visual muito útil para comparação de duas di
 - Distribuições com médias distintas e dispersões similares: os dados encontram-se alinhados paralelamente à reta X=Y, mas há uma translação;
 - Distribuições com médias similares e dispersões distintas: os dados encontram-se rotacionados em relação à reta X=Y, mas sem translação.
 
-> ⚠️ Esse gráfico é muito importante durante a **definição dos domínios de estimativa**. Durante essa etapa, geralmente é necessário agrupar os dados em subconjuntos distintos por algum critério de natureza geológica (e.g. litologia, tipologia do minério, zonas de highgrade e lowgrade). Nesse sentido, o Q-Q Plot pode ser utilizado para validar visualmente a definição desses domínios.
+> ⚠️ Esse gráfico é muito importante durante a **definição dos domínios de estimativa**. Durante essa etapa, geralmente é necessário agrupar os dados em subconjuntos distintos por algum critério de natureza geológica (e.g. litologia, tipologia do minério, controle estrutural). Nesse sentido, o Q-Q Plot pode ser utilizado para validar visualmente a definição desses domínios.
 
 Abaixo, utilizamos o Q-Q plot (Figura 09) para verificar se há diferenças significativas entre as distribuições de um mesmo elemento agrupado por litologias...
 """
@@ -769,7 +763,7 @@ Nas seções anteriores aprendemos sobre técnicas de visualização do espaço 
 md"""
 ### Georreferenciamento
 
-Em Julia, o **georreferenciamento dos dados** consiste em informar quais colunas devem ser tratadas como coordenadas geográficas e quais devem ser entendidas como atributos/variáveis. Para georrefenciar os nossos dados, iremos utilizar a função `georef` do pacote [GeoStats.jl](https://juliaearth.github.io/GeoStats.jl/stable/).
+Na linguagem Julia, o **georreferenciamento dos dados** consiste em informar quais colunas devem ser tratadas como coordenadas geográficas e quais devem ser entendidas como atributos/variáveis. Para georrefenciar os nossos dados, iremos utilizar a função `georef` do pacote [GeoStats.jl](https://juliaearth.github.io/GeoStats.jl/stable/).
 """
 
 # ╔═╡ 447ead1b-53a3-42a3-ad9d-6bc7c099c40f
@@ -879,7 +873,7 @@ end;
 md"""
 Normalmente, o tamanho do bloco de desagrupamento é escolhido em função das dimensões da malha. Nesse sentido, o valor default do slider foi definido como o espaçamento médio da malha (i.e. $\approx 0,25$).
 
-> ⚠️ Voltaremos a mencionar as técnicas de desagrupamento no [módulo 5](https://github.com/fnaghetini/intro-to-geostats/blob/main/5-estimacao.jl). As estatísticas desagrupadas são utilizadas na validação das estimativas.
+> ⚠️ Voltaremos a mencionar as técnicas de desagrupamento no [módulo 5](https://github.com/fnaghetini/intro-to-geostats/blob/main/5-estimacao.jl). As estatísticas desagrupadas são utilizadas na validação das estimativas por Krigagem.
 """
 
 # ╔═╡ 47cf20cd-62f6-43c2-b531-31eab994aa15
@@ -1620,9 +1614,9 @@ uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 
 [[Libffi_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "761a393aeccd6aa92ec3515e428c26bf99575b3b"
+git-tree-sha1 = "0b4a5d71f3e5200a7dff793393e09dfc2d874290"
 uuid = "e9f186c6-92d2-5b65-8a66-fee21dc1b490"
-version = "3.2.2+0"
+version = "3.2.2+1"
 
 [[Libgcrypt_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libgpg_error_jll", "Pkg"]

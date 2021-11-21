@@ -88,7 +88,7 @@ Nesta primeira seção, iremos aprender alguns conceitos teóricos essenciais pa
 md"""
 ### Furos de sondagem
 
-O registro do **furos de sondagem** é uma das atividades mais comuns e importantes entre geólogos, uma vez que frequentemente os furos são a única informação geológica direta sobre as rochas localizadas em subsuperfície. As informações de sondagem, após registradas em um Sistema de Gerenciamento de Banco de Dados, são utilizadas pelos geólogos para gerar interpretações 3D e estimativas de teores de um depósito (*Abzalov, 2016*).
+O registro dos **furos de sondagem** é uma das atividades mais comuns e importantes entre geólogos, uma vez que, frequentemente, os furos são a única informação geológica direta sobre as rochas localizadas em subsuperfície. As informações de sondagem, após registradas em um Sistema de Gerenciamento de Banco de Dados, são utilizadas pelos geólogos para gerar interpretações 3D e estimativas de teores de um depósito (*Abzalov, 2016*).
 
 Normalmente, os dados de sondagem são constituídos por um conjunto de tabelas distintas relacionadas entre si por um campo-chave, o identificador dos furos (comumente chamado de `BHID` ou `HOLEID`) (Figura 01).
 """
@@ -101,17 +101,17 @@ _**Figura 01:** Tabelas Collar, Survey, Assay e Litho relacionadas entre si pelo
 
 # ╔═╡ ae22a6f0-d857-4229-a003-728d43a50d46
 md"""
-A tabela **Collar** traz, essencialmente, informações das coordenadas de boca dos furos. Ela pode conter ainda informações de profundidade final dos furos, método de aquisição de coordenadas (e.g. GPS, Estação Total), sistema de referência e data de finalização.
+A tabela **Collar** traz, essencialmente, informações das coordenadas de boca dos furos. Ela pode conter, ainda, informações de profundidade final dos furos, método de aquisição de coordenadas, sistema de referência e data de finalização.
 
-A tabela **Survey** apresenta informações de perfilagem, ou seja, de orientação dos furos (i.e. sentido e ângulo de mergulho).
+A tabela **Survey** apresenta informações de perfilagem, ou seja, de orientação dos furos (sentido e ângulo de mergulho).
 
-As tabelas do tipo **Interval** são essencialmente constituídas por colunas de início (`FROM`) e final (`TO`) dos intervalos amostrais, bem como por uma característica geológica. A tabela **Assay**, por exemplo, além dos campos que definem o intervalo, contém os campos de teores amostrais analisados em laboratório. Já a tabela **Litho**, por outro lado, traz informações das litologias descritas pelos geólogos responsáveis.
+As tabelas do tipo **Interval** são essencialmente constituídas por colunas de início (`FROM`) e final (`TO`) dos intervalos amostrais, bem como por uma característica geológica. A tabela **Assay**, por exemplo, além dos campos que definem o intervalo, contém os campos de teores amostrais analisados em laboratório. Já a tabela **Litho**, por outro lado, traz informações das litologias descritas pelos geólogos.
 """
 
 # ╔═╡ 51199548-4ec2-4034-b955-8d1f97ddd5ee
 md""" ### Suporte amostral
 
-Uma característica muito importante dos dados utilizados na mineração é o **suporte amostral**. De forma simples, o suporte está associado ao **tamanho, forma e orientação** das amostras. Os furos de sondagem, por exemplo, são constituídos por diversos intervalos cilíndricos menores (definidos pelos campos `FROM` e `TO`) que podem apresentar tamanhos/comprimentos distintos.
+Uma característica muito importante dos dados utilizados na mineração é o **suporte amostral**. De forma simples, o suporte está associado ao **tamanho, forma e orientação** das amostras. Os furos de sondagem, por exemplo, são constituídos por diversos intervalos cilíndricos menores (definidos pelos campos `FROM` e `TO`), que podem apresentar tamanhos/comprimentos distintos.
 
 Os exemplos a seguir, extraídos de *Sinclair & Blackwell (2006)*, evidenciam a importância de características geológicas dos depósitos no suporte amostral:
 
@@ -130,7 +130,7 @@ Neste módulo, iremos trabalhar com o [Marvin](https://github.com/fnaghetini/int
 
 > ⚠️ Para fins de simplificação, apenas os teores de `Au` foram mantidos.
 
-Para a importação das tabelas Collar, Survey, Assay e Litho e geração dos furos de sondagem, utilizaremos o pacote [DrillHoles.jl](https://github.com/JuliaEarth/DrillHoles.jl).
+Para a importação das tabelas Collar, Survey, Assay e Litho e geração dos furos de sondagem, utilizaremos o pacote [DrillHoles.jl](https://github.com/JuliaEarth/DrillHoles.jl)...
 """
 
 # ╔═╡ 9ce42874-5a58-4e6a-a544-dfea97146cc2
@@ -158,7 +158,11 @@ furosdesondagem = drillhole(collar, survey, [assay, litho])
 
 # ╔═╡ 1673eef5-82cf-4eef-8ca2-17d02ecb9b27
 md"""
-Note que uma inconsistência do tipo *overlap* entre as linhas 3 e 4 do arquivo `assay.csv` foi encontrada durante a geração dos furos. Esse erro indica que existem amostras duplicadas na tabela de teores. Podemos seguir a orientação da mensagem e consultar mais detalhes sobre o erro, utilizando o atributo `warns`...
+##### Observações
+
+- Uma inconsistência do tipo *overlap* entre as linhas 3 e 4 do arquivo `assay.csv` foi encontrada durante a geração dos furos;
+- Esse erro indica que existem amostras duplicadas na tabela de teores;
+- Podemos seguir a orientação da mensagem e consultar mais detalhes sobre o erro, utilizando o atributo `warns`...
 """
 
 # ╔═╡ 63ab68f1-b342-4e8c-987d-4fc33166aa3c
@@ -183,7 +187,10 @@ end
 
 # ╔═╡ f16c8b13-256d-4c1d-a376-4e7d41ecf35d
 md"""
-Repare que, após a nova geração dos furos, nenhuma inconistência foi relatada. Ao final desse processo, são criados quatro objetos: `table`, `trace`, `pars` e `warns` (já discutido).
+##### Observações
+
+- Após a nova geração dos furos, nenhuma inconistência foi relatada;
+- Ao final da geração dos furos, são criados quatro objetos: `table`, `trace`, `pars` e `warns` (já discutido).
 
 O objeto `table` contém a própria tabela de furos que será utilizada ao longo deste módulo...
 """
@@ -219,7 +226,7 @@ furosvalidados.pars
 md"""
 ## 3. Compositagem
 
-Normalmente, os dados brutos de sondagem (i.e. sem nenhum processamento prévio) apresentam suportes amostrais distintos e precisam ser combinados para produzir amostras de suporte aproximadamente uniforme (*Sinclair & Blackwell, 2006*). Esse procedimento é denominado **compositagem** e as amostras (combinadas) resultantes são chamadas de **compostas**.
+Normalmente, os dados brutos de sondagem (i.e. sem nenhum processamento prévio) apresentam suportes amostrais distintos e precisam ser combinados para produzir amostras de suporte aproximadamente uniforme (*Sinclair & Blackwell, 2006*). Esse procedimento é denominado **compositagem**, e as amostras (combinadas) resultantes são chamadas de **compostas**.
 
 > ⚠️ A compositagem é realizada com o objetivo de combinar intervalos pequenos em intervalos maiores e uniformes. O processo inverso, ou seja, subdividir intervalos maiores em intervalos menores não é uma prática adequada, pois haveria uma suavização da distribuição espacial dos teores que não corresponde à realidade (*Abzalov, 2016*).
 
@@ -232,7 +239,7 @@ t_c = \frac{\sum_{i=1}^{n} t_i e_i}{\sum_{i=1}^{n} e_i}
 
 # ╔═╡ 3f55ecbb-8f26-4813-ac3e-97588830d987
 md"""
-Você pode estar se perguntando o porque devemos uniformizar o suporte amostral. Imagine que queremos calcular o teor médio de Au entre três amostras:
+Você pode estar se perguntando sobre o porque devemos uniformizar o suporte amostral. Imagine que queremos calcular o teor médio de Au entre três amostras:
 
 | Amostra | Teor (g/t) | Tamanho (m) |
 |:-------:|:----------:|:-----------:|
@@ -248,12 +255,12 @@ md"""
 Segundo *Sinclair & Blackwell (2006)*, a compositagem objetiva:
 1. Reduzir o número de amostras e, consequentemente, diminuir o custo computacional;
 2. Regularizar o suporte amostral;
-3. Reduzir o impacto de valores extremos isolados que podem dificultar a modelagem de variogramas ([módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/4-variografia.jl));
+3. Reduzir o impacto de valores extremos isolados que podem dificultar a modelagem dos variogramas experimentais ([módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/4-variografia.jl));
 4. Adequar o suporte amostral à escala de trabalho.
 
-> ⚠️ A **compositagem por bancadas** busca tornar o suporte amostral igual ou próximo à altura das bancadas, ou seja, a escala de trabalho de minas à céu aberto.
+> ⚠️ A **compositagem por bancadas** busca tornar o suporte amostral igual ou próximo à altura das bancadas, ou seja, à escala de trabalho de minas à céu aberto.
 
-Primeiramente, vamos analisar a distribuição do suporte das amostras. Para isso, utilizaremos o histograma (Figura 02), um gráfico univariado muito útil e que é explicado detalhadamente no [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl).
+Primeiramente, vamos analisar a distribuição do suporte das amostras. Para isso, utilizaremos o histograma (Figura 02), um gráfico univariado muito útil e que será discutido no [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl).
 """
 
 # ╔═╡ 554a5530-e1ca-4261-a1e3-bf27846250fc
@@ -269,12 +276,12 @@ md"""
 ##### Observações
 
 - Existem três grupos de tamanhos de amostras bem definidos: 0.5 m, 1.0 m e 2.5m;
-- Como as amostras não estão regularizadas, iremos compositá-las.
+- Como as amostras não estão regularizadas (i.e. mesmo tamanho), iremos compositá-las.
 """
 
 # ╔═╡ e615de83-bcc4-4a84-8e94-140989508805
 md"""
-Utilizaremos a função `composite` do pacote [DrillHoles.jl](https://github.com/JuliaEarth/DrillHoles.jl) para realizar a compositagem dos furos brutos. Os parâmetros dessa função são apresentados abaixo:
+Utilizaremos a função `composite`, do pacote [DrillHoles.jl](https://github.com/JuliaEarth/DrillHoles.jl), para realizar a compositagem dos furos brutos. Os parâmetros dessa função são apresentados abaixo:
 
 ```julia
 composite(dh, interval=1.0, zone=nothing, mode=:equalcomp, mincomp=0.5)
@@ -284,11 +291,11 @@ composite(dh, interval=1.0, zone=nothing, mode=:equalcomp, mincomp=0.5)
 - `interval`: comprimento do intervalo das compostas (novo suporte);
 - `zone`: coluna de zona. Se considerado, os intervalos só poderão ser combinados caso apresentem o mesmo valor de zona. Podemos utilizar a coluna de litologia `ROCKTYPE`, por exemplo;
 - `mode`: método de compositagem;
-- `mincomp`: comprimento mínimo do intervalo das compostas. Intervalos menores serão descartados.
+- `mincomp`: comprimento mínimo do intervalo das compostas. Intervalos menores são descartados.
 
 > ⚠️ Caso você tenha familiaridade com o software Studio RM da [Datamine](https://www.dataminesoftware.com/), perceberá que a função `composite` é muito similar ao processo `COMPDH`.
 
-A seguir, aprenderemos sobre os dois principais métodos de compositagem de furos de sondagem: **comprimento fixo** e **comprimento ótimo**. Como dito anteriormente, a estratégia de compositagem é definida pelo parâmetro `mode`.
+A seguir, aprenderemos sobre os dois principais métodos de compositagem de furos de sondagem: **comprimento fixo** e **comprimento ótimo**. Como dito anteriormente, o método de compositagem é definido pelo parâmetro `mode`.
 """
 
 # ╔═╡ 29c1aa29-d21f-43c2-b5b4-a2c3443cc983
@@ -313,9 +320,18 @@ begin
 end;
 
 # ╔═╡ 86161dc5-0980-42e2-8455-6b1b07dddeaf
-histogram(cp_fixo[!,:LENGTH], bins=:scott, legend=false,
-		  color=:honeydew2, alpha=0.75, xlims=(3.5,11),
-		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
+begin
+	X̅_fixo = round(mean(cp_fixo.LENGTH), digits=2)
+	md_fixo = round(median(cp_fixo.LENGTH), digits=2)
+	
+	histogram(cp_fixo[!,:LENGTH], bins=:scott, legend=:topleft,
+		  	  color=:honeydew2, alpha=0.75, xlims=(3.5,11),
+		  	  xlabel="Suporte (m)", ylabel="Freq. Absoluta",
+			  label=false)
+
+	vline!([X̅_fixo], color=:red, label="X̅ = $(X̅_fixo) m")
+	vline!([md_fixo], color=:green, label="md = $(md_fixo) m")
+end
 
 # ╔═╡ 66b7f878-c620-4fee-84c0-273bdbc46440
 md"_**Figura 03:** Distribuição do suporte das compostas resultantes do método do comprimento fixo._"
@@ -325,7 +341,7 @@ md"""
 ##### Observações
 
 - A grande maioria das compostas agora apresenta suporte igual a 10 metros;
-- A distribuição apresenta uma forte assimetria negativa (cauda alongada à esquerda). Esse padrão é típico quando se realiza a compositagem pelo método do comprimento fixo. Os tipos de assimetria serão discutidos no [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl). 
+- A distribuição apresenta uma forte assimetria negativa (cauda alongada à esquerda). Esse padrão é típico quando se realiza a compositagem pelo método do comprimento fixo. Os tipos de assimetria que uma distribuição pode apresentar serão discutidos no [módulo 3](https://github.com/fnaghetini/intro-to-geostats/blob/main/3-analise_exploratoria.jl). 
 """
 
 # ╔═╡ 62705acb-a304-4bd4-ae30-cca46037c7dd
@@ -350,9 +366,18 @@ begin
 end;
 
 # ╔═╡ 59454ea0-138c-4005-9c4b-e2e8667189c2
-histogram(cp_otimo[!,:LENGTH], bins=:scott, legend=false,
-		  color=:honeydew2, alpha=0.75, xlims=(4,14),
-		  xlabel="Suporte (m)", ylabel="Freq. Absoluta")
+begin
+	X̅_otimo = round(mean(cp_otimo.LENGTH), digits=2)
+	md_otimo = round(median(cp_otimo.LENGTH), digits=2)
+	
+	histogram(cp_otimo[!,:LENGTH], bins=:scott, legend=:topleft,
+		  	  color=:honeydew2, alpha=0.75, xlims=(4,14),
+		  	  xlabel="Suporte (m)", ylabel="Freq. Absoluta",
+			  label=false)
+
+	vline!([X̅_otimo], color=:red, label="X̅ = $(X̅_otimo) m")
+	vline!([md_otimo], color=:green, label="md = $(md_otimo) m")
+end
 
 # ╔═╡ 0d9d4d97-e1ff-47a5-9a58-c76788b55468
 md"_**Figura 04:** Distribuição do suporte das compostas resultantes do método do comprimento ótimo._"
@@ -382,7 +407,7 @@ Ademais, podemos realizar uma comparação estatística entre as amostras brutas
 
 Idealmente, a metragem total das compostas deve coincidir com a das amostras brutas. Para o cálculo da metragem total, utilizaremos a função `sum`.
 
-Como o objetivo da compositagem é regularizar o suporte amostral, a variabilidade (dispersão) do comprimento das amostras `LENGTH` deve ser reduzida. Mediremos a variabilidade com a função `std`, que representa o desvio padrão.
+Como o objetivo da compositagem é regularizar o suporte amostral, a variabilidade (dispersão) do comprimento das amostras `LENGTH` deve ser reduzida. Mediremos essa variabilidade com a função `std`, que representa o desvio padrão.
 
 A compositagem não deve alterar significativamente o teor metalífero médio das amostras. Qualquer mudança superior a 5% deve ser investigada (*Abzalov, 2016*). Para o cálculo do teor médio de Au (g/t), utilizaremos a função `mean`.
 
@@ -417,15 +442,15 @@ md"""
 
 - Quando se compara a metragem de amostras brutas com a metragem das compostas, nota-se que, na estratégia do comprimento fixo, mais amostras foram descartadas (185 metros) do que no método do comprimento ótimo (9,5 metros);
 - O método do comprimento fixo aumentou a dispersão do comprimento das amostras, enquanto a estratégia do comprimento ótimo reduziu;
-- Nota-se uma redução do teor médio de Au após a compositagem pelos dois métodos. Essa redução já era esperada, uma vez que, ao combinar as amostras, há uma diluição dos teores. Entretanto, a mudança na média não foi tão expressiva em ambos os casos (< 3%);
-- Pelo menos neste exemplo, o algoritmo do comprimento ótimo mostrou uma melhor performance na compositagem do que a estratégia do comprimento fixo. Ainda sim, sugere-se sempre comparar os dois métodos, se possível. O método do comprimento fixo, por vezes, pode apresentar um bom desempenho.
+- Há uma redução no teor médio de Au após a compositagem pelos dois métodos. Essa redução já era esperada, uma vez que, ao combinar as amostras, há uma diluição dos teores. Entretanto, a mudança na média não foi tão expressiva em ambos os casos (< 3%);
+- Pelo menos neste exemplo, o algoritmo do comprimento ótimo mostrou uma melhor performance na compositagem do que a estratégia do comprimento fixo. Ainda sim, sugere-se sempre comparar ambos métodos, se possível.
 """
 
 # ╔═╡ 447e2730-0bd4-4953-ac2e-c6d12cb5e341
 md"""
 ## 4. Visualização dos furos
 
-Agora que realizamos a comparação entre os dois métodos de compositagem e escolhemos as compostas ótimas, podemos visualizá-las interativamente com o pacote [Makie.jl](https://github.com/JuliaPlots/Makie.jl). Esse pacote, ainda relativamente instável, fornece incríveis recursos interativos de visualização 3D!
+Agora que realizamos a comparação entre os dois métodos de compositagem e escolhemos as compostas ótimas, podemos visualizá-las interativamente com o pacote [Makie.jl](https://github.com/JuliaPlots/Makie.jl). Esse pacote fornece incríveis recursos interativos de visualização 3D!
 
 Neste notebook, adotaremos o backend [WGLMakie](https://github.com/JuliaPlots/Makie.jl/tree/master/WGLMakie), por ser interativo e compatível com o visualizações no navegador.
 
@@ -433,7 +458,7 @@ Neste notebook, adotaremos o backend [WGLMakie](https://github.com/JuliaPlots/Ma
 
 Clique na caixa abaixo para visualizar os teores compostos de Au (Figura 05)...
 
-> ⚠️ Ao clicar pela primeira vez, a exibição do plot pode demorar alguns segundos. Entretanto, nos próximos cliques, as compostas serão exibidas instantaneamente! Caso não queira mais visualizá-las, desmarque a caixa para não tornar a execução das demais células lenta.
+> ⚠️ Ao clicar pela primeira vez, a exibição do plot pode demorar alguns segundos. Entretanto, nos próximos cliques, as compostas serão exibidas instantaneamente! Caso não queira mais visualizá-las, desmarque a caixa para não tornar lenta a execução das demais células.
 """
 
 # ╔═╡ baf8bd0f-07b7-4ce6-8850-4f22c4a20ecf
@@ -1104,9 +1129,9 @@ uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 
 [[Libffi_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "761a393aeccd6aa92ec3515e428c26bf99575b3b"
+git-tree-sha1 = "0b4a5d71f3e5200a7dff793393e09dfc2d874290"
 uuid = "e9f186c6-92d2-5b65-8a66-fee21dc1b490"
-version = "3.2.2+0"
+version = "3.2.2+1"
 
 [[Libgcrypt_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libgpg_error_jll", "Pkg"]

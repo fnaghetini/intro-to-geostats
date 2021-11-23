@@ -51,7 +51,7 @@ Diferentemente do [módulo 3](https://github.com/fnaghetini/intro-to-geostats/bl
 
 > ⚠️ Enfatiza-se que, como a variografia é um assunto muito amplo, neste módulo, focaremos apenas em seus aspectos mais básicos. Caso deseje se aprofundar no tema, consulte as seções *Referências* e *Recursos adicionais* deste notebook. Por esse mesmo motivo, as células de código não serão discutidas em profundidade neste notebook.
 
-Ao final da variografia (i.e. modelagem da continuidade de valores), teremos em mãos um **modelo de variograma** representativo da estrutura espacial de uma variável de interesse e que será utilizado como entrada para a estimativa. Veremos que a variografia permite inserir interpretações geológicas na estimativa de recursos.
+Ao final da variografia, teremos em mãos um **modelo de variograma** representativo da estrutura espacial de uma variável de interesse e que será utilizado como entrada na estimativa. Veremos que a variografia permite inserir informações geológicas na estimativa de recursos.
 """
 
 # ╔═╡ 1e211855-33b8-429f-a4e1-b01e8ad88bab
@@ -84,11 +84,11 @@ Segundo *Sinclair & Blackwell (2006)*, o termo **continuidade espacial** é comu
 
 Na tentativa de clarear essa ambiguidade, *Sinclair & Vallée (1994)* definem dois tipos de continuidade espacial:
 
-> **Continuidade geológica:** manifestações físicas de características geológicas, como veios, zonas de cisalhamento e estratos mineralizados. Esse tipo de continuidade é interpretada durante a modelagem geológica e impacta diretamente toda a estimativa de recursos.
+> **Continuidade geológica:** manifestações físicas de características geológicas, como veios, zonas de cisalhamento e estratos mineralizados. Este tipo de continuidade é interpretada durante a modelagem geológica e impacta diretamente toda a estimativa de recursos.
 
-> **Continuidade de valores:** distribuição espacial de caracteristicas quantitativamente mensuradas, como teores metalíferos, densidade e espessura das mineralizações. Esse tipo de continuidade é quantificada a partir de alguma função de autocorrelação (e.g. variograma).
+> **Continuidade de valores:** distribuição espacial de caracteristicas quantitativamente mensuradas, como teores metalíferos, densidade e espessura das mineralizações. Este tipo de continuidade é quantificada a partir de alguma função de autocorrelação (e.g. variograma, covariograma, correlograma).
 
-Neste módulo, aprenderemos sobre a continuidade de valores. Da mesma forma que um depósito mineral não ocorre aleatoriamente na natureza, a distribuição de teores metalíferos, por ser resultado da interação entre diversos processos metalogenéticos, também apresenta uma certa estrutura (ou organização) espacial.
+Neste módulo, aprenderemos a "mapear" a continuidade de valores. Da mesma forma que um depósito mineral não ocorre aleatoriamente na natureza, a distribuição de teores metalíferos, por ser resultado da interação entre diversos processos metalogenéticos, também apresenta uma certa estrutura (ou organização) espacial.
 """
 
 # ╔═╡ faee9091-89aa-46ff-9a90-42eb71dcdd6a
@@ -99,14 +99,14 @@ Se você já teve aulas de Mineralogia, provavelmente já se deparou com o termo
 
 > Quando uma propriedade assume valores distintos para diferentes direções, diz-se que essa propriedade é **anisotrópica**. Por outro lado, uma propriedade que não varia com a direção é dita **isotrópica**.
 
-A distribuição de teores nos depósitos minerais é frequentemente anisotrópica e, portanto, precisamos de ferramentas de modelagem da continuidade que reconheçam anisotropia (e.g. variograma). Imagine um extenso platô de bauxita. É intuitivo pensar que os teores de Al₂O₃ são mais contínuos lateralmente e menos contínuos verticalmente. Nesse exemplo, a distribuição do teor de Al₂O₃ é um fenômeno anisotrópico.
+A distribuição de teores nos depósitos minerais é frequentemente anisotrópica e, portanto, precisamos de ferramentas de modelagem da continuidade de valores que reconheçam anisotropia (e.g. variograma). Imagine um extenso platô de bauxita. É intuitivo pensar que os teores de Al₂O₃ são mais contínuos lateralmente e menos contínuos verticalmente. Nesse exemplo, a distribuição do teor de Al₂O₃ é um fenômeno anisotrópico.
 """
 
 # ╔═╡ 12770ca7-be19-4b11-88b5-0b65a05cefd6
 md"""
 ### Banco de dados
 
-Neste módulo, iremos trabalhar com o banco de dados [Walker Lake](https://github.com/fnaghetini/intro-to-geostats/blob/main/data/Walker_Lake.csv) do excelente livro de *Isaaks & Srivastava (1989)*. Segundo os autores, esse banco de dados foi gerado a partir de um modelo digital de elevação da região de Walker Lake, situada no estado de Nevada (EUA).
+Neste módulo, iremos trabalhar com o banco de dados [Walker Lake](https://github.com/fnaghetini/intro-to-geostats/blob/main/data/Walker_Lake.csv), do excelente livro de *Isaaks & Srivastava (1989)*. Segundo os autores, esse banco de dados foi gerado a partir de um modelo digital de elevação da região de Walker Lake, situada no estado de Nevada (EUA).
 
 Originalmente, *Isaaks & Srivastava (1989)* adaptaram essa informação de elevação para gerar duas variáveis anônimas `U` e `V`. Entretanto, ao realizar manipulações nessa base de dados, o autor deste material irá se referir a essas variáveis como teores fictícios de `Ag` (em ppm) e `Pb` (em %), respectivamente.
 
@@ -158,7 +158,7 @@ md"""
 
 ### Elementos do variograma
 
-O variograma apresenta alguns elementos que o descreve. São eles:
+O variograma é constituído por alguns elementos que o descreve. São eles:
 1. Alcance
 2. Patamar
 3. Efeito Pepita
@@ -171,13 +171,13 @@ md"""
 
 O **alcance** $a$, também chamado de amplitude ou *range*, é definido como a distância $h$ para a qual o variograma atinge seu platô (*Isaaks & Srivastava, 1989*). Pode-se pensar que o alcance é a distância máxima até onde se consegue estabelecer alguma interdependência espacial entre pares de amostras. Em outras palavras, para $h > a$, os pares de amostras não possuem mais correlação espacial entre si.
 
-O **patamar** $C_0+C$, também chamado de *sill*, corresponde ao valor de $\gamma$ para o qual o variograma atinge seu platô (*Samson & Deutsch, 2021*). Durante a modelagem do variograma, que iremos discutir mais a frente, o patamar é normalmente definido como a o valor da variância amostral da variável de interesse.
+O **patamar** $C_0+C$, também chamado de *sill*, corresponde ao valor de $\gamma$ para o qual o variograma atinge seu platô (*Samson & Deutsch, 2021*). Durante a modelagem do variograma, que iremos discutir mais a frente, o patamar é normalmente definido como a o valor da variância amostral da variável de interesse. Essa variância é comumente chamada de **variância à priori**.
 
 > ⚠️ Caso queira se aprofundar mais sobre o patamar do variograma, confira *Samson & Deutsch (2021)*.
 
-O **efeito pepita** $C_0$, também chamado de *nugget effect*, graficamente, é entendido como a descontinuidade na origem do variograma (*Morgan, 2011*). Ressalta-se, entretanto, que o efeito pepita corresponde ao valor de $\gamma$ quando $h$ *tende* a zero, uma vez que o valor de $\gamma$ é zero quando $h=0$ (*Camana & Deutsch, 2019*).
+O **efeito pepita** $C_0$, também chamado de *nugget effect*, graficamente, é entendido como a descontinuidade na origem do variograma (*Morgan, 2011*). Ressalta-se, entretanto, que o efeito pepita corresponde ao valor de $\gamma$ quando $h$ *tende* a zero, uma vez que o valor de $\gamma$ é zero quando $h=0$ por definição (*Camana & Deutsch, 2019*).
 
-> ⚠️ O efeito pepita também pode ser definido como um fenômeno presente em variáveis regionalizadas que representa uma variabilidade adicional a curtas distâncias. Para mais detalhes, confira *Camana & Deutsch (2019)*.
+> ⚠️ O efeito pepita também pode ser definido como um fenômeno presente em variáveis regionalizadas que representa uma variabilidade adicional a curtas distâncias ("variabilidade em microescala"). Para mais detalhes, confira *Camana & Deutsch (2019)*.
 
 Utilize os sliders abaixo para modificar os elementos do variograma mostrado pela Figura 01...
 """
@@ -228,7 +228,7 @@ Cada ponto do variograma experimental representa a média das diferenças quadr�
 
 Note que, no variograma experimental, o valor de $\gamma$ é calculado apenas para um número limitado de distâncias $h$. Para fins de visualização, é comum unir os pontos do variograma experimental por segmentos de reta. Clique na caixa abaixo, caso queira unir os pontos do gráfico.
 
-> ⚠️ Ainda que a ligação dos pontos seja um recurso comum na maioria dos softwares geoestatísticos, devemos lembrar que o variograma experimental é discreto, ou seja, a partir dele, sabemos apenas alguns valores de $\gamma$ para $h$ específicos.
+> ⚠️ Ainda que a ligação dos pontos seja um recurso comum na maioria dos softwares geoestatísticos, devemos lembrar que o variograma experimental é discreto, no sentido de sabermos apenas alguns valores de $\gamma$ para $h$ específicos.
 
 """
 
@@ -273,7 +273,7 @@ Para calcular variogramas experimentais, devemos definir alguns parâmetros:
 - Tolerância do passo;
 - Largura da banda.
 
-> ⚠️ Um outro parâmetro frequentemente utilizado em softwares geoestatísticos é a *tolerância angular*. Como o GeoStats.jl não adota esse parâmetro, ele não será abordado neste módulo. Caso deseje saber mais sobre a tolerância angular, confira *Deutsch (2015)* ou [este notebook](https://github.com/fnaghetini/Variograms).
+> ⚠️ Um outro parâmetro frequentemente utilizado em softwares geoestatísticos é a *tolerância angular*. Como o GeoStats.jl não adota esse parâmetro, ele não será abordado neste módulo. Caso deseje saber mais sobre a tolerância angular, confira *Deutsch (2015)* e [este notebook](https://github.com/fnaghetini/Variograms).
 """
 
 # ╔═╡ c782a92c-cc4d-44bc-8521-2f70ad222bd5
@@ -282,7 +282,9 @@ md"""
 
 Processos naturais não levam a distribuições espaciais isotrópicas. Normalmente, há um plano de maior continuidade (e.g. estrato ou zona de cisalhamento mineralizada) e uma direção de menor continuidade perpendicular a esse plano. Portanto, em contextos 3D, devemos encontrar as três direções principais de um fenômeno (ortogonais entre si) que descrevem a sua continuidade (*Deutsch, 2015*). Essas direções são chamadas de *primária*, *secundária* e *terciária* e definem um **elipsoide de anisotropia**.
 
-Por outro lado, em contextos 2D, precisamos encontrar apenas as duas direções principais (também ortogonais entre si) que descrevem a continuidade espacial do fenômeno. Essas direções, denominadas *primária* e *secundária* definem uma **elipse de anisotropia**.
+> ⚠️ As direções principais do variograma também podem ser chamadas de *major*, *intermediate* e *minor*.
+
+Por outro lado, em contextos 2D, precisamos encontrar apenas as duas direções principais (também ortogonais entre si), que descrevem a continuidade espacial do fenômeno. Essas direções definem uma **elipse de anisotropia**.
 
 > ⚠️ Em contextos 2D, a direção é definida apenas pelo azimute, enquanto que, em contextos 3D, a direção é definida pelo azimute e ângulo de mergulho.
 
@@ -292,7 +294,7 @@ Variogramas experimentais calculados ao longo de uma direção específica são 
 # ╔═╡ 81dc06f6-79a0-4022-9219-c0ae97a20ab6
 md"""
 > ###### Função `sph2cart`
-> Em geral, geólogos (principal público-alvo deste material) não estão muito acostumados a informar orientações em coordenadas cartesianas. Por exemplo, levaria um tempo para você descobrir que o azimute de 045° é representado como ($\frac{\sqrt2}{2}$, $\frac{\sqrt2}{2}$) em coordenadas cartesianas. Como no GeoStats.jl devemos informar orientações em coordenadas cartesianas, iremos criar uma função `sph2cart` que converte azimutes em coordenadas cartesianas. Por exemplo, ao invés de informarmos a direção de cálculo como ($\frac{\sqrt2}{2}$, $\frac{\sqrt2}{2}$), podemos simplesmente escrever `sph2cart(45)`.
+> Em geral, geólogos (principal público-alvo deste material) não estão muito acostumados a informar orientações em coordenadas cartesianas. Por exemplo, levaria um tempo para você descobrir que o azimute de 045° é representado como ($\frac{\sqrt2}{2}$, $\frac{\sqrt2}{2}$) em coordenadas cartesianas. Como no [GeoStats.jl](https://github.com/JuliaEarth/GeoStats.jl) devemos informar orientações em coordenadas cartesianas, iremos criar uma função `sph2cart` que converte azimutes em coordenadas cartesianas. Por exemplo, ao invés de informarmos a direção de cálculo como ($\frac{\sqrt2}{2}$, $\frac{\sqrt2}{2}$), podemos simplesmente escrever `sph2cart(45)`.
 """
 
 # ╔═╡ d4775d05-4943-4493-897e-4340f01475be
@@ -334,7 +336,7 @@ md"""
 
 O **tamanho do passo**, também chamado de *lag*, é a distância média entre as amostras vizinhas na direção em que o variograma experimental está sendo calculado (*Deutsch, 2015*).
 
-Na Figura 04, tem-se um exemplo de busca de pares de amostras na direção W-E (indicado pela seta vermelha) em uma malha regular. Utilize o slider `Passo` para aumentar o tamanho do passo e os sliders `W-E` e `N-S` para modificar a posição inicial e final do vetor $h$.
+Na Figura 04, tem-se um exemplo de busca de pares de amostras na direção W-E (indicado pela seta vermelha) em uma malha regular. Essa busca é feita, quando se deseja calcular variogramas de direção 270°-090°. Utilize o slider `Passo` para aumentar o tamanho do passo e `W-E` e `N-S` para modificar a posição inicial e final do vetor $h$.
 """
 
 # ╔═╡ f4e189ac-5d12-4de5-80e1-516103e5950f
@@ -367,7 +369,7 @@ end
 
 # ╔═╡ 8923e1c1-914d-47b5-a4b4-5f0c53c4e810
 md"""
-_**Figura 04:** Exemplo de busca de pares de amostras em uma malha regular. A seta vermelha indica o vetor $h$._
+_**Figura 04:** Exemplo de busca de pares de amostras W-E em uma malha regular. A seta vermelha indica o vetor $h$._
 """
 
 # ╔═╡ 3d25e2bc-9a6d-4712-92ed-de31dbdea3f2
@@ -406,7 +408,7 @@ end
 
 # ╔═╡ 9d60b923-72e7-42c8-8ef3-d4a590e3f600
 md"""
-_**Figura 05:** Exemplo de busca de pares de amostras em uma malha irregular._
+_**Figura 05:** Exemplo de busca de pares de amostras W-E em uma malha irregular._
 """
 
 # ╔═╡ 7c00b7a2-5c09-46f5-ba8d-03786fd606b8
@@ -420,11 +422,11 @@ A tolerância do passo é normalmente definida como metade do tamanho do passo *
 lagtol = \frac{lag}{2} 
 ```
 
-Se houver poucos dados, uma tolerância maior pode ser necessária, o que pode resultar intervalos de tolerância sobrepostos e um variograma mais estável. Por outro lado, em caso de malhas densas ou aproximadamente regulares, uma tolerância de passo menor pode ser adotada *(Deutsch, 2015)*.
+em que $lagtol$ é a tolerância do passo e $lag$ é o tamanho do passo.
 
-A Figura 06 apresenta amostras colineares de uma malha amostral irregular. Utilize o slider `W-E` para transladar o vetor $h$ e marque a caixa para visualizar a tolerância do passo.
+A Figura 06 apresenta amostras colineares (com coordenadas `Y` idênticas) de uma malha amostral irregular. Utilize o slider `W-E` para transladar o vetor $h$ e marque a caixa para visualizar a tolerância do passo.
 
-Note que, quando a tolerância de passo é adotada, todos os pontos inseridos entre as linhas tracejadas podem ser buscados. Por outro lado, caso essa tolerância não fosse adotada, apenas um par de pontos seria buscado para o cálculo do variograma.
+Note que, quando a tolerância de passo é adotada, todos os pontos inseridos entre as linhas tracejadas podem ser buscados. Por outro lado, caso essa tolerância não for adotada, apenas um par de pontos seria buscado para o cálculo do variograma.
 """
 
 # ╔═╡ 841ffdd2-16b4-4c19-8f03-70942a4ebb2e
@@ -495,7 +497,7 @@ A **largura da banda** é um parâmetro de tolerância que pode ser utilizado pa
 # ╔═╡ 6433f0dc-04f8-450e-9a94-f8cfa8cda552
 md"""
 ![bandwidth](https://i.postimg.cc/vHmM45Qh/bandwidth.png)
-_**Figura 07:** Parâmetros utilizados para o cálculo do variograma experimental. A origem do gráfico pode ser entendida como o centro de uma amostra e os "alvos" como as demais amostras._
+_**Figura 07:** Parâmetros utilizados para o cálculo do variograma experimental. A origem do gráfico pode ser entendida como a amostra de referência e os "alvos" como as demais amostras._
 """
 
 # ╔═╡ e80e5e16-59fb-4ec0-a9f0-6b8b97bc8d36
@@ -503,7 +505,7 @@ md"""
 
 ## 4. Modelos teóricos
 
-A partir dos variogramas experimentais só é possível obter valores médios de variograma $γ(h)$ para distâncias iguais a múltiplos do tamanho de passo $h$ escolhido.
+A partir dos variogramas experimentais, só é possível obter valores médios de variograma $γ(h)$ para distâncias iguais a múltiplos do tamanho de passo $h$ definido.
 
 Portanto, é necessário o ajuste de um *modelo matemático contínuo*, de modo que saberemos o valor de $\gamma$ para qualquer distância entre pares de amostras $h$.
 
@@ -563,7 +565,7 @@ O **modelo gaussiano** apresenta comportamento próximo à origem parabólico e 
 γ(h) = C_0 + C \left[ 1 - exp \left[- \left(\frac{h}{a} \right)^2 \right]  \right] 
 ```
 
-O **modelo esférico** apresenta comportamento próximo à origem linear e é normalmente utilizado para ajustar variogramas experimentais de fenômenos de intermediária heterogeneidade. Esse é a função teórica mais comum para modelar a continuidade espacial de teores metalíferos. Sua equação é descrita como:
+O **modelo esférico** apresenta comportamento próximo à origem linear e é normalmente utilizado para ajustar variogramas experimentais de fenômenos de intermediária heterogeneidade. Essa é a função teórica mais comum para modelar a continuidade espacial de teores metalíferos. Sua equação é descrita como:
 
 ``` math
 γ(h) = C_0 + C \left[\frac{3h}{2a} - \frac{1}{2}\left(\frac{h}{a}\right)^3 \right], ∀ h < a
@@ -579,12 +581,12 @@ O **modelo exponencial** apresenta comportamento próximo à origem linear. Entr
 γ(h) = C_0 + C \left[1 - exp \left[-\left(\frac{h}{a} \right) \right] \right]
 ```
 
-Selecione, na lista suspensa abaixo, o tipo de modelo de variograma que deseja visualizar (Figura 09). Tente observar a diferença do comportamento próximo à origem entre os três ajustes teóricos...
+Selecione, na lista suspensa abaixo, o tipo de modelo teórico de variograma que deseja visualizar (Figura 09). Tente observar a diferença do comportamento próximo à origem entre os três ajustes teóricos...
 """
 
 # ╔═╡ 6d0f5d99-f7e2-4f53-b835-c3b345613e4a
 md"""
-Modelo Teórico: $(@bind model Select(["Gaussiano","Esférico","Exponencial"],
+Modelo teórico: $(@bind model Select(["Gaussiano","Esférico","Exponencial"],
 				  default = "Gaussiano"))
 """
 
@@ -611,7 +613,7 @@ end
 
 # ╔═╡ ab5e6c19-789b-4944-ba8e-f983a9a2652c
 md"""
-_**Figura 09:** Tipos de modelo do variograma._
+_**Figura 09:** Tipos de modelos teóricos de variograma._
 """
 
 # ╔═╡ 8b4ee7b2-2a01-44ae-8539-27f1815fe634
@@ -624,9 +626,9 @@ Na modelagem de variogramas, a anisotropia existe quando um ou mais elementos do
 - *Anisotropia Geométrica*: alcance varia de acordo com a mudança de direção.
 - *Anisotropia Mista*: patamar e alcance variam de acordo com a mudança de direção.
 
-> ⚠️ Embora existam três tipos de anisotropia, é comum considerar apenas a anisotropia geométrica para a modelagem do variograma.
+> ⚠️ Embora existam três tipos de anisotropia, é comum "corrigir" (considerar) apenas a anisotropia geométrica durante a modelagem dos variogramas.
 
-> ⚠️ Não existe anisotropia de efeito pepita, uma vez que esse elemento é, por definição, isotópico.
+> ⚠️ Não existe anisotropia de efeito pepita, uma vez que esse elemento é, por definição, isotrópico.
 
 A partir da lista suspensa abaixo, compare os diferentes tipos de anisotropia (Figura 10)...
 """
@@ -677,7 +679,7 @@ md"""
 
 ## 6. Estruturas imbricadas
 
-Em muitos casos não é possível ajustar de maneira adequada um variograma experimental por meio um modelo teórico simples. Esse tipo de situação ocorre quando há mais de uma estrutura nos dados em questão (i.e. a regionalização está presente em diferentes escalas) (*Sinclair & Blackwell, 2006*). Dessa forma, podemos utilizar o imbricamento/aninhamento de estruturas, com o intuito de tornar a modelagem do variograma mais flexível. 
+Em muitos casos não é possível ajustar de maneira adequada um variograma experimental por meio de um modelo teórico simples. Esse tipo de situação ocorre quando há mais de uma estrutura nos dados em questão (i.e. a regionalização está presente em diferentes escalas) (*Sinclair & Blackwell, 2006*). Dessa forma, podemos utilizar o imbricamento/aninhamento de estruturas, com o intuito de tornar a modelagem do variograma mais flexível. 
 
 A **estrutura do variograma** é a porção da equação do ajuste teórico em que o valor de $C$ cresce com o aumento da distância $h$:
 
@@ -688,7 +690,7 @@ A **estrutura do variograma** é a porção da equação do ajuste teórico em q
 
 > ⚠️ O efeito pepita $C_0$ não pertence à estrutura do variograma.
 
-O **imbricamento/aninhamento das estruturas** é definido como a soma de $n$ estruturas do variograma. A equação abaixo ilustra um imbricamento de $n$ estruturas para um modelo esférico:
+O **imbricamento/aninhamento das estruturas** é definido como a soma de $n$ estruturas do variograma. A equação abaixo apresenta um imbricamento de $n$ estruturas esféricas para a construção de um modelo aninhado final $\gamma(h)$:
 
 ``` math
 γ(h) = C_0 +
@@ -712,7 +714,7 @@ A Figura 11 mostra um exemplo de modelo de variograma imbricado...
 md"""
 #### 🖊️ Exercício
 
-Utilize os sliders abaixo para modelar o variograma experimental. Note o modelo de variograma é constituído por estruturas aninhadas.
+Utilize os sliders abaixo para modelar o variograma experimental (Figura 11). Note o modelo de variograma é constituído por estruturas aninhadas com alcances e contribuições independentes, que facilitam a modelagem do variograma experimental.
 """
 
 # ╔═╡ f95ffa70-f924-404a-8cec-fc281b8588e2
@@ -759,7 +761,7 @@ end
 
 # ╔═╡ 864c9c06-e52b-4de8-bc16-d053fa3c0346
 md"""
-_**Figura 11:** Exemplo de modelo de variograma imbricado._
+_**Figura 11:** Exemplo de modelo imbricado ajustando um variograma experimental._
 """
 
 # ╔═╡ 538bf67b-33c6-45c3-b5bf-328922debb26
@@ -768,14 +770,14 @@ md"""
 
 Como a continuidade espacial de fenômenos naturais tende a ser anisotrópica e o objetivo da variografia é justamente descrever a continuidade espacial desses fenômenos, é plausível que o variograma seja anisotrópico.
 
-Como dito no início do módulo, a forma mais simples e coerente para se representar anisotropia é por meios de elipses (2D) ou elipsoides (3D).
+Como dito no início do módulo, a forma mais simples e coerente de se representar anisotropia é por meios de elipses (2D) ou elipsoides (3D).
 
 Em um contexto 3D, assumindo condições de *anisotropia geométrica*, para representar a continuidade espacial de um fenômeno, basta encontrarmos os eixos principais do elipsoide, de modo que:
 - O efeito pepita será isotrópico.
 - O patamar será assumido como isotrópico.
 - O alcance será anisotrópico.
 
-Portanto, os eixos do elipsoide representam justamente a variação do alcance para diferentes direções.
+Portanto, os eixos do elipsoide representam, justamente, a variação do alcance para diferentes direções.
 
 A equação de um **modelo esférico anisotrópico** é descrita como:
 
@@ -783,7 +785,11 @@ A equação de um **modelo esférico anisotrópico** é descrita como:
 γ(h) = C_0 + C \left[\frac{3h}{2(a_x,a_y,a_z)} - \frac{1}{2}\left(\frac{h}{(a_x,a_y,a_z)}\right)^3 \right]
 ```
 
+em que $a_x$, $a_y$ e $a_z$ representam os alcances das direções principais $x$, $y$ e $z$.
+
 A Figura 12 ilustra graficamente um exemplo de modelo de variograma anisotrópico. Utilize os sliders abaixo para alterar os alcances primário (Y), secundário (X) e terciário (Z)...
+
+> ⚠️ Softwares geoestatísticos adotam convenções para se referir às direções principais do variograma. Iremos adotar a convenção em que Y se refere ao eixo primário, X ao eixo secundário e Z ao eixo terciário. 
 """
 
 # ╔═╡ 18282939-e7ef-4da4-aade-72e7b01886de
@@ -843,7 +849,7 @@ md"""
 md"""
 ## 8. Modelo de variograma x estimativas
 
-Sabe-se que o modelo de variograma é utilizado como entrada na estimativa por krigagem. Nesse sentido, cada um de seus parâmetros e elementos exerce uma influência no modelo de teores estimados:
+Sabe-se que o modelo de variograma é utilizado como entrada na estimativa por Krigagem. Nesse sentido, cada um de seus parâmetros e elementos exerce uma influência no modelo de teores estimados:
 
 - A *direção* indica a orientação da continuidade espacial de teores;
 
@@ -851,22 +857,22 @@ Sabe-se que o modelo de variograma é utilizado como entrada na estimativa por k
 
 - O *patamar* define a "altura" das "elipses";
 
-- O *efeito pepita* define uma variabilidade adicional para escalas menores;
+- O *efeito pepita* define uma variabilidade adicional em microescala;
 
 - O *modelo teórico* define o comportamento próximo a origem.
 
-O exemplo abaixo auxilia na compreensão da influência de cada um desses parâmetros nas estimativas resultantes. A Figura 13 mostra o modelo de variograma anisotrópico utilizado na estimativa por Krigagem. A Figura 14 representa o mapa da localização das amostras.
+O exemplo abaixo auxilia na compreensão da influência de cada um desses parâmetros nas estimativas resultantes. A Figura 13 mostra o modelo de variograma anisotrópico considerado na estimativa por Krigagem. A Figura 14 representa o mapa da localização das amostras.
 
 > ⚠️ Não se assuste com os termos *estimativa* e *Krigagem*. Aprenderemos sobre esses conceitos no [módulo 5](https://github.com/fnaghetini/intro-to-geostats/blob/main/5-estimacao.jl).
 
-Utilize os sliders abaixo para ajustar os variogramas experimentais azul e vermelho. Em seguida, clique na primeira caixa para visualizar apenas os highgrades e, na segunda caixa, para visualizar as estimativas resultantes. Faça o exercício de analisar qual é o impacto de cada parâmetro do variograma nas estimativas resultantes.
+Utilize os sliders abaixo para ajustar os variogramas experimentais azul e vermelho. Em seguida, clique na primeira caixa para visualizar apenas os highgrades e, na segunda caixa, para visualizar as estimativas resultantes. Faça o exercício de analisar qual é o impacto de cada parâmetro do variograma nas estimativas resultantes...
 """
 
 # ╔═╡ 8079a74c-005d-4654-8e44-d763a12aefd8
 md"""
 Direção de maior continuidade: $(@bind azi₂ Slider(0.0:45.0:90.0, default=0.0, show_value=true))°
 
-Modelo Teórico: $(@bind m Select(["Gaussiano","Esférico","Exponencial"],
+Modelo teórico: $(@bind m Select(["Gaussiano","Esférico","Exponencial"],
 							 default = "Esférico"))
 
 Efeito pepita: $(@bind Cₒ Slider(0.00:0.1:5.0, default=3.0, show_value=true))
@@ -937,7 +943,7 @@ end
 
 # ╔═╡ a0b3b930-5f2a-47a1-bc81-c70c2ff595e6
 md"""
-_**Figura 13:** Modelo de variograma anisotrópico utilizado na estimativa._
+_**Figura 13:** Modelo de variograma anisotrópico considerado na estimativa._
 """
 
 # ╔═╡ fb99bba7-e81b-4653-a7dc-3558f6fc7e2c
@@ -2521,11 +2527,11 @@ version = "0.9.1+5"
 # ╟─81dc06f6-79a0-4022-9219-c0ae97a20ab6
 # ╠═d4775d05-4943-4493-897e-4340f01475be
 # ╟─73cded81-c93e-4609-80ae-ca1dfcb79ec7
-# ╠═43bc79ba-bb97-48bd-a8e4-c478bdc3a60b
+# ╟─43bc79ba-bb97-48bd-a8e4-c478bdc3a60b
 # ╟─3f39dcf2-055e-4aa8-8caa-09223175a5fa
 # ╟─facdf937-4056-4699-b505-d9cada0c8ce3
 # ╟─5cb62b37-fe28-4816-b7ed-f5f40df255dc
-# ╠═f4e189ac-5d12-4de5-80e1-516103e5950f
+# ╟─f4e189ac-5d12-4de5-80e1-516103e5950f
 # ╟─c3135efd-e69c-4270-8b45-b3f9f2dd586c
 # ╟─8923e1c1-914d-47b5-a4b4-5f0c53c4e810
 # ╟─3d25e2bc-9a6d-4712-92ed-de31dbdea3f2

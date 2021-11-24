@@ -44,17 +44,21 @@ md"""
 md"""
 # 🎯 Estimação
 
-Você com certeza já ouviu falar sobre **modelagem geológica 3D**. Durante esse procedimento, o geólogo utiliza os dados disponíveis (e.g. furos de sondagem, mapa geológico) e faz algumas inferências para gerar um modelo tridimensional da subsuperfície. Após a geração desse modelo (contínuo), ele normalmente é discretizado em pequenos "tijolos" denominados blocos. Por essa razão, o modelo geológico discretizado é chamado de **modelo de blocos**.
+Você com certeza já ouviu falar sobre **Modelagem Geológica 3D**. Durante esse procedimento, o geólogo utiliza os dados disponíveis (e.g. furos de sondagem, mapa geológico) e faz algumas inferências para gerar um modelo tridimensional da subsuperfície. Após a geração desse modelo (contínuo), ele normalmente é discretizado em pequenos "tijolos" denominados blocos. Por essa razão, o modelo geológico discretizado é chamado de **modelo de blocos**.
 
 Neste módulo, aprenderemos sobre diferentes **estimadores** (i.e. métodos de estimação) que visam atribuir um valor de teor a cada bloco do modelo de blocos. Para realizar essa tarefa, precisamos de amostras (e.g. furos de sondagem, amostras de solo) e do modelo de blocos, onde realizaremos as estimativas. O modelo de blocos, de forma genérica, pode ser chamado de **domínio de estimação** (ou grid de estimação).
 
-Podemos pensar que a estimação consiste na interpolação de amostras com teores conhecidos para atribuir teores (estimados) a regiões que não foram amostradas.
+Podemos pensar que a estimação consiste na interpolação de amostras com teores conhecidos para atribuir teores (estimados) a regiões que não foram amostradas. A Figura 01 ilustra o problema de estimação de um bloco, em um contexto bidimensional. O objetivo é ponderar e "combinar" os teores das amostras da vizinhança, representadas pelos triângulos, para estimar o teor médio do bloco. Esse procedimento é realizado para cada bloco do modelo de blocos!
 
-> ⚠️ Neste módulo adotaremos uma convenção para facilitar a compreensão do conteúdo. O processo de atribuir valores de teor a unidades discretizadas será chamado de **estimação**, do inglês *estimation*. Por outro lado, os teores resultantes do processo de estimação serão chamados de **estimativas**, do inglês *estimates*. Ressalta-se que, na indústria, o termo *estimativa* é comumente utilizado para se referir tanto ao processo quanto aos valores estimados.
+![Figura 01](https://i.postimg.cc/mrBQryqN/estimation.png)
+
+_**Figura 01:** Exemplo de estimação de um bloco (2D). O intuito é estimar o teor médio do bloco a partir da ponderação dos teores das amostras circunvizinhas (triângulos). Extraído de Sinclair & Blackwell (2006)._
+
+> ⚠️ Neste módulo, adotaremos uma convenção para facilitar a compreensão do conteúdo. O processo de atribuir valores de teor a unidades discretizadas será chamado de **estimação**, do inglês *estimation*. Por outro lado, os teores resultantes do processo de estimação serão chamados de **estimativas**, do inglês *estimates*. Ressalta-se que, na indústria, o termo *estimativa* é comumente utilizado para se referir tanto ao processo quanto aos valores estimados.
 
 Este módulo é estruturado de forma a seguir o fluxo de trabalho adotado pelo [GeoStats.jl](https://github.com/JuliaEarth/GeoStats.jl):
 
-- **Etapa 1:** Criação do domínio de estimativas;
+- **Etapa 1:** Criação do domínio de estimação;
 - **Etapa 2:** Definição do problema de estimação;
 - **Etapa 3:** Definição do estimador;
 - **Etapa 4:** Solução do problema de estimação.
@@ -98,11 +102,11 @@ Os três métodos listados acima compartilham a mesma equação para calcular es
 \hat{z}(x_o) = \sum_{i=1}^{n} w_i \cdot z(x_i) = w_1 \cdot z(x_1) + w_2 \cdot z(x_2) + \cdots + w_n \cdot z(x_n)
 ```
 
-em que $\{z(x_1), z(x_2), ..., z(x_n)\}$ são os valores das $n$ amostras que serão utilizadas na estimação da posição $x_0$, enquanto $\{w_1, w_2, ..., w_n\}$ representam os pesos atribuídos a cada $i$-ésima amostra (*Isaaks & Srivastava, 1989*).
+em que $\{z(x_i)\}_{i=1}^{n}$ são os valores das $n$ amostras que serão utilizadas na estimação da posição $x_0$, enquanto $\{w_i\}_{i=1}^{n}$ representam os pesos atribuídos a cada $i$-ésima amostra (*Isaaks & Srivastava, 1989*).
 
 > ⚠️ Na Estatística, é muito comum representar estimativas com o símbolo "^".
 
-Os métodos caracterizados por essa equação são denominados **estimadores lineares ponderados** e se diferenciam entre si de acordo com a forma que os pesos $w_i$ são atribuídos a cada amostra.
+Os métodos caracterizados por essa equação são denominados **estimadores lineares ponderados** e se diferenciam entre si na forma que os pesos $w_i$ são atribuídos a cada amostra.
 """
 
 # ╔═╡ 9b31cfec-400a-4068-84b8-8170b3c8ab58
@@ -111,7 +115,7 @@ md"""
 
 Uma abordagem intuitiva para atribuir pesos é pensar que amostras mais distantes do ponto a ser estimado devem receber pesos menores, enquanto amostras próximas devem receber pesos maiores.
 
->⚠️ De acordo com a 1ª Lei da Geografia, proposta por Tobler na década de 1970: *"tudo está relacionado a tudo, mas coisas mais próximas são mais parecidas (relacionadas) entre si do que coisas mais distantes"*.
+>⚠️ De acordo com a 1ª Lei da Geografia, proposta por Waldo Tobler na década de 1970: *"tudo está relacionado a tudo, mas coisas mais próximas são mais parecidas (relacionadas) entre si do que coisas mais distantes"*.
 
 Nesse sentido, no método **Inverso da Potência da Distância (IPD)**, o peso $w_i$ de uma amostra $z(x_i)$ é inversamente proporcional a sua distância Euclidiana $d_i$ até o ponto que está sendo estimado $\hat{z}(x_o)$ (*Isaaks & Srivastava, 1989*). É comum escolhermos uma potência $p$ arbitrária associada à distância:
 
@@ -123,7 +127,7 @@ em que $w_i = \frac{1}{d_i^p}$. O denominador da equação acima é uma **condi�
 
 >⚠️ Na Mineração, é muito comum adotar-se $p=2$. Nesse caso específico, o método pode ser chamado de **Inverso do Quadrado da Distância (IQD)**.
 
-A Figura 01 mostra um gráfico de distância por peso para diferentes potências $p$:
+A Figura 02 mostra um gráfico de distância por peso para diferentes potências $p$:
 """
 
 # ╔═╡ 951ca515-39a9-4e95-a53c-6fd7977a4cbb
@@ -141,7 +145,7 @@ end
 
 # ╔═╡ 28acc648-ac4a-4d1c-86ce-5bb329c6a141
 md"""
-_**Figura 01:** Relação entre distância e peso para diferentes potências $p$._
+_**Figura 02:** Relação entre distância e peso para diferentes potências $p$._
 """
 
 # ╔═╡ 25ddae7c-a276-417e-92c8-9fc2076db219
@@ -155,17 +159,17 @@ md"""
 md"""
 ### Krigagem
 
-**Krigagem** é um termo genérico aplicado a uma família de métodos de estimação que buscam *minimizar o erro (ou resíduo) da estimação*, normalmente pela estratégia de Mínimos Quadrados (*Sinclair & Blackwell, 2006*). Alguns exemplos são: Krigagem Simples (KS), Krigagem Ordinária (KO), Krigagem Universal (KU) e Krigagem com Deriva Externa (KDE). Neste módulo, abordaremos apenas os dois primeiros.
+**Krigagem** é um termo genérico aplicado a uma família de métodos de estimação que buscam *minimizar o erro (ou resíduo) da estimação*, normalmente pela estratégia de Mínimos Quadrados (*Sinclair & Blackwell, 2006*). Alguns exemplos são: Krigagem Simples (KS), Krigagem Ordinária (KO), Krigagem Universal (KU) e Krigagem com Deriva Externa (KDE). Ainda que todos esses estimadores estejam disponíveis no [GeoStats.jl](https://github.com/JuliaEarth/GeoStats.jl), neste módulo, abordaremos apenas os dois primeiros.
 
 >⚠️ Um **resíduo** (ou erro) consiste na diferença entre o valor estimado e o valor real $r = \hat{z}(x) - z(x)$ para um determinado ponto pertencente ao domínio de estimação.
 
-Os métodos de Krigagem estão associados ao acrônimo **B.L.U.E.** (*Best Linear Unbiased Estimator*). Eles são estimadores **lineares**, pois suas estimativas são combinações lineares ponderadas das amostras disponíveis. Além disso, são **não enviesados**, já que a média dos resíduos é idealmente igual a zero. Por fim, esses métodos são **"melhores"**, pois objetivam minimizar a variância dos resíduos $\sigma_r^2$, que pode ser escrita como (*Isaaks & Srivastava, 1989*):
+Os métodos de Krigagem estão associados ao acrônimo **B.L.U.E.** (*Best Linear Unbiased Estimator*). Eles são estimadores **lineares**, pois suas estimativas são combinações lineares ponderadas das amostras disponíveis. Além disso, são **não enviesados**, já que a média dos resíduos é idealmente igual a zero. Por fim, esses métodos são **ótimos**, pois objetivam minimizar a variância dos resíduos $\sigma_r^2$, que pode ser escrita como (*Isaaks & Srivastava, 1989*):
 
 ```math
 \sigma_r^2 = \frac{1}{n} \sum_{i=1}^{n} [\hat{z}(x_i) - z(x_i)]^2 = E[\hat{z}(x_i) - z(x_i)]^2
 ```
 
-A minimização de $\sigma_r^2$ é justamente o diferencial dos estimadores da família da Krigagem, já que o método IPD também é linear e não enviesado (*Isaaks & Srivastava, 1989*). A Figura 02 mostra um exemplo de duas distribuições de resíduos hipotéticas...
+A minimização de $\sigma_r^2$ é justamente o diferencial dos estimadores da família da Krigagem, já que o método IPD também é linear e não enviesado (*Isaaks & Srivastava, 1989*). A Figura 03 mostra um exemplo de duas distribuições de resíduos hipotéticas...
 """
 
 # ╔═╡ 78866735-d01e-4c9d-abec-3ed54b8ed612
@@ -191,7 +195,7 @@ end
 
 # ╔═╡ d5d0ef84-7c79-4d5e-af5c-52090b1dd233
 md"""
-_**Figura 02:** Distribuições de resíduos hipotéticas._
+_**Figura 03:** Exemplos de duas distribuições de resíduos hipotéticas._
 """
 
 # ╔═╡ fa6d5e16-ad13-4e68-8ee8-d846db277917
@@ -207,9 +211,9 @@ md"""
 md"""
 #### Krigagem Simples (KS)
 
-Para se utilizar a **Krigagem Simples (KS)**, um estimador da família da Krigagem, deve-se ter conhecimento, à priori, da média real do depósito $\mu$. Esse seria o "maravilhoso caso em que conhecemos a média" (*Chilès & Delfiner, 2012*).
+Para se utilizar a **Krigagem Simples (KS)**, um estimador da família da Krigagem, deve-se ter conhecimento, à priori, da média do depósito $\mu$. Esse seria o "maravilhoso caso em que conhecemos a média" (*Chilès & Delfiner, 2012*).
 
-Na SK, ao minimizar a variância da estimação $\sigma_r^2$, obtemos as seguintes equações (*Sinclair & Blackwell, 2006*):
+Na KS, ao minimizar a variância da estimação $\sigma_r^2$, obtemos as seguintes equações (*Sinclair & Blackwell, 2006*):
 
 ```math
 \begin{bmatrix}
@@ -235,9 +239,9 @@ Na SK, ao minimizar a variância da estimação $\sigma_r^2$, obtemos as seguint
 	\gamma(x_n,x_0) \\
 \end{bmatrix}
 ```
-em que $\gamma(x_1, x_j)$ representa o valor do variograma entre os pares das $n$ amostras utilizadas na estimação, $w_i$ representa os pesos que serão atribuídos às amostras e $\gamma(x_i, x_0)$ é o valor do variograma entre uma amostra e o ponto a ser estimado. O passo seguinte é realizar uma simples manipulação algébrica para isolar o vetor de pesos que, por sua vez, é a informação que desejamos obter.
+em que $\gamma(x_i, x_j)$ representa o valor do variograma para cada par de amostras $(x_i,x_j)$ utilizadas na estimação; $w_i$ representa os pesos que serão atribuídos às amostras e $\gamma(x_i, x_0)$ é o valor do variograma entre cada amostra $x_i$ e o ponto a ser estimado $x_0$. O passo seguinte é realizar uma simples manipulação algébrica para isolar o vetor de pesos que, por sua vez, é a informação que desejamos obter.
 
-Especificamente na KS, a soma dos pesos $w_i$ não totaliza em 1 e, o peso restante é atribuído ao valor da média do depósito. Chamaremos esse peso atribuído a média de $w_\mu$:
+Especificamente na KS, a soma dos pesos $w_i$ não totaliza em 1 e o peso restante é atribuído ao valor da média do depósito. Chamaremos esse peso atribuído a média global de $w_\mu$:
 
 ```math
 w_\mu = 1 - \sum_{i=1}^{n}w_i
@@ -245,7 +249,7 @@ w_\mu = 1 - \sum_{i=1}^{n}w_i
 
 >⚠️ A demonstração de como obter o sistema linear acima foge do escopo deste material. Para mais detalhes, consulte *Isaaks & Srivastava (1989)*.
 
-Como raramente temos acesso à média do depósito, a KS não é um método tão utilizado como a Krigagem Simples, que veremos a seguir (*Sinclair & Blackwell, 2006*).
+Como raramente temos acesso à média do depósito, a KS não é um método tão utilizado como a Krigagem Ordinária, que veremos a seguir (*Sinclair & Blackwell, 2006*).
 """
 
 # ╔═╡ eab5920c-fd1f-4e03-a6f3-90e3ce731b6e
@@ -254,7 +258,7 @@ md"""
 
 Ao contrário da KS, na **Krigagem Ordinária (KO)**, a média do depósito não precisa ser conhecida. Nesse método, a minimização de $\sigma_r^2$ é realizada com uma restrição de que a soma dos pesos $w_i$ deve totalizar em 1 (*Sinclair & Blackwell, 2006*).
 
-Essa restrição é introduzida no processo de minimização a partir da criação de uma variável artificial, o *Parâmetro de Lagrange* $\lambda$. Portanto, uma equação adicional (equivalente a zero) é introduzida no sistema linear da KO (*Sinclair & Blackwell, 2006*):
+Essa restrição é introduzida no processo de minimização a partir da criação de uma variável artificial, o *parâmetro de Lagrange* $\lambda$. Portanto, uma equação adicional, equivalente a zero, é introduzida no sistema linear da KO (*Sinclair & Blackwell, 2006*):
 
 ```math
 \begin{bmatrix}
@@ -284,7 +288,7 @@ Essa restrição é introduzida no processo de minimização a partir da criaç�
 \end{bmatrix}
 ```
 
->⚠️ Note que o sistema linear da KO é muito similar àquele da KS. A única diferença é que adicionamos uma equação extra para garantir a condição de fechamento.
+>⚠️ Note que o sistema linear da KO é muito similar àquele da KS. A única diferença é que adicionamos uma equação extra para garantir o fechamento.
 
 Como a soma dos pesos $w_i$ totaliza em 1, não é necessário atribuir um peso $w_\mu$ à média real e, consequentemente, não precisamos ter conhecimento desse parâmetro. Isso corrobora o fato de a KO ser o estimador mais utilizado na indústria.
 """
@@ -293,7 +297,7 @@ Como a soma dos pesos $w_i$ totaliza em 1, não é necessário atribuir um peso 
 md"""
 ## 2. Criação do domínio de estimação
 
-Assim como no módulo anterior, também utilizaremos a famosa base de dados [Walker Lake](https://github.com/fnaghetini/intro-to-geostats/blob/main/data/Walker_Lake.csv). Primeiramente, vamos importar e georreferenciar esses dados. Novamente, apenas a variável `Pb` (em %) será considerada...
+Assim como no módulo anterior, também utilizaremos a base de dados [Walker Lake](https://github.com/fnaghetini/intro-to-geostats/blob/main/data/Walker_Lake.csv). Primeiramente, vamos importar e georreferenciar esses dados. Novamente, apenas a variável `Pb` (em %) será considerada...
 """
 
 # ╔═╡ 669d757d-dc19-43e1-b96f-8c1aa31f7579
@@ -321,17 +325,17 @@ Agora, podemos criar o nosso **domínio de estimação**, ou seja, um grid 2D on
 
 - Coordenada do ponto de origem do domínio (vértice inferior esquerdo);
 - Coordenada do ponto de término do domínio (vértice superior direito);
-- Número de células em cada direção (i.e. X e Y).
+- Número de células em cada direção (X e Y).
 
-Definiremos a "caixa delimitadora" do grid a partir da criação de um retângulo aderente à malha amostral, utilizando a função `boundingbox`. Dessa forma, podemos encontrar as coordenadas de origem e de término do domínio, obtendo as coordenadas mínima e máxima do retângulo, respectivamente.
+Definiremos a "caixa delimitadora" do grid por meio da criação de um retângulo aderente à malha amostral, utilizando a função `boundingbox`. Dessa forma, podemos encontrar as coordenadas de origem e término do domínio, obtendo as coordenadas mínima e máxima do retângulo, respectivamente.
 
 Ao invés de informarmos o número de células em cada direção, é mais conveniente informarmos as dimensões que cada uma das células deve ter, ou seja, o *tamanho da célula*. Para isso, basta fazermos algumas manipulações, como veremos a seguir.
 
 >⚠️ Aqui o termo *célula* foi adotado simplesmente por se tratar de um problema 2D. Em contextos 3D, o termo *bloco* é mais comum, como veremos no próximo módulo.
 
-O tamanho da célula (ou bloco) é um parâmetro crucial, principalmente quando o objetivo é realizar uma *Krigagem de blocos*. Como neste módulo realizaremos uma *Krigagem de pontos*, ou seja, estimaremos o centroide de cada célula, não iremos discutir sobre esse parâmetro com tanto rigor. Definiremos o tamanho das células como ½ do espaçamento médio entre amostras vizinhas que, no nosso caso, é de `10 m x 10 m`.
+O tamanho da célula (ou bloco) é um parâmetro crucial quando o objetivo é realizar uma *Krigagem de blocos*. Como neste módulo realizaremos uma *Krigagem de pontos*, ou seja, estimaremos o centroide de cada célula, não iremos discutir sobre esse parâmetro com tanto rigor. Definiremos o tamanho das células como ½ do espaçamento médio entre amostras vizinhas que, no nosso caso, é de 10 m x 10 m.
 
->⚠️ Na estimação 3D de recursos, uma [heurística](https://en.wikipedia.org/wiki/Heuristic) comumente adotada é definir o tamanho do bloco como ¼ a ½ do espaçamento médio entre amostras vizinhas (*Abzalov, 2016*). Caso queira investigar as diferenças entre Krigagem de pontos e Krigagem de blocos, consulte *Isaaks & Srivastava (1989)*.
+>⚠️ Na estimação 3D de recursos, uma [heurística](https://en.wikipedia.org/wiki/Heuristic) comumente adotada é definir o tamanho do bloco como ⅓ a ½ do espaçamento médio entre amostras vizinhas (*Abzalov, 2016*). Caso queira investigar as diferenças entre Krigagem de pontos e Krigagem de blocos, consulte *Isaaks & Srivastava (1989)*.
 """
 
 # ╔═╡ b14c6b92-81cc-482f-9746-d9a011cff5cd
@@ -354,7 +358,7 @@ end
 
 # ╔═╡ 9055d652-1c6c-4d73-9302-d58a35ffb975
 md"""
-A Figura 03 ilustra a distribuição espacial das amostras de Pb (%) sobre o grid de estimação definido acima. O nosso objetivo, neste módulo, é estimar valores de `Pb` para cada centroide das células.
+A Figura 04 ilustra a distribuição espacial das amostras de Pb (%) sobre o grid de estimação definido acima. O nosso objetivo, neste módulo, é estimar valores de `Pb` para cada centroide das células.
 """
 
 # ╔═╡ 37462572-3c3d-46e1-8e2d-266e86470b6a
@@ -369,7 +373,7 @@ end
 
 # ╔═╡ 4469f1a2-6054-4ba0-b402-03892d3a90e4
 md"""
-_**Figura 03:** Amostras de Pb (%) plotadas sobre o domínio de estimação._
+_**Figura 04:** Amostras de Pb (%) plotadas sobre o domínio de estimação (grid)._
 """
 
 # ╔═╡ 2531eee8-72c5-4056-879c-b1b65273d51a
@@ -380,7 +384,7 @@ O passo seguinte é definir o **problema de estimação**. Para isso, basta info
 
 - Amostras georreferenciadas;
 - Domínio de estimação;
-- Variável que será estimado.
+- Variável que será estimada.
 
 No nosso caso, conforme mencionado anteriormente, estamos interessados em estimar os centroides das células e, para isso, utilizaremos a função `centroid`.
 
@@ -416,11 +420,11 @@ end;
 md"""
 ## 4. Definição do estimador
 
-Além de escolhermos qual estimador utilizaremos e obtermos o modelo de variograma (apenas no caso da Krigagem), devemos definir os chamados **parâmetros de vizinhança** ou, simplesmente, *vizinhança*. A vizinhança restringe o número de amostras que serão utilizadas na estimação de um ponto.
+Além de escolhermos qual estimador utilizaremos e obtermos o modelo de variograma (apenas no caso da Krigagem), devemos definir os chamados *parâmetros de vizinhança* ou, simplesmente, **vizinhança**. A vizinhança restringe o número de amostras que serão utilizadas na estimação de um ponto.
 
-Segundo *Chilès & Delfiner (2012)*, a teoria sempre foi construída considerando todas as $n$ amostras disponíveis para calcular cada uma das estimativas. Entretanto, na prática, $n$ pode ser suficientemente grande a ponto do cálculo das estimativas não ser computacionalmente viável. Nesse sentido, uma prática comum é definir um **número mínimo e máximo de amostras** que serão utilizadas para estimar um determinado ponto. Essas informações são exemplos de parâmetros de vizinhança e são representados pelos argumentos `minneighbors` e `maxneighbors`, respectivamente.
+Segundo *Chilès & Delfiner (2012)*, a teoria sempre foi construída considerando todas as $n$ amostras disponíveis para calcular cada uma das estimativas. Entretanto, na prática, $n$ pode ser suficientemente grande a ponto do cálculo das estimativas não ser computacionalmente viável. Nesse sentido, uma prática comum é definir um **número mínimo e máximo de amostras** que serão utilizadas para estimar cada ponto. Essas informações são exemplos de parâmetros de vizinhança e são representados pelos argumentos `minneighbors` e `maxneighbors`, respectivamente.
 
-Outro parâmetro importante é a **área de busca**, que, normalmente, é representada por uma elipse. Durante a estimação, o centroide da elipse coincide com a posição do ponto a ser estimado. Dessa forma, apenas as amostras que se situarem no interior da área de busca poderão ser utilizadas na estimativa. A elipse (ou elipsoide) de busca é representado pelo parâmetro `neighborhood`.
+Outro parâmetro importante é a **área de busca**, que, normalmente, é representada por uma elipse. Durante a estimação, o centroide da elipse coincide com a posição do ponto a ser estimado. Dessa forma, apenas as amostras que se situarem no interior da área de busca poderão ser utilizadas na estimação. A elipse (ou elipsoide) de busca é representada pelo parâmetro `neighborhood`.
 
 > ⚠️ As dimensões de uma elipse são definidas por dois eixos principais ortogonais entre si, enquanto sua orientação é definida por uma rotação em relação ao Norte (i.e. azimute). É comum utilizar a elipse de anisotropia (obtida durante a variografia) como elipse de busca, uma vez que ela nos indica até qual distância duas amostras apresentam interdependência espacial.
 """
@@ -441,17 +445,17 @@ end;
 
 # ╔═╡ 045cdf16-d264-4b5d-990b-c1bd2acb5613
 md"""
-Considerere uma estimação em que os números mínimo e máximo de amostras são iguais a 2 e 5, respectivamente. A elipse de busca apresenta uma rotação de 45°, ou seja, seu maior eixo está alinhado ao azimute 045°. A Figura 04 mostra três situações distintas que podem ocorrer durante a estimação do centroide de um bloco. As amostras em vermelho são externas à área de busca e não podem ser utilizadas na estimação, enquanto as amostras verdes, por se situarem dentro da elipse de busca, podem.
+Considerere uma estimação em que os números mínimo e máximo de amostras são iguais a 2 e 5, respectivamente. A elipse de busca apresenta uma rotação de 45°, ou seja, seu maior eixo está alinhado ao azimute 045°. A Figura 05 mostra três situações distintas que podem ocorrer durante a estimação do centroide de um bloco. As amostras em vermelho são externas à área de busca e não podem ser utilizadas na estimação, enquanto as amostras verdes, por se situarem dentro da elipse de busca, podem.
 
-- No **cenário A**, como existem 4 amostras no interior da elipse e o máximo permitido é de 5 amostras, todas elas serão utilizadas na estimação do centroide;
+- No **Cenário A**, como existem 4 amostras no interior da elipse e o máximo permitido é de 5 amostras, todas elas serão utilizadas na estimação do centroide;
 
-- No **cenário B**, as 2 amostras internas à área de busca serão utilizadas na estimação;
+- No **Cenário B**, as 2 amostras internas à área de busca serão utilizadas na estimação;
 
-- No **cenário C**, como apenas 1 amostra está inserida dentro da elipse de busca e o mínimo de amostras é igual a 2, o centroide do bloco *não* será estimado.
+- No **Cenário C**, como apenas 1 amostra está inserida dentro da elipse de busca e o mínimo de amostras é igual a 2, o centroide do bloco *não* será estimado.
 
-![Figura_04](https://i.postimg.cc/HLgMG7Sr/elipses.jpg)
+![Figura_05](https://i.postimg.cc/HLgMG7Sr/elipses.jpg)
 
-_**Figura 04:** Estimação do centroide de um bloco. (A) As quatro amostras internas à elipse de busca são utilizadas na estimação. (B) As duas amostras internas à elipse de busca são utilizadas na estimação. (C) Como não há amostras suficientes, o centroide não é estimado. Figura elaborada pelo autor._
+_**Figura 05:** Estimação do centroide de um bloco. (A) As quatro amostras internas à elipse de busca são utilizadas na estimação. (B) As duas amostras internas à elipse de busca são utilizadas na estimação. (C) Como não há amostras suficientes, o centroide não é estimado. Figura elaborada pelo autor._
 """
 
 # ╔═╡ 79c812cf-849a-4eea-93d2-b08a3844d5a7
@@ -460,12 +464,12 @@ No nosso exemplo, iremos definir três estimadores distintos: IQD, KS e KO. Os n
 
 No caso dos estimadores KS e KO, utilizaremos o modelo de variograma `γ` e uma elipse de busca `elp` igual à elipse de anisotropia. A média , que deve ser informada no caso da KS, será definida como o valor da média desagrupada de Pb `μₚ`.
 
-> ⚠️ O modelo de variograma `γ` utilizado apresenta o eixo primário alinhado N-S, com um alcance de 100 m e um eixo segundário alinhado E-W, com um alcance de 35 m. O efeito pepita considerado foi de 3.0, ou seja, cerca de 30% do valor do patamar.
+> ⚠️ O modelo de variograma `γ` utilizado apresenta o eixo primário alinhado N-S, com um alcance de 100 metros e um eixo segundário alinhado E-W, com um alcance de 35 metros. O efeito pepita considerado foi de 3.0, e corresponde a $\approx$ 30% do valor do patamar.
 """
 
 # ╔═╡ b2cb5618-72ba-43a3-9b04-cb2a8821bfa9
 begin
-	# média desclusterizada
+	# média desagrupada
     μₚ = mean(geowl, :Pb, 25.)
 	
 	# IQD
@@ -488,9 +492,9 @@ end;
 md"""
 ## 5. Solução do problema de estimação
 
-Para gerar as de estimativas de Pb (%), resolvemos o problema definido com os três estimadores. Para isso, devemos passar o problema de estimação e o estimador como parâmetros da função `solve`. Clique na caixa abaixo para executar as estimativas...
+Para gerar as de estimativas de Pb (%), resolvemos o problema definido com os três estimadores. Para isso, devemos passar o problema de estimação e o estimador como parâmetros da função `solve`. Clique na caixa abaixo para calcular as estimativas...
 
-Executar estimativas: $(@bind run CheckBox())
+Calcular estimativas: $(@bind run CheckBox())
 """
 
 # ╔═╡ d5977fdd-c9bc-4589-ae0e-f6cac6973fbb
@@ -511,7 +515,7 @@ end
 # ╔═╡ 73b54c21-7b69-429b-a088-fba3d0c09459
 if run
 	md"""
-	Agora que os teores de Pb foram estimados, clique na caixa abaixo para visualizar o resultado (Figura 05). Em seguida, utilize a lista suspensa abaixo para selecionar a solução que deseja visualizar...
+	Agora que os teores de Pb foram estimados, clique na caixa abaixo para visualizar o resultado (Figura 06). Em seguida, utilize a lista suspensa abaixo para selecionar a solução que deseja visualizar...
 
 	Visualizar estimativas: $(@bind viz CheckBox())
 	"""
@@ -559,7 +563,7 @@ end
 # ╔═╡ 981efb6c-b1ea-4577-9c40-f3f374a23ba1
 if run && viz
 	md"""
-	_**Figura 05:** Visualização das estimativas de Pb por $solucao._
+	_**Figura 06:** Visualização das estimativas de Pb por $solucao._
 	"""
 end
 
@@ -568,7 +572,7 @@ if run && viz
 	md"""
 	##### Observações
 
-	- Visualmente, as estimativas geradas por KO são muito similares àquelas geradas por KS, mas distintas daquelas produzidas por IQD;
+	- Visualmente, as estimativas geradas por KO são muito similares àquelas geradas por KS, mas distintas daquelas produzidas pelo IQD;
 	- As estimativas geradas por Krigagem são muito mais contínuas na direção N-S do que na direção E-W. Esse resultado reflete o modelo de variograma informado e é coerente com a distribuição espacial dos teores de Pb (%) que, por sua vez, são também mais contínuos na direção N-S;
 	- Como discutido no módulo anterior, essa base de dados foi gerada a partir do modelo digital de elevação da região de Walker Lake, nos EUA. Nessa região, há uma serra orientada na direção N-S, o que valida a nossa hipótese de que os dados são mais contínuos ao longo dessa direção;
 	- Como não é possível informar um modelo de variograma na estimação por IQD, esse estimador não apresentou um desempenho tão bom ao reproduzir a maior continuidade do fenômeno (i.e. mineralização de Pb) na direção N-S;
@@ -586,7 +590,7 @@ Existem diferentes abordagens de validação das estimativas, sendo a principal 
 
 Uma outra inspeção que deve ser realizada é a **validação global das estimativas**. Para isso, devemos comparar as estatísticas desagrupadas das amostras com as estatísticas associadas às estimativas obtidas. Segundo *Sinclair & Blackwell (2006)*, os métodos de Krigagem levam em consideração a redundância de informação ao atribuir pesos às amostras. Em outras palavras, amostras muito próximas entre si são consideradas redundantes e recebem pesos menores. Portanto, como a Krigagem realiza um desagrupamento intrínseco, é mais conveniente comparar as estatísticas das estimativas resultantes com as estatísticas desagrupadas.
 
-A seguir compararemos quatro sumários estatísticos da variável Pb (%):
+A seguir, compararemos quatro sumários estatísticos da variável Pb (%):
 - Teores amostrais desagrupados;
 - Teores estimados por IQD;
 - Teores estimados por KS;
@@ -609,7 +613,7 @@ end;
 
 # ╔═╡ 260d5fa1-b2d9-4e9d-9154-c07f2959bce5
 md"""
-> ⚠️ Para visualizar os sumários estatísticos, a caixa *Executar estimativas* deve estar marcada.
+> ⚠️ Para visualizar os sumários estatísticos, a caixa *Calcular estimativas* deve estar marcada.
 """
 
 # ╔═╡ 6b4e35a1-4f1a-4745-9370-f982762af210
@@ -652,11 +656,11 @@ end
 md"""
 Um outro ponto que merece a nossa atenção é o **grau de suavização** das estimativas produzidas. Para isso, utilizaremos um gráfico que já conhecemos, o Q-Q Plot.
 
-O Q-Q plot entre os teores amostrais e os teores estimados pode ser utilizado para realizar uma comparação entre ambas as distribuições. Podemos analisar visualmente o grau de suavização dos diferentes estimadores a partir desse gráfico bivariado.
+O Q-Q plot entre os teores amostrais e os teores estimados pode ser utilizado para realizar uma comparação entre ambas as distribuições. Podemos analisar, visualmente, o grau de suavização dos diferentes estimadores a partir desse gráfico bivariado.
 
-A Figura 06 mostra os Q-Q plots entre os teores amostrais de Pb e os teores estimados de Pb pelos três métodos. Quanto mais distantes forem os pontos plotados da função identidade (X=Y), mais suaves são as estimativas em relação a distribuicão amostral.
+A Figura 07 mostra os Q-Q plots entre os teores amostrais de Pb e os teores estimados de Pb pelos três métodos. Quanto mais distantes forem os pontos plotados da função identidade $X=Y$, mais suaves são as estimativas em relação à distribuição amostral.
 
-> ⚠️ Para visualizar os Q-Q plots, a caixa *Executar estimativas* deve estar marcada.
+> ⚠️ Para visualizar os Q-Q plots, a caixa *Calcular estimativas* deve estar marcada.
 """
 
 # ╔═╡ 03d1da66-8202-4415-a44d-8c204e740960
@@ -693,7 +697,7 @@ end
 # ╔═╡ 5b07d44b-af44-425b-9e3e-9a5f643e840d
 if run
 	md"""
-	_**Figura 06:** Q-Q plots entre os teores amostrais e estimados de Pb (%)._
+	_**Figura 07:** Q-Q plots entre os teores amostrais e estimados de Pb (%)._
 	"""
 end
 
@@ -702,9 +706,9 @@ if run
 	md"""
 	##### Observações
 
-	- Os três métodos geraram estimativas suavizadas. Note que, pela rotação dos pontos em relação à reta X=Y, os teores de Pb estimados apresentam sempre dispersões inferiores em relação à dispersão dos teores de Pb amostrais. Esse fato é ligeiramente mais evidente no caso da KS;
+	- Os três métodos geraram estimativas suavizadas. Note que, pela rotação dos pontos em relação à reta $X=Y$, os teores de Pb estimados apresentam sempre dispersões inferiores em relação à dispersão dos teores de Pb amostrais. Esse fato é ligeiramente mais evidente no caso da KS;
 	- Em geral, há uma superestimação dos teores mais baixos e uma subestimação dos teores mais altos;
-	- Os estimadores da família da Krigagem tendem a gerar estimativas que não honram a real variabilidade do depósito (i.e. mais suavizadas). Uma alternativa seria a utilização de técnicas de **Simulação Geoestatística**. Para ter uma breve introdução a esse tópico, confira este [notebook](https://github.com/juliohm/CBMina2021/blob/main/notebook2.jl) e esta [videoaula](https://www.youtube.com/watch?v=3cLqK3lR56Y&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ) do Prof. Michael Pyrcz.
+	- Os estimadores da família da Krigagem tendem a gerar estimativas que não honram a real variabilidade do depósito (i.e. mais suavizadas). Uma alternativa seria a utilização de técnicas de **Simulação Geoestatística**. Para ter uma breve introdução a esse tópico, confira este [notebook](https://github.com/juliohm/CBMina2021/blob/main/notebook2.jl) e esta [videoaula](https://www.youtube.com/watch?v=3cLqK3lR56Y&list=PLG19vXLQHvSB-D4XKYieEku9GQMQyAzjJ) do Prof. Michael Pyrcz, da University of Texas.
 	"""
 end
 
@@ -1444,9 +1448,9 @@ uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 
 [[Libffi_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "761a393aeccd6aa92ec3515e428c26bf99575b3b"
+git-tree-sha1 = "0b4a5d71f3e5200a7dff793393e09dfc2d874290"
 uuid = "e9f186c6-92d2-5b65-8a66-fee21dc1b490"
-version = "3.2.2+0"
+version = "3.2.2+1"
 
 [[Libgcrypt_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libgpg_error_jll", "Pkg"]

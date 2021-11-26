@@ -48,9 +48,9 @@ md"""
 
 Este último módulo visa demonstrar, na prática, um fluxo de trabalho completo de estimativa de recursos realizado com o pacote [GeoStats.jl](https://github.com/JuliaEarth/GeoStats.jl). Para isso, utilizaremos todo o conhecimento adquirido nos cinco módulos anteriores. Abordaremos desde a etapa de importação dos dados brutos (tabelas Collar, Survey e Assay) até a geração de um modelo de teores 3D.
 
-> ⚠️ Nos dois últimos módulos trabalhamos com uma base de dados 2D (i.e. Walker Lake). Neste módulo, no entanto, trabalharemos com um banco de dados 3D e, por isso, adaptaremos alguns conceitos.
+> ⚠️ Nos dois últimos módulos, trabalhamos com uma base de dados 2D (i.e. Walker Lake). Neste módulo, no entanto, trabalharemos com um banco de dados 3D e, por isso, adaptaremos alguns procedimentos.
 
-O produto final deste módulo é um modelo de blocos estimado (i.e. modelo de teores) por diferentes métodos: Inverso do Quadrado da Distância (IQD), Krigagem Simples (KS) e Krigagem Ordinária (KO).
+O produto final deste módulo é um modelo de blocos (i.e. modelo de teores) estimado por três métodos: Inverso do Quadrado da Distância (IQD), Krigagem Simples (KS) e Krigagem Ordinária (KO).
 """
 
 # ╔═╡ 3353d0be-4280-4ffd-824b-745bb6b64f41
@@ -72,7 +72,7 @@ md"""
 md"""
 ## 1. Base de dados
 
-Neste módulo, utilizaremos uma base de dados desenvolvida pelo autor, denominada [Junipero](https://github.com/fnaghetini/intro-to-geostats/tree/main/data/Junipero). Ela consiste em conjunto de furos realizados durante uma campanha de sondagem em um depósito fictício de Cu Pórfiro. Portanto, estaremos interessados na estimativa da commodity Cu (%).
+Neste módulo, utilizaremos uma base de dados desenvolvida pelo autor, denominada [Junipero](https://github.com/fnaghetini/intro-to-geostats/tree/main/data/Junipero). Ela consiste em conjunto de furos realizados durante uma campanha de sondagem de um depósito fictício de Cu Pórfiro. Portanto, estaremos interessados na estimação da commodity Cu (%).
 
 A Figura 01 mostra os campos presentes nas quatro tabelas do banco de dados.
 """
@@ -81,14 +81,14 @@ A Figura 01 mostra os campos presentes nas quatro tabelas do banco de dados.
 md"""
 ![tabelas_raw](https://i.postimg.cc/52Qz4t7Z/tables.jpg)
 
-_**Figura 01:** Tabelas Collar, Survey, Assay e Litho e seus respectivos campos._
+_**Figura 01:** Tabelas Collar, Survey, Assay e Litho e seus respectivos campos. Figura elaborada pelo autor._
 """
 
 # ╔═╡ ff01a7d7-d491-4d49-b470-a2af6783c82b
 md"""
 ## 2. Geração de furos
 
-Primeiramente, vamos importar as quatro tabelas (i.e. Collar, Survey, Assay e Litho), utilizando o pacote [DrillHoles.jl](https://github.com/JuliaEarth/DrillHoles.jl)...
+Primeiramente, vamos importar as quatro tabelas, utilizando o pacote [DrillHoles.jl](https://github.com/JuliaEarth/DrillHoles.jl)...
 """
 
 # ╔═╡ 444402c6-99a3-4829-9e66-c4962fb83612
@@ -108,7 +108,7 @@ end;
 
 # ╔═╡ 0d0d610a-b06c-4c16-878d-8d2d124b8b9e
 md"""
-Em seguida, podemos utilizar a função `drillhole` do mesmo pacote para gerar os furos de sondagem...
+Em seguida, podemos utilizar a função `drillhole` para gerar os furos de sondagem...
 """
 
 # ╔═╡ 1d7df6f8-f643-4c1e-92b4-52e51c4ccda8
@@ -122,11 +122,16 @@ Vamos, agora, armazenar uma cópia da tabela de furos na variável `dh`...
 # ╔═╡ 412cfe3d-f9f1-49a5-9f40-5ab97946df6d
 dh = copy(drillholes.table);
 
+# ╔═╡ 43924780-8c8b-48c2-a287-a7e9082b3ced
+md"""
+> ⚠️ O símbolo `;`, ao final de uma linha, é utilizado para omitir a saída de um comando.
+"""
+
 # ╔═╡ d343401d-61dc-4a45-ab9b-beaff2534886
 md"""
 ##### Observações
 
-- Após a geração dos furos, não há inconsistências em nenhuma das tabelas importadas.
+- Não há inconsistências em nenhuma das tabelas importadas.
 """
 
 # ╔═╡ ec102b27-79e2-4a91-99d6-dff061752855
@@ -138,7 +143,7 @@ md"""
 md"""
 ## 3. Limpeza dos dados
 
-Nesta seção, iremos verificar a necessidade de se realizar uma limpeza na base de dados. Uma das primeiras atitudes a se tomar quando se lida com um novo banco de dados é a visualização do sumário estatístico de suas colunas. Frequentemente são encontrados valores faltantes e eventuais inconsistências. Podemos fazer isso com a função `describe`...
+Nesta seção, iremos verificar a necessidade de se realizar uma limpeza na base de dados. Uma das primeiras atitudes a se tomar, quando se lida com um novo banco de dados, é a visualização do sumário estatístico de suas colunas. Frequentemente, são encontrados valores faltantes e eventuais inconsistências. Podemos fazer isso com a função `describe`...
 """
 
 # ╔═╡ 15fd1c4d-fbf2-4389-bc1c-eabbbd26817b
@@ -150,12 +155,14 @@ md"""
 
 - Existem 307 valores faltantes das variáveis `CU` e `LITH`;
 - As variáveis que deveriam ser numéricas foram reconhecidas como tal;
-- Não existem valores anômalos que "saltam aos olhos".
+- Não existem valores anômalos que *saltam aos olhos*.
 """
 
 # ╔═╡ f9545a95-57c0-4de6-9ab7-3ac3728b3d27
 md"""
 Como o objetivo deste módulo é a geração de um modelo de estimativas de Cu (%), podemos remover os 307 valores faltantes do banco de dados e recalcular o sumário estatístico para validar essa operação. Para a remoção dos valores faltantes, utilizaremos a função `dropmissing!`...
+
+> ⚠️ O símbolo `!` de `dropmissing!` é utilizado para indicar que a remoção dos valores faltantes deve persistir. Ele é análago ao parâmetro `inplace=True` do Pandas.
 """
 
 # ╔═╡ 4d5f2467-c7d5-4a82-9968-97f193090bd6
@@ -222,7 +229,7 @@ md"""
 
 # ╔═╡ d8ce39f1-8017-4df3-a55d-648bdd3dbc04
 md"""
-Vamos agora utilizar a função `composite` para realizar a compositagem das amostras pelo método do comprimento ótimo (`mode=:nodiscard`) para um tamanho `interval` de 10 metros...
+Vamos, agora, utilizar a função `composite` para conduzir a compositagem das amostras pelo método do comprimento ótimo (`mode=:nodiscard`), com um tamanho `interval` de 10 metros...
 """
 
 # ╔═╡ 32f75604-b01a-4a0b-a008-33b2a56f4b57
@@ -279,7 +286,7 @@ md"""
 
 # ╔═╡ b85a7c2f-37e2-48b0-a1db-984e2e719f29
 md"""
-Podemos agora realizar uma comparação estatística entre as amostras brutas e as compostas ótimas a partir da função `compvalid`. Para isso, iremos avaliar a dispersão do comprimento das amostras e a média do teor de Cu (%).
+Podemos agora realizar uma comparação estatística entre as amostras brutas e as compostas ótimas por meio da função `compvalid`. Para isso, iremos avaliar a dispersão do comprimento das amostras e a média do teor de Cu (%).
 """
 
 # ╔═╡ 676bea93-69a9-4f2c-bb3e-759a9d28b12e
@@ -312,7 +319,7 @@ md"""
 md"""
 ## 5. Análise exploratória
 
-Nesta seção, iremos conduzir uma análise exploratória simples, visando descrever principalmente a variável `CU`.
+Nesta seção, iremos conduzir uma análise exploratória simples, visando descrever, principalmente, a variável `CU`.
 
 Primeiramente, vamos calcular sumário estatístico da variável `CU` e, em seguida, visualizar sua distribuição (Figura 04)...
 """
@@ -371,18 +378,16 @@ _**Figura 04:** Distribuição dos teores compostos de Cu (%)._
 md"""
 ##### Observações
 
-- A média do Cu é igual a 0,86%;
+- A média de Cu é igual a 0,86%;
 - O coeficiente de variação do Cu é de 46% e, portanto, essa variável é pouco errática;
-- A princípio, os lowgrades do depósito correspondem a amostras ≤ 0,47%;
-- A princípio, os high grades do depósito correspondem a amostras > 1,32%;
-- Como X̅ > P50, Skew > 0 e tem-se cauda alongada à direita, a distribuição dos teores compostos de Cu é assimétrica positiva.
+- Como X̅ > P50, Skew > 0 e tem-se uma cauda alongada à direita, a distribuição dos teores compostos de Cu é assimétrica positiva.
 """
 
 # ╔═╡ c0604ed8-766e-4c5d-a628-b156615f8140
 md"""
 Como estamos lidando com dados geoespaciais, a visualização espacial da variável de interesse sempre deve ser realizada em conjunto com a sua descrição estatística.
 
-Nesse sentido, podemos utilizar o pacote [Plots.jl](https://github.com/JuliaPlots/Plots.jl) para visualizar a distribuição espacial dos teores de Cu (Figura 05). Utilize os sliders abaixo para analisar os dados por ângulos diferentes...
+Nesse sentido, podemos utilizar o pacote [Plots.jl](https://github.com/JuliaPlots/Plots.jl) para visualizar a distribuição espacial dos teores de Cu (Figura 05). Utilize os sliders abaixo para rotacionar as amostras...
 """
 
 # ╔═╡ eac8e835-83bc-4f9c-b25b-3aaddcf69611
@@ -418,7 +423,7 @@ Podemos, ainda, visualizar os highgrades e lowgrades de Cu (Figura 06). Como nã
 - `lowgrades`: Cu (%) ≤ P10
 - `highgrades`: Cu (%) > P90
 
-Utilize os sliders acima para analisar esses teores por ângulos diferentes...
+Utilize os sliders acima para rotacionar as amostras...
 """
 
 # ╔═╡ 52c28a55-3a4a-4df3-841a-ab8fc748bf55
@@ -465,7 +470,7 @@ md"""
 
 - Os highgrades ocorrem em regiões de maior densidade amostral;
 - Os lowgrades tendem a se concentrar em porções de densidade amostral baixa;
-- As amostras apresentam-se ligeiramente agrupadas na porção sudeste do depósito.
+- As amostras apresentam-se ligeiramente agrupadas na porção SE do depósito.
 """
 
 # ╔═╡ c6c41764-509c-4f40-b063-a5f85dcc16db
@@ -477,7 +482,7 @@ md"""
 md"""
 ## 6. Desagrupamento
 
-Antes de calcularmos as estatísticas desagrupadas, devemos georreferenciar os dados, utilizando a função `georef`...
+Antes de calcularmos as estatísticas desagrupadas, devemos georreferenciar os dados. Para isso, utilizaremos a função `georef`...
 """
 
 # ╔═╡ 63b75ae2-8dca-40e3-afe0-68c6a639f54e
@@ -485,7 +490,7 @@ samples = georef(cp, (:X,:Y,:Z))
 
 # ╔═╡ 5699c563-d6cb-4bc2-8063-e1be00722a41
 md"""
-Com os dados georreferenciados, podemos calcular as estatísticas desagrupadas do Cu (%). Utilize o slider abaixo para configurar o tamanho do bloco de desagrupamento... 
+Com os dados georreferenciados `samples`, podemos calcular as estatísticas desagrupadas do Cu (%). Utilize o slider abaixo para configurar o tamanho do bloco de desagrupamento... 
 """
 
 # ╔═╡ 16cb8eaa-773e-4a42-ae8d-00bebddedc59
@@ -518,7 +523,7 @@ end
 md"""
 ##### Observações
 
-- A média desagrupada representa $(round(Xᵣ, digits=2))% da média original. Ou seja, há uma diferença de $(round((100-Xᵣ), digits=2))% de Cu entre a média original e a média desagrupada;
+- A média desagrupada representa $(round(Xᵣ, digits=2))% da média original;
 - Utilizaremos essas estatísticas desagrupadas mais tarde, durante a validação das estimativas.
 """
 
@@ -532,19 +537,20 @@ md"""
 
 ## 7. Variografia
 
-Durante o [módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/4-variografia.jl) tivemos uma breve introdução à variografia, com exemplos 2D. Neste módulo, entretanto, lidaremos com dados de sondagem 3D e, por isso, adotaremos o fluxo de trabalho a seguir. Em cada etapa, listamos os principais parâmetros encontrados:
+Durante o [módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/4-variografia.jl), tivemos uma breve introdução à variografia, com exemplos 2D. Neste módulo, entretanto, lidaremos com dados de sondagem 3D e, por isso, adotaremos o fluxo de trabalho a seguir. Em cada etapa, foram listados os principais parâmetros encontrados:
 
 1. **Variograma down hole:**
-    - Efeito pepita e as contribuições das estruturas.
+    - Efeito pepita;
+    - Contribuições por estrutura.
 2. **Variograma azimute:**
     - Azimute de maior continuidade;
-    - Primeira rotação do variograma (eixo Z).
+    - Primeira rotação do variograma (em torno do eixo Z).
 3. **Variograma primário:**
     - Dip de maior continuidade, fixando-se o azimute;
-    - Segunda rotação do variograma (eixo X);
+    - Segunda rotação do variograma (em torno do eixo X);
     - Alcance da direção (azimute + dip) de maior continuidade (Y).
 4. **Variogramas secundário e terciário:**
-    - Terceira rotação do variograma (eixo Y);
+    - Terceira rotação do variograma (em torno do eixo Y);
     - Alcance da direção de continuidade intermediária (X);
     - Alcance da direção de menor continuidade (Z).
 """
@@ -553,14 +559,14 @@ Durante o [módulo 4](https://github.com/fnaghetini/intro-to-geostats/blob/main/
 md"""
 ### 1. Variograma down hole
 
-Primeiramente, iremos calcular o **variograma experimental down hole**, com o intuito de se obter o *efeito pepita* e o valor de *contribuição por estrutura*.
+Primeiramente, iremos calcular o **variograma experimental down hole**, com o intuito de se obter o *efeito pepita* e o valor da *contribuição ao patamar por estrutura*.
 
 > ⚠️ Esses parâmetros serão utilizados na modelagem de todos os variogramas experimentais que serão calculados adiante.
 """
 
 # ╔═╡ 289865a9-906f-46f4-9faa-f62feebbc92a
 md"""
-Como o variograma down hole é calculado ao longo da orientação dos furos, devemos avaliar as estatísticas das variáveis `AZM` (azimute) e `DIP` (mergulho) pertencentes à tabela de perfilagem:
+Como o variograma down hole é calculado ao longo da orientação dos furos, podemos avaliar as estatísticas das variáveis `AZM` (azimute) e `DIP` (mergulho) pertencentes à tabela de perfilagem:
 """
 
 # ╔═╡ 1db51803-8dc4-4db6-80a1-35a489b6fb9e
@@ -610,7 +616,9 @@ end;
 
 # ╔═╡ a717d5d3-9f4e-4a2d-8e32-f0605bbd742f
 md"""
-Agora que sabemos a orientação média dos furos ($(round(μazi,digits=2))°/ $(round(μdip,digits=2))°), podemos calcular o variograma experimental down hole (Figura 07). Utilize os sliders abaixos para configurar os parâmetros necessários...
+Agora que sabemos a orientação média dos furos ($(round(μazi,digits=2))°/ $(round(μdip,digits=2))°), podemos calcular o variograma experimental down hole (Figura 07). Utilize os sliders abaixo para configurar os parâmetros necessários desse variograma experimental...
+
+> ⚠️ A linha continua cinza ($\sigma^2$) plotada em todos os variogramas daqui em diante representa a *variância à priori* dos dados.
 """
 
 # ╔═╡ 8348abd3-27f6-4161-bd04-c4be6a644888
@@ -651,7 +659,7 @@ end
 
 # ╔═╡ 0b46230a-b305-4840-aaad-e985444cf54e
 md"""
-Com o variograma down hole calculado, podemos ajustá-lo com um modelo teórico conhecido. Utilize os sliders abaixo para encontrar o melhor ajuste para esse variograma experimental (Figura 08)...
+Com o variograma down hole calculado, podemos ajustá-lo por um modelo teórico conhecido. Utilizaremos o modelo esférico para ajustar todos os variogramas daqui em diante. Utilize os sliders abaixo para encontrar o melhor ajuste para esse variograma experimental (Figura 08)...
 """
 
 # ╔═╡ fc2ea8f3-064a-4d6d-8115-236c8160cc23
@@ -720,12 +728,12 @@ Calcularemos diversos variogramas experimentais ortogonais entre si e escolherem
 
 Utilize o slider `Azimute` para definir o azimute de cálculo. Automaticamente, o variograma de direção perpendicular àquela definida também será calculado. Utilize os demais sliders para configurar os parâmetros restantes...
 
-> ⚠️ Normalmente, o variograma de menor continuidade é perpendicular ao variograma de maior alcance. Utilize essa informação para selecionar a direção mais contínua.
+> ⚠️ Em geral, assume-se que o variograma de menor continuidade é perpendicular ao variograma de maior alcance. Utilize essa informação para selecionar a direção mais contínua.
 """
 
 # ╔═╡ bda3cda3-9d57-495b-be79-1415aa95707f
 md"""
-_**Figura 09:** Variogramas experimentais de azimutes de maior e menor continuidade._
+_**Figura 09:** Variogramas experimentais de azimutes de maior (laranja) e menor (roxo) continuidade._
 """
 
 # ╔═╡ 17b21a63-9fa6-4975-9302-5465cdd3d2fa
@@ -774,15 +782,15 @@ colorpri, colorsec, colorter = :red, :green, :blue;
 md"""
 ### 3. Variograma primário
 
-Agora, calcularemos o **variograma experimental primário**, ou seja, aquele que representa a *direção (azimute/mergulho) de maior continuidade*.
+Agora, calcularemos o **variograma experimental primário**, ou seja, aquele que representa a *direção (azimute/dip) de maior continuidade*.
 
 Nesta etapa, devemos encontrar o *maior alcance* do modelo de variograma final, além da *segunda rotação do variograma*.
 
 > ⚠️ A segunda rotação do variograma ocorre em torno do eixo X.
 
-Para o cálculo deste variograma experimental, devemos fixar o azimute de maior continuidade já encontrado ($azi °) e variar o mergulho. A orientação (azimute/mergulho) que fornecer o maior alcance, será eleita a *direção de maior continuidade* (Figura 10).
+Para o cálculo deste variograma experimental, devemos fixar o azimute de maior continuidade já encontrado ($(azi)°) e variar o dip. A orientação (azimute/dip) que fornecer o maior alcance, será eleita a *direção de maior continuidade* (Figura 10).
 
-Utilize o slider `Mergulho` para definir o mergulho de cálculo e os outros para configurar os demais parâmetros...
+Utilize o slider `Dip` para definir o dip e os outros sliders para configurar os demais parâmetros...
 """
 
 # ╔═╡ 774f8e10-fd10-4b16-abcf-20579f174f8a
@@ -793,7 +801,7 @@ _**Figura 10:** Variograma experimental primário._
 # ╔═╡ 97670210-2c91-4be7-a607-0da83cb16f44
 md"""
 
-Mergulho: $(@bind dip Slider(0.0:22.5:90.0, default=22.5, show_value=true))°
+Dip: $(@bind dip Slider(0.0:22.5:90.0, default=22.5, show_value=true))°
 
 Número de passos: $(@bind nlagspri Slider(5:1:20, default=8, show_value=true))
 
@@ -817,7 +825,7 @@ end
 
 # ╔═╡ eb9ebce2-7476-4f44-ad4f-10a1ca522143
 md"""
-Agora que o variograma primário foi calculado, podemos utilizar os sliders abaixo para ajustá-lo com um modelo teórico conhecido (Figura 11)...
+Agora que o variograma primário foi calculado, podemos utilizar os sliders abaixo para ajustá-lo por um modelo teórico esférico (Figura 11)...
 """
 
 # ╔═╡ 24981600-3336-4295-b567-8f05785b9346
@@ -867,22 +875,22 @@ md"""
 
 ### 4. Variogramas secundário e terciário
 
-Por definição, os três eixos principais do variograma são ortogonais entre si. Agora que encontramos a *direção de maior continuidade do variograma (eixo primário)*, sabemos que os outros dois eixos (secundário e terciário) pertencem a um plano cuja normal é o próprio eixo primário!
+Por definição, os três eixos principais do variograma são ortogonais entre si. Agora que encontramos o *eixo primário*, sabemos que os outros dois eixos (i.e. secundário e terciário) pertencem a um plano cuja normal é o próprio eixo primário.
 
-Portanto, nesta etapa, encontraremos os *alcances intermediário e menor* do modelo de variograma final, bem como a *terceira rotação do variograma (rake)*.
+Portanto, nesta etapa, encontraremos os *alcances intermediário e menor* do modelo de variograma final, bem como a *terceira rotação do variograma (tilt)*.
 
 > ⚠️ A terceira rotação do variograma ocorre em torno do eixo Y.
 
-Como o eixo primário do variograma apresenta uma orientação $(azi)° / $(dip)°, podemos encontrar o plano que contém os eixos secundário e terciário. Ressalta-se ainda que *eixos secundário e terciário são ortogonais entre si*.
+Como o eixo primário do variograma apresenta uma orientação $(azi)° / $(dip)°, podemos encontrar o plano que contém os eixos secundário e terciário.
 
 > ⚠️ Iremos adotar a seguinte convenção de eixos:
->- Eixo primário (maior continuidade) = Y;
->- Eixo secundário (continuidade intermediária) = X;
->- Eixo terciário (menor continuidade) = Z.
+>- Eixo primário = Y;
+>- Eixo secundário = X;
+>- Eixo terciário = Z.
 
 Para o cálculo dos variogramas experimentais secundário e terciário, escolheremos duas direções para serem eleitas as *direções secundária e terciária* do modelo de variograma (Figura 12).
 
-Utilize o slider `Rake` para definir as direções de cálculo dos variogramas secundário e terciário. Utilize os demais sliders para configurar os outros parâmetros...
+Utilize o slider `Tilt` para definir as direções de cálculo dos variogramas secundário e terciário. Utilize os demais sliders para configurar os outros parâmetros...
 """
 
 # ╔═╡ a92f702d-8859-4f95-b676-36deab03e717
@@ -893,7 +901,7 @@ _**Figura 12:** Variogramas experimentais secundário e terciário._
 # ╔═╡ 120f4a9c-2ca6-49f1-8abc-999bcc559149
 md"""
 
-Rake: $(@bind θ Slider(range(0, stop=90-180/8, step=180/8), default=45, show_value=true))°
+Tilt: $(@bind θ Slider(range(0, stop=90-180/8, step=180/8), default=45, show_value=true))°
 
 Número de passos: $(@bind nlagssec Slider(5:1:20, default=11, show_value=true))
 
@@ -980,7 +988,7 @@ end
 md"""
 ✔️ Agora encontramos os *alcances do eixo secundário* do variograma.
 
-Finalmente, podemos também utilizar os sliders abaixo para modelar o variograma terciário (Figura 14)...
+Finalmente, podemos também utilizar os sliders abaixo para modelar o variograma experimental terciário (Figura 14)...
 """
 
 # ╔═╡ 33ba8a9b-f548-4984-8a31-1c381b31ced4
@@ -1030,7 +1038,7 @@ md"""
 md"""
 ### Modelo de variograma final
 
-Agora que temos as três direções principais do modelo de variograma, podemos sumarizar as informações obtidas nos passos anteriores na tabela abaixo. A Figura 15 é a representação gráfica das informações contidas nessa tabela.
+Agora que temos as três direções principais do modelo de variograma, podemos sumarizar as informações por meio da tabela abaixo. A Figura 15 é a representação gráfica das informações contidas nessa tabela.
 
 | Estrutura | Modelo | Alcance em Y | Alcance em X | Alcance em Z | Contribuição | Efeito Pepita |
 |:---:|:--------:|:--------:|:--------:|:--------:|:---:|:---:|
@@ -1058,11 +1066,18 @@ md"""
 _**Figura 15:** Modelo de variograma 3D anisotrópico._
 """
 
+# ╔═╡ ff94890f-f0d3-4ba0-a2d6-adbdb3682447
+md"""
+##### Observações
+
+- Ainda que se tenha considerado o patamar menor que o valor da variância à priori, note que o modelo de variograma final apresenta apenas anisotropia geométrica, mas não zonal.
+"""
+
 # ╔═╡ d700e40b-dd7f-4630-a29f-f27773000597
 md"""
 Além das informações sumarizadas acima, devemos escolher uma convenção de rotação que, por sua vez, é utilizada para definir a orientação do elipsoide de anisotropia no espaço.
 
-A convenção de rotação que iremos adotar é a do clássico software **GSLIB**. Portanto, as rotações do do elipsoide de anisotropia serão:
+A convenção de rotação que iremos adotar é a do clássico software geoestatístico **GSLIB**. Portanto, as rotações do elipsoide de anisotropia serão:
 
 | Rotação | Eixo |   Ângulo   |
 |:-------:|:----:|:----------:|
@@ -1070,9 +1085,9 @@ A convenção de rotação que iremos adotar é a do clássico software **GSLIB*
 |    2ª   |   X  |  $(-dip)°  |
 |    3ª   |   Y  |  $(-θ)°    |
 
-> ⚠️ Caso queira entender melhor a convenção de rotação GSLIB, consulte [Deutsch (2015)](https://geostatisticslessons.com/lessons/anglespecification).
+> ⚠️ Caso queira entender a convenção de rotação GSLIB, consulte [Deutsch (2015)](https://geostatisticslessons.com/lessons/anglespecification).
 
-O elipsoide de anisotropia nada mais é do que uma representação do modelo de variograma que utilizaremos como entrada no sistema linear de Krigagem. Os eixos desse elipsoide representam os alcances (do variograma) e a orientação dessa geometria é definida pelas três rotações. Sabendo disso, podemos construir o modelo de variograma final...
+O elipsoide de anisotropia pode ser entendido como uma representação geométrica do modelo de variograma que utilizaremos como entrada no sistema linear de Krigagem. Os eixos desse elipsoide representam os alcances (do variograma) e a orientação dessa geometria é definida pelas três rotações. Sabendo disso, podemos construir o modelo de variograma final...
 """
 
 # ╔═╡ 38d15817-f3f2-496b-9d83-7dc55f4276dc
@@ -1116,9 +1131,7 @@ md"""
 
 Nesta primeira etapa, delimitaremos o domínio de estimação que, no nosso caso, podemos chamar de modelo de blocos.
 
-Faremos algumas manipulações e, em seguida, utilizaremos a função `CartesianGrid` para criar o modelo de blocos, cujas dimensões dos blocos serão `20 m x 20 m x 10 m` (Figura 16)...
-
-> ⚠️ Note que, como temos dados 3D, chamaremos as unidades do domínio de estimação de *blocos*.
+Faremos algumas manipulações e, em seguida, utilizaremos a função `CartesianGrid` para criar o modelo de blocos, cujas dimensões dos blocos serão 20 m x 20 m x 10 m (Figura 16)...
 """
 
 # ╔═╡ f7cee6a3-5ac2-44ff-9d5e-58ede7327c46
@@ -1178,13 +1191,13 @@ md"""
 
 ### Definição do estimador
 
-Nesta etapa, devemos selecionar o estimador e configurar os parâmetros de vizinhança. Neste exemplo, utilizaremos três estimadores:
+Nesta etapa, devemos selecionar o estimador e configurar os parâmetros de vizinhança. Utilizaremos três estimadores:
 
 - Inverso do Quadrado da Distância (IQD);
 - Krigagem Simples (KS);
 - Krigagem Ordinária (KO).
 
-No caso dos estimadores KS e OK, utilizaremos o modelo de variograma `γ` e um volume de busca igual ao elipsoide de anisotropia `ellipsoid₂` definido anteriormente.
+No caso dos estimadores KS e OK, utilizaremos o modelo de variograma `γ` e um volume de busca igual ao elipsoide de anisotropia `ellipsoid₂`, definido anteriormente.
 
 A média do depósito, um parâmetro que deve ser informado no caso da KS, será definida como o valor da média desagrupada de Cu `μ`.
 
@@ -1229,7 +1242,7 @@ md"""
 
 Para gerar o modelo de estimativas de Cu, resolvemos o problema definido com os três estimadores para, posteriormente, compará-los. Clique na caixa abaixo para executar as estimativas...
 
-Executar estimativas: $(@bind run CheckBox())
+Calcular estimativas: $(@bind run CheckBox())
 """
 
 # ╔═╡ e9b7e9b7-146f-4763-ad79-c93e111b25b4
@@ -1249,7 +1262,7 @@ end
 
 # ╔═╡ 50650d2f-350b-446d-8c4b-6aa19e18c148
 md"""
-Agora que os teores de Cu foram estimados, clique na caixa abaixo para visualizar o modelo de teores (Figura 17). Em seguida, selecione, na lista suspensa abaixo, a solução que deseja visualizar...
+Agora que os teores de Cu foram estimados, clique na caixa abaixo para visualizar o modelo de teores (Figura 17). Em seguida, selecione, na lista suspensa, a solução que deseja visualizar...
 
 Visualizar estimativas: $(@bind viz CheckBox())
 """
@@ -1317,7 +1330,7 @@ end
 md"""
 ## 9. Validação das estimativas
 
-Nesta etapa, iremos comparar as estimativas geradas pelos três estimadores por meio de duas abordagens de validação:
+Nesta etapa, iremos comparar as estimativas geradas pelos três estimadores a partir de duas abordagens de validação:
 
 - Validação global das estimativas;
 - Q-Q plot entre teores amostrais e teores estimados.
@@ -1336,7 +1349,7 @@ Na **validação global das estimativas**, nos atentaremos para a comparação e
 
 Compare os quatro sumários estatísticos gerados abaixo...
 
-> ⚠️ Para visualizar os sumários estatísticos, a caixa *Executar estimativas* deve estar marcada. 
+> ⚠️ Para visualizar os sumários estatísticos, a caixa *Calcular estimativas* deve estar marcada. 
 """
 
 # ╔═╡ 92b731f3-5eae-406e-a593-4e6d49f476d9
@@ -1383,19 +1396,17 @@ if run
 	##### Observações
 
 	- As médias estimadas são próximas à média declusterizada;
-	- Nota-se uma suavização extrema da distribuição dos teores estimados pelos três métodos em relação à distribuição dos teores amostrais. Isso é evidenciado pela redução  de S²;
-	- IQD gerou estimativas menos suavizadas do que KO;
-	- KO gerou estimativas menos suavizadas do que KS e IQD.
+	- Há uma suavização extrema da distribuição dos teores estimados pelos três métodos em relação à distribuição dos teores amostrais. Isso é evidenciado pela variância (S²);
+	- O método IQD gerou estimativas menos suavizadas do que KO;
+	- O método KO gerou estimativas menos suavizadas do que KS e IQD.
 	"""
 end
 
 # ╔═╡ 263c1837-7474-462b-bd97-ee805baec458
 md"""
-Já o **Q-Q plot entre os teores amostrais e os teores estimados** pode ser utilizado para realizar uma comparação entre as distribuições de Cu amostral e Cu estimado. Podemos analisar visualmente o grau de suavização dos diferentes estimadores.
+Já o **Q-Q plot entre os teores amostrais e os teores estimados** pode ser utilizado para realizar uma comparação entre as distribuições de Cu amostral e estimado. Podemos analisar visualmente o grau de suavização dos diferentes estimadores. Compare os Q-Q plots gerados abaixo (Figura 18)...
 
-Compare os Q-Q plots gerados abaixo (Figura 18)...
-
-> ⚠️ Para visualizar os Q-Q plots, a caixa *Executar estimativas* deve estar marcada. 
+> ⚠️ Para visualizar os Q-Q plots, a caixa *Calcular estimativas* deve estar marcada. 
 """
 
 # ╔═╡ 193dde9b-1f4a-4313-a3a6-ba3c89600bcb
@@ -1451,11 +1462,11 @@ end
 md"""
 ## 10. Exportação das estimativas
 
-Nesta última seção, iremos exportar as estimativas geradas pelo método da Krigagem Ordinária no formato CSV.
+Nesta última seção, iremos exportar as estimativas geradas pela Krigagem Ordinária no formato CSV.
 
 Marque a caixa abaixo para executar a exportação das estimativas...
 
-> ⚠️ Para exportar as estimativas, a caixa *Executar estimativas* deve estar marcada.
+> ⚠️ Para exportar as estimativas, a caixa *Calcular estimativas* deve estar marcada.
 
 Salvar estimativas: $(@bind store CheckBox())
 """
@@ -3066,6 +3077,7 @@ version = "0.9.1+5"
 # ╠═1d7df6f8-f643-4c1e-92b4-52e51c4ccda8
 # ╟─bb8336ba-f347-418c-8883-47d86350bc94
 # ╠═412cfe3d-f9f1-49a5-9f40-5ab97946df6d
+# ╟─43924780-8c8b-48c2-a287-a7e9082b3ced
 # ╟─d343401d-61dc-4a45-ab9b-beaff2534886
 # ╟─ec102b27-79e2-4a91-99d6-dff061752855
 # ╟─bedcf585-53ef-4cf6-9dc2-d3fc9cff7755
@@ -3158,6 +3170,7 @@ version = "0.9.1+5"
 # ╟─483487c6-acf8-4551-8357-2e69e6ff44ff
 # ╟─c9ac9fb4-5d03-43c9-833e-733e48565946
 # ╟─5134e2cb-8c98-4e5e-9f13-722b8f828dc7
+# ╟─ff94890f-f0d3-4ba0-a2d6-adbdb3682447
 # ╟─d700e40b-dd7f-4630-a29f-f27773000597
 # ╠═38d15817-f3f2-496b-9d83-7dc55f4276dc
 # ╟─b2156251-26ae-4b1d-8757-ffdf3a02a2f8

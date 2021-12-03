@@ -25,15 +25,15 @@ Este material é dividido em seis módulos:
 
 1. **[💻 Lógica de Programação](https://fnaghetini.github.io/intro-to-geostats/1-logica_de_programacao.html)**
 
-2. **[🛠️ Preparação de Amostras](https://fnaghetini.github.io/intro-to-geostats/2-preparacao_de_amostras.jl)**
+2. **[🛠️ Preparação de Amostras](https://fnaghetini.github.io/intro-to-geostats/2-preparacao_de_amostras.html)**
 
-3. **[🔎 Análise Exploratória](https://fnaghetini.github.io/intro-to-geostats/3-analise_exploratoria.jl)**
+3. **[🔎 Análise Exploratória](https://fnaghetini.github.io/intro-to-geostats/3-analise_exploratoria.html)**
 
-4. **[📈 Variografia](https://fnaghetini.github.io/intro-to-geostats/4-variografia.jl)**
+4. **[📈 Variografia](https://fnaghetini.github.io/intro-to-geostats/4-variografia.html)**
 
-5. **[🎯 Estimação](https://fnaghetini.github.io/intro-to-geostats/5-estimacao.jl)**
+5. **[🎯 Estimação](https://fnaghetini.github.io/intro-to-geostats/5-estimacao.html)**
 
-6. **[🏆 Projeto Final](https://fnaghetini.github.io/intro-to-geostats/6-projeto_final.jl)**
+6. **[🏆 Projeto Final](https://fnaghetini.github.io/intro-to-geostats/6-projeto_final.html)**
 
 No módulo de **Lógica de Programação**, teremos uma breve introdução a alguns conceitos relacionados à lógica de programação (e.g. funções, estruturas condicionais, laços de repetição) e aos recursos interativos do [PlutoUI.jl](https://github.com/JuliaPluto/PlutoUI.jl). No módulo **Preparação de Amostras**, aprenderemos como gerar furos de sondagem a partir das tabelas de Collar, Survey e Assay e a compositar amostras. Já no módulo seguinte, **Análise Exploratória**, abordaremos técnicas de descrição univariada, bivariada e espacial, além de métodos de desagrupamento de amostras. No módulo **Variografia**, teremos nosso primeiro contato com uma das principais ferramentas geoestatísticas, o variograma. No módulo **Estimação**, aprenderemos sobre os principais métodos de estimação utilizados na Avaliação de Recursos Minerais: _Inverso da Potência da Distância (IPD)_, _Krigagem Simples (KS)_ e _Krigagem Ordinária (KO)_. Por fim, no módulo **Projeto Final**, colocaremos em prática todos os conceitos aprendidos nos módulos anteriores e executaremos um projeto de Avaliação de Recursos desde a geração dos furos de sondagem até a validação das estimativas obtidas.
 

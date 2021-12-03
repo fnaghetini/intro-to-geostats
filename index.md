@@ -16,4 +16,4 @@
 
 6. 🏆 **[Projeto Final](https://fnaghetini.github.io/intro-to-geostats/6-projeto_final.html)**
 
-Para visualizar a **versão estática** dos notebooks, clique nos links acima. Ainda sim, recomenda-se a execução dos notebooks em ambiente local que, por sua vez, é compatível com todos os recursos interativos e responsivos do material.
+> 👉 Para visualizar a **versão estática** dos notebooks, clique nos links acima. Ainda sim, recomenda-se a execução dos notebooks em ambiente local que, por sua vez, é compatível com todos os recursos interativos e responsivos do material.

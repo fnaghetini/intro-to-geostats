@@ -3,6 +3,11 @@
 </p>
 
 ## Introdução à Geoestatística aplicada à Avaliação de Recursos Minerais
+#### Departamento de Geologia - Instituto de Geociências - UFMG
+
+**Autor:** [Franco Naghetini](https://github.com/fnaghetini)
+
+### Notebooks Estáticos
 
 1. 💻 **[Lógica de Programação](https://fnaghetini.github.io/intro-to-geostats/1-logica_de_programacao.html)**
 
@@ -16,4 +21,4 @@
 
 6. 🏆 **[Projeto Final](https://fnaghetini.github.io/intro-to-geostats/6-projeto_final.html)**
 
-> 👉 Para visualizar a **versão estática** dos notebooks, clique nos links acima. Ainda sim, recomenda-se a execução dos notebooks em ambiente local que, por sua vez, é compatível com todos os recursos interativos e responsivos do material.
+> 👉 Para visualizar a **versão estática** dos notebooks, clique nos links acima. Ainda sim, recomenda-se a execução dos notebooks em ambiente local que, por sua vez, é compatível com todos os recursos interativos e responsivos do material. Para isso, siga as instruções contidas [neste link](https://github.com/fnaghetini/intro-to-geostats/blob/main/README.md).

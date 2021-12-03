@@ -2,7 +2,7 @@
   <img src="https://logodownload.org/wp-content/uploads/2015/02/ufmg-logo-2.png" height="80"><br>
 </p>
 
-# Introdução à Geoestatística aplicada à Avaliação de Recursos Minerais
+## Introdução à Geoestatística aplicada à Avaliação de Recursos Minerais
 
 1. 💻 **[Lógica de Programação](https://fnaghetini.github.io/intro-to-geostats/1-logica_de_programacao.html)**
 

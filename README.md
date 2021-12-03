@@ -2,8 +2,10 @@
   <img src="https://logodownload.org/wp-content/uploads/2015/02/ufmg-logo-2.png" height="80"><br>
 </p>
 
-# Introdução à Geoestatística aplicada à Avaliação de Recursos Minerais
-### Departamento de Geologia - Instituto de Geociências - UFMG
+## Introdução à Geoestatística aplicada à Avaliação de Recursos Minerais
+#### Departamento de Geologia - Instituto de Geociências - UFMG
+
+**Autor:** [Franco Naghetini](https://github.com/fnaghetini)
 
 Geoestatística não é _Estatística aplicada a dados geológicos_. Bom, pelo menos era o que pensava quando ouvia falar sobre o tema nos corredores da faculdade. Na realidade, a **Geoestatística**, ou Estatística Espacial, é *Estatística aplicada a dados que possuem uma posição no espaço*, ou seja, uma ferramenta que pode ser aplicada em diferentes áreas que lidam com dados geoespaciais, desde Sensoriamento Remoto até Avaliação de Recursos Minerais, que é o foco deste material.
 
